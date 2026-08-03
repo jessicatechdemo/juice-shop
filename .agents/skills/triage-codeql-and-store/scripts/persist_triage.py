@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 from collections import Counter
@@ -17,8 +18,12 @@ from typing import Any
 
 
 SCHEMA_VERSION = "triage-finding/v0"
+INTAKE_SCHEMA_VERSION = "codeql-branch-intake/v1"
 VERDICTS = {"confirmed", "needs_review", "not_actionable"}
 CONFIDENCE_LEVELS = {"high", "medium", "low"}
+ALERT_URL_PATTERN = re.compile(
+    r"(?:/security/code-scanning/|/code-scanning/alerts/)([0-9]+)(?:$|[/?#])"
+)
 
 
 class ValidationError(ValueError):
@@ -36,10 +41,14 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--branch", required=True, help="Git branch or ref triaged.")
     parser.add_argument(
-        "--expected-count",
+        "--intake",
         required=True,
+        help="Branch-bound codeql-branch-intake/v1 JSON path",
+    )
+    parser.add_argument(
+        "--expected-count",
         type=int,
-        help="Number of CodeQL alerts imported before triage.",
+        help="Optional independent count assertion",
     )
     parser.add_argument(
         "--output-root",
@@ -62,6 +71,17 @@ def load_payload(input_value: str) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValidationError("top-level JSON value must be an object")
     return payload
+
+
+def load_intake(path: Path) -> tuple[dict[str, Any], bytes]:
+    try:
+        raw = path.read_bytes()
+        intake = json.loads(raw)
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValidationError(f"cannot read branch intake JSON: {error}") from error
+    if not isinstance(intake, dict):
+        raise ValidationError("branch intake JSON must be an object")
+    return intake, raw
 
 
 def require_nonempty_string(value: Any, field: str) -> str:
@@ -151,6 +171,154 @@ def validate_payload(payload: dict[str, Any], expected_count: int) -> Counter[st
     return counts
 
 
+def normalized_branch(branch: str) -> str:
+    value = require_nonempty_string(branch, "branch")
+    return value[len("refs/heads/") :] if value.startswith("refs/heads/") else value
+
+
+def validate_intake(
+    intake: dict[str, Any], payload: dict[str, Any], branch: str
+) -> tuple[int, str, dict[int, set[str]]]:
+    if intake.get("schema_version") != INTAKE_SCHEMA_VERSION:
+        raise ValidationError(
+            f'intake schema_version must be "{INTAKE_SCHEMA_VERSION}"'
+        )
+    intake_branch = require_nonempty_string(intake.get("branch"), "intake.branch")
+    if intake_branch != normalized_branch(branch):
+        raise ValidationError(
+            f"intake branch {intake_branch!r} does not match requested branch "
+            f"{normalized_branch(branch)!r}"
+        )
+    expected_ref = f"refs/heads/{intake_branch}"
+    intake_ref = require_nonempty_string(intake.get("ref"), "intake.ref")
+    if intake_ref != expected_ref:
+        raise ValidationError(
+            f"intake ref {intake_ref!r} does not match current branch ref {expected_ref!r}"
+        )
+    endpoint = require_nonempty_string(
+        intake.get("alerts_endpoint"), "intake.alerts_endpoint"
+    )
+    encoded_ref = expected_ref.replace("/", "%2F")
+    if f"state=open&ref={encoded_ref}&" not in endpoint:
+        raise ValidationError("intake endpoint is not bound to the current branch ref")
+
+    repository = payload.get("repository")
+    if not isinstance(repository, dict):
+        raise ValidationError("repository must be an object")
+    payload_path = Path(
+        require_nonempty_string(repository.get("path"), "repository.path")
+    ).resolve()
+    intake_path = Path(
+        require_nonempty_string(
+            intake.get("local_repository"), "intake.local_repository"
+        )
+    ).resolve()
+    if payload_path != intake_path:
+        raise ValidationError("triage repository path does not match branch intake")
+    payload_revision = require_nonempty_string(
+        repository.get("revision"), "repository.revision"
+    )
+    intake_revision = require_nonempty_string(
+        intake.get("revision"), "intake.revision"
+    )
+    if payload_revision != intake_revision:
+        raise ValidationError("triage revision does not match branch intake")
+
+    alerts = intake.get("alerts")
+    expected_count = intake.get("expected_count")
+    if not isinstance(alerts, list):
+        raise ValidationError("intake.alerts must be an array")
+    if not isinstance(expected_count, int) or expected_count < 0:
+        raise ValidationError("intake.expected_count must be a non-negative integer")
+    if len(alerts) != expected_count:
+        raise ValidationError("intake alert count does not match expected_count")
+
+    commits_by_alert: dict[int, set[str]] = {}
+    for index, item in enumerate(alerts):
+        field = f"intake.alerts[{index}]"
+        if not isinstance(item, dict) or not isinstance(item.get("alert"), dict):
+            raise ValidationError(f"{field}.alert must be an object")
+        number = item["alert"].get("number")
+        if not isinstance(number, int) or number < 1:
+            raise ValidationError(f"{field}.alert.number must be a positive integer")
+        if number in commits_by_alert:
+            raise ValidationError(f"duplicate intake alert number: {number}")
+        instances = item.get("matching_instances")
+        if not isinstance(instances, list) or not instances:
+            raise ValidationError(f"{field}.matching_instances must not be empty")
+        commits = set()
+        for instance in instances:
+            if not isinstance(instance, dict) or instance.get("ref") != expected_ref:
+                raise ValidationError(f"{field} contains an instance for another ref")
+            commit = instance.get("commit_sha")
+            if isinstance(commit, str) and commit:
+                commits.add(commit)
+        if not commits:
+            raise ValidationError(f"{field} does not preserve an instance commit")
+        commits_by_alert[number] = commits
+    return expected_count, expected_ref, commits_by_alert
+
+
+def finding_alert_number(finding: dict[str, Any], field: str) -> int:
+    normalized = finding.get("normalized_input")
+    if not isinstance(normalized, dict):
+        raise ValidationError(f"{field}.normalized_input must be an object")
+    references = normalized.get("references")
+    if not isinstance(references, list):
+        raise ValidationError(f"{field}.normalized_input.references must be an array")
+    for reference in references:
+        if isinstance(reference, str):
+            match = ALERT_URL_PATTERN.search(reference)
+            if match:
+                return int(match.group(1))
+    raise ValidationError(f"{field} does not preserve a GitHub alert number")
+
+
+def validate_payload_against_intake(
+    payload: dict[str, Any], intake_ref: str, commits_by_alert: dict[int, set[str]]
+) -> None:
+    seen: set[int] = set()
+    for index, finding in enumerate(payload["findings"]):
+        field = f"findings[{index}]"
+        number = finding_alert_number(finding, field)
+        if number not in commits_by_alert:
+            raise ValidationError(f"{field} alert {number} is absent from branch intake")
+        if number in seen:
+            raise ValidationError(f"duplicate triage result for alert {number}")
+        seen.add(number)
+        references = finding["normalized_input"]["references"]
+        if f"ref:{intake_ref}" not in references:
+            raise ValidationError(f"{field} does not preserve current branch ref")
+        intake_commits = commits_by_alert[number]
+        if not any(f"commit:{commit}" in references for commit in intake_commits):
+            raise ValidationError(f"{field} does not preserve a matching instance commit")
+    if seen != set(commits_by_alert):
+        missing = sorted(set(commits_by_alert) - seen)
+        raise ValidationError(f"triage results are missing intake alerts: {missing}")
+
+
+def validate_current_checkout(intake: dict[str, Any]) -> None:
+    repository_path = require_nonempty_string(
+        intake.get("local_repository"), "intake.local_repository"
+    )
+    checks = (
+        (["git", "symbolic-ref", "--quiet", "--short", "HEAD"], intake["branch"]),
+        (["git", "rev-parse", "HEAD"], intake["revision"]),
+    )
+    for command, expected in checks:
+        result = subprocess.run(
+            command,
+            cwd=repository_path,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0 or result.stdout.strip() != expected:
+            raise ValidationError(
+                "current checkout changed after branch-bound CodeQL intake"
+            )
+
+
 def branch_slug(branch: str) -> str:
     normalized = require_nonempty_string(branch, "branch")
     if normalized.startswith("refs/heads/"):
@@ -204,7 +372,17 @@ def main() -> int:
     args = parse_args()
     try:
         payload = load_payload(args.input)
-        counts = validate_payload(payload, args.expected_count)
+        intake, intake_raw = load_intake(Path(args.intake))
+        expected_count, intake_ref, commits_by_alert = validate_intake(
+            intake, payload, args.branch
+        )
+        if args.expected_count is not None and args.expected_count != expected_count:
+            raise ValidationError(
+                "expected-count does not match branch intake expected_count"
+            )
+        counts = validate_payload(payload, expected_count)
+        validate_payload_against_intake(payload, intake_ref, commits_by_alert)
+        validate_current_checkout(intake)
         slug = branch_slug(args.branch)
         repository = payload["repository"]
         revision = require_nonempty_string(repository["revision"], "repository.revision")
@@ -224,8 +402,9 @@ def main() -> int:
         receipt = {
             "schema_version": SCHEMA_VERSION,
             "branch": args.branch,
+            "ref": intake_ref,
             "revision": revision,
-            "imported_alert_count": args.expected_count,
+            "imported_alert_count": expected_count,
             "stored_result_count": len(payload["findings"]),
             "verdict_counts": {
                 verdict: counts[verdict]
@@ -233,6 +412,8 @@ def main() -> int:
             },
             "current_path": str(current_path),
             "history_path": str(history_path),
+            "intake_path": str(Path(args.intake)),
+            "intake_sha256": hashlib.sha256(intake_raw).hexdigest(),
             "sha256": hashlib.sha256(content).hexdigest(),
             "github_modified": False,
         }

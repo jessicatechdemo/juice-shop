@@ -217,7 +217,7 @@ token itself.
 - [create-m3-theme skill](./.ai/skills/create-m3-theme/SKILL.md): Instructions for creating new Angular Material M3 themes
 - [generate-release-notes skill](./.ai/skills/generate-release-notes/SKILL.md): Instructions for generating release notes.
 - [triage-codeql-and-store skill](./.agents/skills/triage-codeql-and-store/SKILL.md): Instructions for triaging GitHub CodeQL alerts, persisting validated results, and applying approval-gated status updates to existing GitHub alerts
-- [clean-reset-codeql-and-retriage skill](./.agents/skills/clean-reset-codeql-and-retriage/SKILL.md): Instructions for approval-gated reopening, final-analysis deletion, CodeQL rerun verification, and fresh triage
+- [clean-reset-codesql skill](./.agents/skills/clean-reset-codesql/SKILL.md): Instructions for approval-gated reopening, final-analysis deletion, CodeQL rerun verification, and fresh triage
 - [verify-challenge skill](./.ai/skills/verify-challenge/SKILL.md): Instructions for verifying new challenges fulfill all project requirements and metadata
 - [verify-rsn-fix skill](./.ai/skills/verify-rsn-fix/SKILL.md): Instructions for identifying and fixing broken RSN caused by code changes
 

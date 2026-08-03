@@ -1,9 +1,9 @@
 ---
-name: clean-reset-codeql-and-retriage
+name: clean-reset-codesql
 description: Reopen CodeQL alerts changed by an audited writeback receipt, delete the single final CodeQL analysis for a branch, rerun the matching GitHub Actions workflow, verify the replacement analysis and open alerts, and invoke fresh Codex triage. Use when a user explicitly requests a destructive clean reset of GitHub CodeQL results and alert state for one branch. Always generate an exact mutation preview and obtain approval for its token before reopening alerts, deleting analysis history, or rerunning GitHub Actions.
 ---
 
-# Clean Reset CodeQL and Retriage
+# Clean Reset CodeSQL
 
 Perform an auditable branch reset in this fixed order:
 
@@ -33,7 +33,7 @@ CodeQL analysis for the branch; stop instead of guessing across configurations.
 Run:
 
 ```bash
-python3 .agents/skills/clean-reset-codeql-and-retriage/scripts/codeql_clean_reset.py plan \
+python3 .agents/skills/clean-reset-codesql/scripts/codeql_clean_reset.py plan \
   --receipt security-results/triage/codeql/<branch-slug>/github-writeback/receipts/current.json \
   --repository <owner/repo> \
   --branch <branch> \
@@ -52,7 +52,7 @@ workflow run for the analysis commit.
 Run:
 
 ```bash
-python3 .agents/skills/clean-reset-codeql-and-retriage/scripts/codeql_clean_reset.py preview \
+python3 .agents/skills/clean-reset-codesql/scripts/codeql_clean_reset.py preview \
   --plan security-results/triage/codeql/<branch-slug>/clean-reset/plan.json
 ```
 
@@ -70,7 +70,7 @@ token.
 After approval only, run:
 
 ```bash
-python3 .agents/skills/clean-reset-codeql-and-retriage/scripts/codeql_clean_reset.py apply \
+python3 .agents/skills/clean-reset-codesql/scripts/codeql_clean_reset.py apply \
   --plan security-results/triage/codeql/<branch-slug>/clean-reset/plan.json \
   --approval-token <approved-token>
 ```
@@ -93,7 +93,7 @@ gh run watch <run-id> --repo <owner/repo> --exit-status
 After a successful run, verify:
 
 ```bash
-python3 .agents/skills/clean-reset-codeql-and-retriage/scripts/codeql_clean_reset.py verify \
+python3 .agents/skills/clean-reset-codesql/scripts/codeql_clean_reset.py verify \
   --plan security-results/triage/codeql/<branch-slug>/clean-reset/plan.json
 ```
 

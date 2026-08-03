@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Explanation Viewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0a0f1e;
+      --panel: #10192d;
+      --panel-alt: #0d1424;
+      --panel-muted: #15203a;
+      --border: rgba(160, 174, 208, 0.18);
+      --text: #ecf2ff;
+      --muted: #9fb0d8;
+      --accent: #7cc7ff;
+      --accent-strong: #44a7ff;
+      --warning: #ffcf70;
+      --success: #7cd9a3;
+      --danger: #ff9b9b;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(68, 167, 255, 0.15), transparent 28%),
+        radial-gradient(circle at top right, rgba(124, 217, 163, 0.12), transparent 22%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(380px, 44%) minmax(480px, 56%);
+      height: 100vh;
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .left-pane,
+    .right-pane {
+      min-height: 0;
+      background: var(--panel-alt);
+    }
+
+    .left-pane {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+    }
+
+    .hero {
+      padding: 28px 28px 18px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(124, 199, 255, 0.06), transparent);
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .section-tabs {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(12, 20, 36, 0.86);
+      backdrop-filter: blur(8px);
+    }
+
+    .section-tab {
+      border: 1px solid var(--border);
+      background: var(--panel-muted);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .section-tab.active {
+      color: var(--text);
+      border-color: rgba(124, 199, 255, 0.55);
+      background: rgba(68, 167, 255, 0.14);
+      box-shadow: inset 0 0 0 1px rgba(124, 199, 255, 0.22);
+    }
+
+    .explanation-scroll {
+      overflow: auto;
+      padding: 24px 24px 40px;
+    }
+
+    .section-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.03));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-card h1,
+    .section-card h2,
+    .section-card h3 {
+      margin: 0;
+      scroll-margin-top: 24px;
+    }
+
+    .section-card h1 {
+      font-size: 28px;
+      line-height: 1.2;
+      margin-bottom: 18px;
+    }
+
+    .section-card h2 {
+      font-size: 22px;
+      margin-top: 30px;
+      margin-bottom: 14px;
+    }
+
+    .section-card h3 {
+      font-size: 18px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    .section-card p,
+    .section-card li,
+    .section-card td,
+    .section-card th,
+    .section-card blockquote {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .section-card strong {
+      color: var(--text);
+    }
+
+    .section-card p,
+    .section-card ul,
+    .section-card ol,
+    .section-card table,
+    .section-card blockquote,
+    .section-card pre {
+      margin: 0 0 16px;
+    }
+
+    .section-card li + li {
+      margin-top: 10px;
+    }
+
+    .section-card a {
+      color: var(--accent);
+    }
+
+    .section-card hr {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 22px 0;
+    }
+
+    .section-card blockquote {
+      margin-left: 0;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+    }
+
+    .section-card code {
+      font-family: 'IBM Plex Mono', monospace;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 1px 6px;
+      color: #d7eeff;
+      font-size: 12px;
+    }
+
+    .section-card pre {
+      overflow: auto;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(6, 11, 22, 0.9);
+    }
+
+    .section-card pre code {
+      display: block;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .section-card table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .section-card th,
+    .section-card td {
+      border-bottom: 1px solid var(--border);
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .section-card th {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .section-card tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .ref-chip {
+      border: 1px solid rgba(124, 199, 255, 0.28);
+      background: rgba(68, 167, 255, 0.12);
+      color: #d7eeff;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .ref-chip {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 2px;
+      transition: background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .ref-chip.active {
+      background: rgba(68, 167, 255, 0.3);
+      border-color: rgba(124, 199, 255, 0.75);
+    }
+
+    .mermaid-wrap {
+      position: relative;
+      margin: 0 0 16px;
+      padding: 48px 16px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      overflow: auto;
+    }
+
+    .mermaid-diagram {
+      min-width: fit-content;
+    }
+
+    .mermaid-expand {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      border: 1px solid rgba(124, 199, 255, 0.28);
+      background: rgba(68, 167, 255, 0.12);
+      color: #d7eeff;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'IBM Plex Mono', monospace;
+      cursor: pointer;
+    }
+
+    .mermaid-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      background: rgba(4, 8, 18, 0.82);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+    }
+
+    .mermaid-modal.open {
+      display: flex;
+    }
+
+    .mermaid-modal-card {
+      position: relative;
+      width: min(1200px, 100%);
+      height: min(80vh, 900px);
+      padding: 56px 20px 20px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--panel-alt);
+      box-shadow: var(--shadow);
+      overflow: auto;
+    }
+
+    .mermaid-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      border: 1px solid rgba(160, 174, 208, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'IBM Plex Mono', monospace;
+      cursor: pointer;
+    }
+
+    .mermaid-modal-content {
+      min-width: fit-content;
+      min-height: 100%;
+    }
+
+    .mermaid-error {
+      border-left: 4px solid var(--danger);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .section-empty {
+      display: grid;
+      place-items: center;
+      padding: 48px 24px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .right-pane {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .code-header {
+      padding: 22px 22px 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(124, 199, 255, 0.05), transparent);
+    }
+
+    .code-title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .file-path {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      color: #d7eeff;
+    }
+
+    .line-range {
+      color: var(--muted);
+      font-size: 13px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .code-meta {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #editor {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .code-footer {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      overflow: auto;
+      white-space: nowrap;
+    }
+
+    .empty-state,
+    .monaco-error {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1080px) {
+      .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 54%) minmax(0, 46%);
+      }
+
+      .section-tabs {
+        padding-top: 14px;
+        padding-bottom: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <section class="left-pane">
+      <div class="hero">
+        <div class="eyebrow">Grounded Code Explanation</div>
+        <h1 id="page-title"></h1>
+      </div>
+      <nav id="section-tabs" class="section-tabs" aria-label="Explanation headings"></nav>
+      <div class="explanation-scroll">
+        <article id="section-content" class="section-card"></article>
+      </div>
+    </section>
+
+    <section class="right-pane">
+      <div class="code-header">
+        <div class="code-title">
+          <span class="file-path" id="code-file-path">Select a code reference</span>
+          <span class="line-range" id="code-line-range"></span>
+        </div>
+        <div class="code-meta" id="code-meta">Click any reference chip in the explanation to load the corresponding code here.</div>
+      </div>
+      <div id="editor-wrap">
+        <div id="editor"></div>
+      </div>
+      <div class="code-footer" id="code-footer">Ready</div>
+    </section>
+  </div>
+
+  <div id="mermaid-modal" class="mermaid-modal" aria-hidden="true">
+    <div class="mermaid-modal-card">
+      <button id="mermaid-modal-close" class="mermaid-modal-close" type="button">Close</button>
+      <div id="mermaid-modal-content" class="mermaid-modal-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const EXPLANATION_DATA = {"title": "How `triage-codeql-and-store` handles false positives and confirmed findings", "repoRoot": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop", "markdown": "# How `triage-codeql-and-store` handles false positives and confirmed findings\n\nThis walkthrough explains the current repository-local skill and its writeback\nscript. The central rule is that a triage **verdict** and a GitHub **dismissal\nreason** are different things. `confirmed` is a triage verdict. `false positive`\nis a GitHub dismissal reason that can be selected only for a finding already\ntriaged as `not_actionable`.\n\n## End-to-end flow\n\n```mermaid\nflowchart LR\n  A[Open CodeQL alerts] --> B[Read-only Codex Security triage]\n  B --> C[current.json and immutable history]\n  C --> D[Local writeback plan]\n  D -->|confirmed or needs_review| E[keep_open]\n  D -->|not_actionable| F[pending classification]\n  F -->|evidence defeats scanner claim| G[false positive selected locally]\n  G --> H[preview plus approval token]\n  H -->|explicit user approval| I[GitHub dismissal request]\n  I --> J[Alert stays open; reviewer decides]\n```\n\nThe skill first imports open alerts and performs a read-only static triage. It\nmust retain one result per alert and preserve the GitHub identity, branch, and\ncommit evidence. No code or GitHub state may change during this phase.\n[[.agents/skills/triage-codeql-and-store/SKILL.md:30-45]]\n\nThe persistence script accepts exactly three verdict values:\n`confirmed`, `needs_review`, and `not_actionable`.\n[[.agents/skills/triage-codeql-and-store/scripts/persist_triage.py:19-21]] It\nwrites the validated payload to both `current.json` and a timestamped history\nfile, verifies both copies, and reports verdict counts without modifying\nGitHub. [[.agents/skills/triage-codeql-and-store/scripts/persist_triage.py:203-239]]\n\n## What happens to a confirmed finding\n\nThe mapping is fixed: a `confirmed` alert is assigned `keep_open`; it is not a\ndismissal candidate. The same rule applies to `needs_review`.\n[[.agents/skills/triage-codeql-and-store/SKILL.md:86-107]]\n\nThe plan builder enforces that mapping mechanically. It creates `pending` only\nfor `not_actionable`; every other verdict receives `keep_open`, `selected:\nfalse`, and no dismissal reason or comment.\n[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:185-215]]\n\nPlan validation prevents later tampering: a `confirmed` item must remain\nunselected with action `keep_open`, and it cannot acquire a dismissal reason.\n[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:267-281]]\n\nTherefore this skill does **not** update a confirmed alert on GitHub. The normal\nnext action is to hand it to `codex-security:fix-finding`, revalidate it against\nthe current checkout, implement and test a minimal fix, then rerun CodeQL on the\nfixed revision. If the behavior is an intentional Juice Shop vulnerability,\nthat fact alone is insufficient to dismiss it; repository evidence or an\nexplicit maintainer decision is required.\n[[.agents/skills/triage-codeql-and-store/SKILL.md:111-120]]\n\n## What \u201cfalse positive\u201d means in this workflow\n\n`false positive` is not another triage verdict. It is one of three allowed\nGitHub dismissal reasons, alongside `used in tests` and `won't fix`.\n[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:20-25]]\n\nBefore selection, the agent must classify each `not_actionable` finding using\nevidence. `false positive` means the scanner's technical claim is defeated by\nthe static evidence. Uncertain cases stay `pending`.\n[[.agents/skills/triage-codeql-and-store/SKILL.md:109-136]]\n\nRunning `select` changes only the local plan. The script rejects any alert whose\ntriage verdict is not `not_actionable`; for an eligible alert it records\n`request_dismissal`, the chosen reason, and an evidence-bearing comment.\n[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:361-388]]\n\nThis means a finding cannot remain `confirmed` and simultaneously be selected\nas a false positive. If the scanner claim is actually incorrect, the triage\nevidence should support `not_actionable`; if the claim is valid and reachable,\nthe finding remains `confirmed` and must stay open for remediation.\n\n## Preview and approval gate\n\n`preview` validates the entire plan, hashes its exact bytes into an approval\ntoken, and prints every proposed PATCH body. Each body contains\n`create_request: true`, so the operation creates a reviewer-controlled request\nrather than directly dismissing the alert.\n[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:392-429]]\n\nThe skill must then pause and ask the user to approve the exact alert numbers\nand approval token. An earlier or modified plan has a different token and is\nnot approved. [[.agents/skills/triage-codeql-and-store/SKILL.md:150-168]]\n\n## Apply, readback, and final state\n\nBefore any write, `apply` recalculates the plan hash and rejects a mismatched\napproval token. It then runs preflight for every selected alert.\n[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:690-701]]\n\nPreflight verifies the alert identity and URL, requires the alert to be open,\nchecks for conflicting dismissal requests, and proves that an instance exists\non the requested branch. [[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:586-671]]\n\nFor a newly selected false positive, the script sends the approved PATCH with\n`create_request: true`, reads back both the alert and its dismissal request,\nand fails unless the alert is still open and the request matches the approved\nreason and comment. It then persists current and historical receipts.\n[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:716-776]]\n\nThe immediate state after a successful apply is therefore:\n\n| Triage result | Local plan | GitHub operation | Immediate GitHub state |\n|---|---|---|---|\n| `confirmed` | `keep_open` | None | Alert remains open |\n| `needs_review` | `keep_open` | None | Alert remains open |\n| `not_actionable` + `false positive` | `request_dismissal` | Approval-gated dismissal request | Alert open; request open |\n| `not_actionable` without enough evidence | `pending` | None | Alert remains open |\n\nAn independent GitHub reviewer must approve or deny the request. This workflow\nnever performs that reviewer decision and never directly dismisses an alert.\n[[.agents/skills/triage-codeql-and-store/SKILL.md:170-208]]\n\n## Practical decision rule\n\nUse these questions in order:\n\n1. Is the CodeQL source-to-sink claim technically wrong? Record\n   `not_actionable`, classify it as `false positive`, preview, and seek explicit\n   approval for a dismissal request.\n2. Is the claim technically valid and reachable? Keep it `confirmed`, leave the\n   alert open, and use `fix-finding` to remediate it.\n3. Is the behavior valid but explicitly accepted as an intentional training\n   vulnerability? Only with repository evidence or a maintainer decision,\n   classify the `not_actionable` result as `won't fix`; do not call it a false\n   positive.\n4. Is the evidence incomplete? Use `needs_review` or leave the disposition\n   `pending`; do not send a GitHub write.\n\nThe hard rules prohibit dismissing `confirmed` or `needs_review` alerts,\nskipping approval, using direct dismissal, or inventing a dismissal reason\nwithout evidence. [[.agents/skills/triage-codeql-and-store/SKILL.md:203-212]]\n", "references": [{"id": "ref-1", "literal": "[[.agents/skills/triage-codeql-and-store/SKILL.md:30-45]]", "file_id": "file-1", "file_path": ".agents/skills/triage-codeql-and-store/SKILL.md", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/SKILL.md", "start_line": 30, "end_line": 45}, {"id": "ref-2", "literal": "[[.agents/skills/triage-codeql-and-store/scripts/persist_triage.py:19-21]]", "file_id": "file-2", "file_path": ".agents/skills/triage-codeql-and-store/scripts/persist_triage.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/persist_triage.py", "start_line": 19, "end_line": 21}, {"id": "ref-3", "literal": "[[.agents/skills/triage-codeql-and-store/scripts/persist_triage.py:203-239]]", "file_id": "file-2", "file_path": ".agents/skills/triage-codeql-and-store/scripts/persist_triage.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/persist_triage.py", "start_line": 203, "end_line": 239}, {"id": "ref-4", "literal": "[[.agents/skills/triage-codeql-and-store/SKILL.md:86-107]]", "file_id": "file-1", "file_path": ".agents/skills/triage-codeql-and-store/SKILL.md", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/SKILL.md", "start_line": 86, "end_line": 107}, {"id": "ref-5", "literal": "[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:185-215]]", "file_id": "file-3", "file_path": ".agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "start_line": 185, "end_line": 215}, {"id": "ref-6", "literal": "[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:267-281]]", "file_id": "file-3", "file_path": ".agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "start_line": 267, "end_line": 281}, {"id": "ref-7", "literal": "[[.agents/skills/triage-codeql-and-store/SKILL.md:111-120]]", "file_id": "file-1", "file_path": ".agents/skills/triage-codeql-and-store/SKILL.md", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/SKILL.md", "start_line": 111, "end_line": 120}, {"id": "ref-8", "literal": "[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:20-25]]", "file_id": "file-3", "file_path": ".agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "start_line": 20, "end_line": 25}, {"id": "ref-9", "literal": "[[.agents/skills/triage-codeql-and-store/SKILL.md:109-136]]", "file_id": "file-1", "file_path": ".agents/skills/triage-codeql-and-store/SKILL.md", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/SKILL.md", "start_line": 109, "end_line": 136}, {"id": "ref-10", "literal": "[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:361-388]]", "file_id": "file-3", "file_path": ".agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "start_line": 361, "end_line": 388}, {"id": "ref-11", "literal": "[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:392-429]]", "file_id": "file-3", "file_path": ".agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "start_line": 392, "end_line": 429}, {"id": "ref-12", "literal": "[[.agents/skills/triage-codeql-and-store/SKILL.md:150-168]]", "file_id": "file-1", "file_path": ".agents/skills/triage-codeql-and-store/SKILL.md", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/SKILL.md", "start_line": 150, "end_line": 168}, {"id": "ref-13", "literal": "[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:690-701]]", "file_id": "file-3", "file_path": ".agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "start_line": 690, "end_line": 701}, {"id": "ref-14", "literal": "[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:586-671]]", "file_id": "file-3", "file_path": ".agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "start_line": 586, "end_line": 671}, {"id": "ref-15", "literal": "[[.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py:716-776]]", "file_id": "file-3", "file_path": ".agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "start_line": 716, "end_line": 776}, {"id": "ref-16", "literal": "[[.agents/skills/triage-codeql-and-store/SKILL.md:170-208]]", "file_id": "file-1", "file_path": ".agents/skills/triage-codeql-and-store/SKILL.md", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/SKILL.md", "start_line": 170, "end_line": 208}, {"id": "ref-17", "literal": "[[.agents/skills/triage-codeql-and-store/SKILL.md:203-212]]", "file_id": "file-1", "file_path": ".agents/skills/triage-codeql-and-store/SKILL.md", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/SKILL.md", "start_line": 203, "end_line": 212}], "files": [{"id": "file-1", "path": ".agents/skills/triage-codeql-and-store/SKILL.md", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/SKILL.md", "language": "markdown", "content": "---\nname: triage-codeql-and-store\ndescription: Import open GitHub CodeQL code-scanning alerts, triage them against the current repository, persist the exact triage-finding/v0 result, generate a filterable HTML verdict report, and submit approved dismissal requests for eligible `not_actionable` findings without directly dismissing alerts. Use when the user explicitly requests end-to-end CodeQL triage, durable local storage and reporting, and reviewer-gated GitHub writeback. Always preview GitHub mutations and obtain explicit approval before applying them. Never request dismissal of `confirmed` or `needs_review` alerts.\n---\n\n# Triage CodeQL, Store, and Request GitHub Dismissal\n\nRun one end-to-end workflow with a mandatory approval pause before GitHub\nwriteback:\n\n1. triage CodeQL alerts read-only\n2. persist and verify the exact triage contract\n3. generate and verify a filterable HTML verdict report\n4. prepare and preview GitHub dismissal requests\n5. pause for explicit user approval\n6. submit approved requests and verify pending state by readback\n\n## Inputs\n\nResolve:\n\n- GitHub repository as `owner/repo`\n- target branch or ref\n- canonical local repository and current revision\n- output root, defaulting to `security-results/triage/codeql`\n\nIf the repository or branch cannot be resolved, ask for it. Do not guess a\ndifferent repository or revision.\n\n## Phase 1: Read-only triage\n\n1. Invoke `$codex-security:triage-finding` for the repository's open GitHub\n   code-scanning alerts on the requested branch.\n2. Follow its GitHub REST intake, static-only assessment, security policy gate,\n   verdict rules, ranking rules, and `triage-finding/v0` output contract.\n3. Preserve alert number, alert URL, rule ID, tool, ref, commit SHA, and\n   instance locations in each input's identifiers or references.\n4. Produce exactly one result per imported alert. Do not merge or drop\n   duplicate-looking inputs.\n5. Retain the exact complete JSON payload passed to the triage results app.\n   Do not reconstruct it from the Markdown summary.\n6. Record the successfully imported alert count as `expected_count`.\n\nDo not edit files, run code, change revisions, or mutate GitHub during this\nphase. Stop if intake or triage is incomplete.\n\n## Phase 2: Persist and verify\n\nAfter read-only triage completes, materialize the exact retained payload as a\ntemporary input outside the repository and run:\n\n```bash\npython3 .agents/skills/triage-codeql-and-store/scripts/persist_triage.py \\\n  --input <temporary-json-path> \\\n  --branch <branch> \\\n  --expected-count <imported-alert-count>\n```\n\nThe script writes and reads back:\n\n```text\nsecurity-results/triage/codeql/<branch-slug>/current.json\nsecurity-results/triage/codeql/<branch-slug>/history/<timestamp>-<revision>.json\n```\n\nStop if persistence validation fails. Use `current.json` as immutable input to\nthe following plan; do not add GitHub state to the triage contract.\n\n## Phase 2b: Generate and verify the HTML report\n\nRender the persisted contract into a self-contained report:\n\n```bash\npython3 .agents/skills/triage-codeql-and-store/scripts/render_triage_report.py \\\n  --triage security-results/triage/codeql/<branch-slug>/current.json \\\n  --branch <branch> \\\n  --output security-results/triage/codeql/<branch-slug>/report.html\n```\n\nRequire the renderer to report the same finding and verdict counts as\n`current.json`. Stop if report generation or readback verification fails. The\nreport must escape imported alert content, remain self-contained, link each\nfinding to its GitHub alert when available, and provide interactive filters for\n`confirmed`, `needs_review`, and `not_actionable`.\n\n## Phase 3: Plan GitHub status updates\n\nApply this fixed mapping:\n\n- `confirmed`: keep the CodeQL alert open; do not issue a PATCH request.\n- `needs_review`: keep the CodeQL alert open; do not issue a PATCH request.\n- `not_actionable`: make the alert eligible for an approved dismissal request.\n\nGenerate a dismissal-request plan so an independent GitHub reviewer controls\nthe final alert status:\n\n```bash\npython3 .agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py plan \\\n  --triage security-results/triage/codeql/<branch-slug>/current.json \\\n  --repository <owner/repo> \\\n  --branch <branch> \\\n  --write-mode dismissal_request \\\n  --output security-results/triage/codeql/<branch-slug>/github-writeback/plan.json\n```\n\nEvery finding remains in the plan. `confirmed` and `needs_review` use\n`keep_open`; `not_actionable` begins as `pending`. Direct dismissal is disabled.\n\n## Phase 4: Classify and select justified dismissal requests\n\nSelect a requested GitHub dismissal reason from evidence, not verdict alone:\n\n- `false positive`: the scanner's technical claim is incorrect.\n- `used in tests`: the finding is limited to test or fixture code.\n- `won't fix`: the behavior is valid but explicitly accepted, including a\n  documented intentional Juice Shop training vulnerability.\n\nDo not infer accepted risk merely because this repository is Juice Shop.\nRequire repository evidence or an explicit maintainer decision for\n`won't fix`.\n\nBefore selecting alerts, classify every `not_actionable` finding into exactly\none reviewer-facing disposition:\n\n- `false positive`: the CodeQL claim is technically defeated by the static\n  evidence.\n- `used in tests`: all reported instances are confined to test or fixture\n  code.\n- `won't fix`: the claim is valid and repository evidence explicitly accepts\n  the behavior.\n- `pending`: the evidence does not justify one of the three GitHub reasons.\n\nShow a compact classification table with alert number, alert URL, disposition,\nand the specific evidence supporting that disposition. Group and list alert\nnumbers by disposition so false positives are immediately identifiable. Do not\nhide the disposition only inside the plan JSON or PATCH body.\n\nSelect candidates locally:\n\n```bash\npython3 .agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py select \\\n  --plan <plan-path> \\\n  --alert <alert-number> \\\n  --reason \"won't fix\"\n```\n\nRepeat `--alert` for alerts sharing the same reason. Leave uncertain candidates\nas `pending`.\n\n## Phase 5: Preview and pause\n\nRun:\n\n```bash\npython3 .agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py preview \\\n  --plan <plan-path>\n```\n\nShow the complete preview: repository, branch, revision, alert URLs, exact\nPATCH bodies including `create_request: true`, keep-open count, pending count,\napproval token, and the grouped `disposition_counts` and `disposition_alerts`\nfields. Immediately before the approval question, repeat the alert numbers\ngrouped under `false positive`, `used in tests`, `won't fix`, `pending`, and\n`keep open`.\n\nPause and ask the user to approve the exact alert numbers and approval token.\nDo not treat the original request to run this skill as approval of the rendered\nwriteback plan. Approval from a different plan or token is invalid.\n\n## Phase 6: Apply and verify\n\nOnly after explicit approval, run:\n\n```bash\npython3 .agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py apply \\\n  --plan <plan-path> \\\n  --approval-token <token-from-preview>\n```\n\nThe script performs read-only preflight for all selected alerts before its\nfirst write. It verifies that delegated dismissal requests are enabled and\nreadable, checks alert identity and open state, and confirms an instance on the\nrequested branch. It submits requests only for selected `not_actionable`\nalerts. For each submission, it reads back both the alert and the dismissal\nrequest and requires:\n\n- the CodeQL alert remains `open`\n- the dismissal request has status `open`\n- the requested reason and comment match the approved plan\n\nAn identical existing open request is treated as `already_pending`. A\nconflicting request or unverifiable request stops the workflow. Receipts are\nwritten to:\n\n```text\nsecurity-results/triage/codeql/<branch-slug>/github-writeback/receipts/current.json\nsecurity-results/triage/codeql/<branch-slug>/github-writeback/receipts/history/<timestamp>.json\n```\n\nIf preflight fails, make no GitHub changes. If submission or readback fails,\nstop and report the partial receipt rather than retrying blindly.\n\n## Hard rules\n\n- Never update GitHub before the explicit approval pause.\n- Never request dismissal of `confirmed` or `needs_review` findings.\n- Never use direct dismissal; every PATCH must include `create_request: true`.\n- Never approve or deny a dismissal request in this workflow.\n- Never select a dismissal reason without supporting evidence.\n- Never upload SARIF or create GitHub issues in this workflow.\n- Never expose GitHub tokens in commands, output, plans, or receipts.\n- Never bypass the approval token, preflight, or readback checks.\n\n## Final output\n\nReport the HTML report path alongside the local JSON artifact paths, counts,\nand alert numbers grouped by disposition before the approval pause. Include a\ncompact evidence table for every selected dismissal request. After an approved\nwriteback, report every alert's before/after state, requested reason, request\nstatus, requester, timestamp, and receipt paths. State clearly that the\nsubmitted requests remain pending until a GitHub reviewer approves or denies\nthem, and that all affected alerts remain open while pending.\n"}, {"id": "file-2", "path": ".agents/skills/triage-codeql-and-store/scripts/persist_triage.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/persist_triage.py", "language": "python", "content": "#!/usr/bin/env python3\n\"\"\"Validate and persist a CodeQL triage-finding/v0 payload.\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport hashlib\nimport json\nimport os\nimport re\nimport sys\nimport tempfile\nfrom collections import Counter\nfrom datetime import datetime, timezone\nfrom pathlib import Path\nfrom typing import Any\n\n\nSCHEMA_VERSION = \"triage-finding/v0\"\nVERDICTS = {\"confirmed\", \"needs_review\", \"not_actionable\"}\nCONFIDENCE_LEVELS = {\"high\", \"medium\", \"low\"}\n\n\nclass ValidationError(ValueError):\n    pass\n\n\ndef parse_args() -> argparse.Namespace:\n    parser = argparse.ArgumentParser(\n        description=\"Persist a validated CodeQL triage result atomically.\"\n    )\n    parser.add_argument(\n        \"--input\",\n        required=True,\n        help=\"Path to the triage JSON payload, or - to read stdin.\",\n    )\n    parser.add_argument(\"--branch\", required=True, help=\"Git branch or ref triaged.\")\n    parser.add_argument(\n        \"--expected-count\",\n        required=True,\n        type=int,\n        help=\"Number of CodeQL alerts imported before triage.\",\n    )\n    parser.add_argument(\n        \"--output-root\",\n        default=\"security-results/triage/codeql\",\n        help=\"Root directory for persisted results.\",\n    )\n    return parser.parse_args()\n\n\ndef load_payload(input_value: str) -> dict[str, Any]:\n    try:\n        if input_value == \"-\":\n            payload = json.load(sys.stdin)\n        else:\n            with Path(input_value).open(encoding=\"utf-8\") as input_file:\n                payload = json.load(input_file)\n    except (OSError, json.JSONDecodeError) as error:\n        raise ValidationError(f\"cannot read input JSON: {error}\") from error\n\n    if not isinstance(payload, dict):\n        raise ValidationError(\"top-level JSON value must be an object\")\n    return payload\n\n\ndef require_nonempty_string(value: Any, field: str) -> str:\n    if not isinstance(value, str) or not value.strip():\n        raise ValidationError(f\"{field} must be a non-empty string\")\n    return value.strip()\n\n\ndef validate_payload(payload: dict[str, Any], expected_count: int) -> Counter[str]:\n    if expected_count < 0:\n        raise ValidationError(\"expected count must not be negative\")\n    if payload.get(\"schema_version\") != SCHEMA_VERSION:\n        raise ValidationError(f'schema_version must be \"{SCHEMA_VERSION}\"')\n\n    repository = payload.get(\"repository\")\n    if not isinstance(repository, dict):\n        raise ValidationError(\"repository must be an object\")\n    require_nonempty_string(repository.get(\"path\"), \"repository.path\")\n    require_nonempty_string(repository.get(\"revision\"), \"repository.revision\")\n\n    findings = payload.get(\"findings\")\n    if not isinstance(findings, list):\n        raise ValidationError(\"findings must be an array\")\n    if len(findings) != expected_count:\n        raise ValidationError(\n            f\"stored result count {len(findings)} does not match \"\n            f\"imported alert count {expected_count}\"\n        )\n\n    triage_ids: set[str] = set()\n    input_ids: set[str] = set()\n    counts: Counter[str] = Counter()\n\n    for index, finding in enumerate(findings):\n        field = f\"findings[{index}]\"\n        if not isinstance(finding, dict):\n            raise ValidationError(f\"{field} must be an object\")\n\n        triage_id = require_nonempty_string(\n            finding.get(\"triage_item_id\"), f\"{field}.triage_item_id\"\n        )\n        input_id = require_nonempty_string(\n            finding.get(\"input_id\"), f\"{field}.input_id\"\n        )\n        if triage_id in triage_ids:\n            raise ValidationError(f\"duplicate triage_item_id: {triage_id}\")\n        if input_id in input_ids:\n            raise ValidationError(f\"duplicate input_id: {input_id}\")\n        triage_ids.add(triage_id)\n        input_ids.add(input_id)\n\n        if finding.get(\"source_type\") != \"sarif\":\n            raise ValidationError(f'{field}.source_type must be \"sarif\"')\n\n        verdict = finding.get(\"verdict\")\n        if verdict not in VERDICTS:\n            raise ValidationError(f\"{field}.verdict is invalid: {verdict!r}\")\n        counts[verdict] += 1\n\n        confidence = finding.get(\"confidence\")\n        if confidence not in CONFIDENCE_LEVELS:\n            raise ValidationError(f\"{field}.confidence is invalid: {confidence!r}\")\n\n        normalized = finding.get(\"normalized_input\")\n        if not isinstance(normalized, dict):\n            raise ValidationError(f\"{field}.normalized_input must be an object\")\n        references = normalized.get(\"references\")\n        if not isinstance(references, list) or not references:\n            raise ValidationError(f\"{field}.normalized_input.references must not be empty\")\n        if not any(\n            isinstance(reference, str)\n            and (\"github.com/\" in reference or \"code-scanning\" in reference)\n            for reference in references\n        ):\n            raise ValidationError(f\"{field} does not preserve a GitHub CodeQL reference\")\n\n        for list_field in (\"evidence\", \"counterevidence\", \"proof_gaps\"):\n            if not isinstance(finding.get(list_field), list):\n                raise ValidationError(f\"{field}.{list_field} must be an array\")\n        if not isinstance(finding.get(\"boundary_assessment\"), dict):\n            raise ValidationError(f\"{field}.boundary_assessment must be an object\")\n        if not isinstance(finding.get(\"exploitability_stack_rank\"), dict):\n            raise ValidationError(f\"{field}.exploitability_stack_rank must be an object\")\n\n    for verdict in VERDICTS:\n        counts[verdict] += 0\n    return counts\n\n\ndef branch_slug(branch: str) -> str:\n    normalized = require_nonempty_string(branch, \"branch\")\n    if normalized.startswith(\"refs/heads/\"):\n        normalized = normalized[len(\"refs/heads/\") :]\n    slug = normalized.replace(\"/\", \"__\")\n    slug = re.sub(r\"[^A-Za-z0-9._-]\", \"_\", slug).strip(\".\")\n    if not slug or slug in {\".\", \"..\"}:\n        raise ValidationError(\"branch does not produce a safe storage path\")\n    return slug[:180]\n\n\ndef serialized_payload(payload: dict[str, Any]) -> bytes:\n    return (json.dumps(payload, indent=2, sort_keys=True) + \"\\n\").encode(\"utf-8\")\n\n\ndef atomic_write(path: Path, content: bytes, exclusive: bool = False) -> None:\n    path.parent.mkdir(parents=True, exist_ok=True)\n    descriptor, temporary_name = tempfile.mkstemp(\n        dir=path.parent, prefix=f\".{path.name}.\", suffix=\".tmp\"\n    )\n    temporary_path = Path(temporary_name)\n    try:\n        with os.fdopen(descriptor, \"wb\") as output_file:\n            output_file.write(content)\n            output_file.flush()\n            os.fsync(output_file.fileno())\n        if exclusive:\n            try:\n                os.link(temporary_path, path)\n            except FileExistsError as error:\n                raise ValidationError(f\"history file already exists: {path}\") from error\n            temporary_path.unlink()\n        else:\n            os.replace(temporary_path, path)\n    finally:\n        if temporary_path.exists():\n            temporary_path.unlink()\n\n\ndef verify_written_file(path: Path, expected: bytes) -> None:\n    try:\n        actual = path.read_bytes()\n        json.loads(actual)\n    except (OSError, json.JSONDecodeError) as error:\n        raise ValidationError(f\"cannot verify {path}: {error}\") from error\n    if actual != expected:\n        raise ValidationError(f\"written content mismatch: {path}\")\n\n\ndef main() -> int:\n    args = parse_args()\n    try:\n        payload = load_payload(args.input)\n        counts = validate_payload(payload, args.expected_count)\n        slug = branch_slug(args.branch)\n        repository = payload[\"repository\"]\n        revision = require_nonempty_string(repository[\"revision\"], \"repository.revision\")\n        revision_slug = re.sub(r\"[^A-Za-z0-9._-]\", \"_\", revision)[:12]\n        timestamp = datetime.now(timezone.utc).strftime(\"%Y%m%dT%H%M%S.%fZ\")\n\n        branch_directory = Path(args.output_root) / slug\n        current_path = branch_directory / \"current.json\"\n        history_path = branch_directory / \"history\" / f\"{timestamp}-{revision_slug}.json\"\n        content = serialized_payload(payload)\n\n        atomic_write(history_path, content, exclusive=True)\n        atomic_write(current_path, content)\n        verify_written_file(history_path, content)\n        verify_written_file(current_path, content)\n\n        receipt = {\n            \"schema_version\": SCHEMA_VERSION,\n            \"branch\": args.branch,\n            \"revision\": revision,\n            \"imported_alert_count\": args.expected_count,\n            \"stored_result_count\": len(payload[\"findings\"]),\n            \"verdict_counts\": {\n                verdict: counts[verdict]\n                for verdict in (\"confirmed\", \"needs_review\", \"not_actionable\")\n            },\n            \"current_path\": str(current_path),\n            \"history_path\": str(history_path),\n            \"sha256\": hashlib.sha256(content).hexdigest(),\n            \"github_modified\": False,\n        }\n        print(json.dumps(receipt, indent=2, sort_keys=True))\n        return 0\n    except ValidationError as error:\n        print(f\"error: {error}\", file=sys.stderr)\n        return 2\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n"}, {"id": "file-3", "path": ".agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/.agents/skills/triage-codeql-and-store/scripts/codeql_writeback.py", "language": "python", "content": "#!/usr/bin/env python3\n\"\"\"Plan and submit approval-gated CodeQL dismissal requests.\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport hashlib\nimport json\nimport os\nimport re\nimport shutil\nimport subprocess\nimport sys\nimport tempfile\nfrom datetime import datetime, timezone\nfrom pathlib import Path\nfrom typing import Any\n\n\nPLAN_SCHEMA = \"codeql-triage-writeback/v1\"\nRECEIPT_SCHEMA = \"codeql-triage-writeback-receipt/v1\"\nTRIAGE_SCHEMA = \"triage-finding/v0\"\nVERDICTS = {\"confirmed\", \"needs_review\", \"not_actionable\"}\nDISMISSAL_REASONS = {\"false positive\", \"won't fix\", \"used in tests\"}\nWRITE_MODE = \"dismissal_request\"\nGITHUB_API_VERSION = \"2026-03-10\"\nMAX_DISMISSED_COMMENT_LENGTH = 280\nREPOSITORY_PATTERN = re.compile(r\"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$\")\nALERT_URL_PATTERN = re.compile(\n    r\"(?:/security/code-scanning/|/code-scanning/alerts/)([0-9]+)(?:$|[/?#])\"\n)\n\n\nclass WritebackError(RuntimeError):\n    pass\n\n\ndef utc_timestamp() -> str:\n    return datetime.now(timezone.utc).strftime(\"%Y%m%dT%H%M%S.%fZ\")\n\n\ndef read_json(path: Path) -> tuple[dict[str, Any], bytes]:\n    try:\n        raw = path.read_bytes()\n        value = json.loads(raw)\n    except (OSError, json.JSONDecodeError) as error:\n        raise WritebackError(f\"cannot read JSON from {path}: {error}\") from error\n    if not isinstance(value, dict):\n        raise WritebackError(f\"top-level JSON value in {path} must be an object\")\n    return value, raw\n\n\ndef json_bytes(value: dict[str, Any]) -> bytes:\n    return (json.dumps(value, indent=2, sort_keys=True) + \"\\n\").encode(\"utf-8\")\n\n\ndef sha256(content: bytes) -> str:\n    return hashlib.sha256(content).hexdigest()\n\n\ndef atomic_write(path: Path, content: bytes, exclusive: bool = False) -> None:\n    path.parent.mkdir(parents=True, exist_ok=True)\n    descriptor, temporary_name = tempfile.mkstemp(\n        dir=path.parent, prefix=f\".{path.name}.\", suffix=\".tmp\"\n    )\n    temporary_path = Path(temporary_name)\n    try:\n        with os.fdopen(descriptor, \"wb\") as output_file:\n            output_file.write(content)\n            output_file.flush()\n            os.fsync(output_file.fileno())\n        if exclusive:\n            try:\n                os.link(temporary_path, path)\n            except FileExistsError as error:\n                raise WritebackError(f\"file already exists: {path}\") from error\n            temporary_path.unlink()\n        else:\n            os.replace(temporary_path, path)\n    finally:\n        if temporary_path.exists():\n            temporary_path.unlink()\n\n\ndef require_string(value: Any, field: str) -> str:\n    if not isinstance(value, str) or not value.strip():\n        raise WritebackError(f\"{field} must be a non-empty string\")\n    return value.strip()\n\n\ndef validate_repository(repository: str) -> str:\n    value = require_string(repository, \"repository\")\n    if not REPOSITORY_PATTERN.fullmatch(value):\n        raise WritebackError(\"repository must use owner/repo format\")\n    return value\n\n\ndef github_references(finding: dict[str, Any]) -> list[str]:\n    normalized = finding.get(\"normalized_input\")\n    if not isinstance(normalized, dict):\n        return []\n    references = normalized.get(\"references\")\n    if not isinstance(references, list):\n        return []\n    return [reference for reference in references if isinstance(reference, str)]\n\n\ndef extract_alert_number(finding: dict[str, Any]) -> int:\n    for reference in github_references(finding):\n        match = ALERT_URL_PATTERN.search(reference)\n        if match:\n            return int(match.group(1))\n\n    input_id = str(finding.get(\"input_id\", \"\"))\n    match = re.search(r\"(?:alert|code[-_ ]?scanning)[^0-9]*([0-9]+)$\", input_id, re.I)\n    if match:\n        return int(match.group(1))\n    if input_id.isdigit():\n        return int(input_id)\n    raise WritebackError(\n        f\"cannot resolve GitHub alert number for {finding.get('triage_item_id', 'unknown')}\"\n    )\n\n\ndef extract_alert_url(finding: dict[str, Any], repository: str, number: int) -> str:\n    for reference in github_references(finding):\n        if \"github.com/\" in reference and ALERT_URL_PATTERN.search(reference):\n            return reference\n    return f\"https://github.com/{repository}/security/code-scanning/{number}\"\n\n\ndef summarize_not_actionable(finding: dict[str, Any]) -> str:\n    for field in (\"counterevidence\", \"evidence\"):\n        values = finding.get(field)\n        if isinstance(values, list):\n            for value in values:\n                if isinstance(value, str) and value.strip():\n                    return \" \".join(value.split())[:500]\n    return require_string(finding.get(\"title\"), \"finding.title\")[:500]\n\n\ndef build_dismissed_comment(\n    plan: dict[str, Any], item: dict[str, Any], reason: str\n) -> str:\n    prefix = (\n        \"Codex triage verdict: not_actionable\\n\"\n        f\"GitHub disposition: {reason}\\n\"\n        f\"Triage item: {item['triage_item_id']}\\n\"\n        f\"Revision: {plan['triage_revision'][:12]}\\n\"\n        \"Evidence: \"\n    )\n    suffix = f\"\\nArtifact SHA-256: {plan['triage_sha256'][:16]}\"\n    available = MAX_DISMISSED_COMMENT_LENGTH - len(prefix) - len(suffix)\n    if available < 4:\n        raise WritebackError(\"dismissal comment metadata exceeds GitHub limit\")\n\n    summary = require_string(item.get(\"summary\"), \"dismissal summary\")\n    if len(summary) > available:\n        summary = summary[: available - 3].rstrip() + \"...\"\n    return prefix + summary + suffix\n\n\ndef validate_triage(triage: dict[str, Any]) -> tuple[str, list[dict[str, Any]]]:\n    if triage.get(\"schema_version\") != TRIAGE_SCHEMA:\n        raise WritebackError(f'triage schema_version must be \"{TRIAGE_SCHEMA}\"')\n    repository = triage.get(\"repository\")\n    if not isinstance(repository, dict):\n        raise WritebackError(\"triage.repository must be an object\")\n    revision = require_string(repository.get(\"revision\"), \"triage.repository.revision\")\n    findings = triage.get(\"findings\")\n    if not isinstance(findings, list):\n        raise WritebackError(\"triage.findings must be an array\")\n    for index, finding in enumerate(findings):\n        if not isinstance(finding, dict):\n            raise WritebackError(f\"triage.findings[{index}] must be an object\")\n        if finding.get(\"source_type\") != \"sarif\":\n            raise WritebackError(f\"triage.findings[{index}] is not a SARIF finding\")\n        if finding.get(\"verdict\") not in VERDICTS:\n            raise WritebackError(f\"triage.findings[{index}] has an invalid verdict\")\n        require_string(finding.get(\"triage_item_id\"), f\"triage.findings[{index}].triage_item_id\")\n        require_string(finding.get(\"input_id\"), f\"triage.findings[{index}].input_id\")\n    return revision, findings\n\n\ndef build_plan(args: argparse.Namespace) -> int:\n    triage_path = Path(args.triage)\n    triage, triage_raw = read_json(triage_path)\n    revision, findings = validate_triage(triage)\n    repository = validate_repository(args.repository)\n    branch = require_string(args.branch, \"branch\")\n\n    items = []\n    alert_numbers: set[int] = set()\n    for finding in findings:\n        number = extract_alert_number(finding)\n        if number in alert_numbers:\n            raise WritebackError(f\"duplicate GitHub alert number in triage: {number}\")\n        alert_numbers.add(number)\n        verdict = finding[\"verdict\"]\n        item = {\n            \"alert_number\": number,\n            \"alert_url\": extract_alert_url(finding, repository, number),\n            \"triage_item_id\": finding[\"triage_item_id\"],\n            \"input_id\": finding[\"input_id\"],\n            \"title\": finding.get(\"title\", \"CodeQL alert\"),\n            \"verdict\": verdict,\n            \"confidence\": finding.get(\"confidence\"),\n            \"action\": \"pending\" if verdict == \"not_actionable\" else \"keep_open\",\n            \"selected\": False,\n            \"dismissed_reason\": None,\n            \"dismissed_comment\": None,\n            \"summary\": summarize_not_actionable(finding)\n            if verdict == \"not_actionable\"\n            else None,\n        }\n        items.append(item)\n\n    plan = {\n        \"schema_version\": PLAN_SCHEMA,\n        \"repository\": repository,\n        \"branch\": branch,\n        \"triage_revision\": revision,\n        \"triage_path\": str(triage_path),\n        \"triage_sha256\": sha256(triage_raw),\n        \"created_at\": utc_timestamp(),\n        \"write_mode\": args.write_mode,\n        \"items\": items,\n    }\n    validate_plan(plan, require_selection=False)\n    output_path = Path(args.output)\n    atomic_write(output_path, json_bytes(plan))\n    print(json.dumps(plan_summary(plan, output_path), indent=2, sort_keys=True))\n    return 0\n\n\ndef validate_plan(\n    plan: dict[str, Any], require_selection: bool\n) -> list[dict[str, Any]]:\n    if plan.get(\"schema_version\") != PLAN_SCHEMA:\n        raise WritebackError(f'plan schema_version must be \"{PLAN_SCHEMA}\"')\n    validate_repository(plan.get(\"repository\"))\n    require_string(plan.get(\"branch\"), \"plan.branch\")\n    require_string(plan.get(\"triage_revision\"), \"plan.triage_revision\")\n    digest = require_string(plan.get(\"triage_sha256\"), \"plan.triage_sha256\")\n    if not re.fullmatch(r\"[0-9a-f]{64}\", digest):\n        raise WritebackError(\"plan.triage_sha256 must be a lowercase SHA-256 digest\")\n    if plan.get(\"write_mode\") != WRITE_MODE:\n        raise WritebackError(\n            \"plan.write_mode must be dismissal_request; direct dismissal is disabled\"\n        )\n\n    items = plan.get(\"items\")\n    if not isinstance(items, list):\n        raise WritebackError(\"plan.items must be an array\")\n    numbers: set[int] = set()\n    selected: list[dict[str, Any]] = []\n    for index, item in enumerate(items):\n        field = f\"plan.items[{index}]\"\n        if not isinstance(item, dict):\n            raise WritebackError(f\"{field} must be an object\")\n        number = item.get(\"alert_number\")\n        if not isinstance(number, int) or number < 1:\n            raise WritebackError(f\"{field}.alert_number must be a positive integer\")\n        if number in numbers:\n            raise WritebackError(f\"duplicate plan alert number: {number}\")\n        numbers.add(number)\n        verdict = item.get(\"verdict\")\n        action = item.get(\"action\")\n        selected_for_dismissal = item.get(\"selected\")\n        if verdict not in VERDICTS:\n            raise WritebackError(f\"{field}.verdict is invalid\")\n        if not isinstance(selected_for_dismissal, bool):\n            raise WritebackError(f\"{field}.selected must be boolean\")\n\n        if verdict in {\"confirmed\", \"needs_review\"}:\n            if action != \"keep_open\" or selected_for_dismissal:\n                raise WritebackError(\n                    f\"alert {number}: {verdict} must remain unselected and keep_open\"\n                )\n            if item.get(\"dismissed_reason\") is not None:\n                raise WritebackError(f\"alert {number}: keep_open cannot have a reason\")\n        elif action == \"pending\":\n            if selected_for_dismissal or item.get(\"dismissed_reason\") is not None:\n                raise WritebackError(\n                    f\"alert {number}: pending item cannot be selected or have a reason\"\n                )\n        elif action == \"request_dismissal\":\n            if not selected_for_dismissal:\n                raise WritebackError(f\"alert {number}: dismissal must be selected\")\n            if item.get(\"dismissed_reason\") not in DISMISSAL_REASONS:\n                raise WritebackError(f\"alert {number}: invalid dismissal reason\")\n            comment = require_string(\n                item.get(\"dismissed_comment\"), f\"alert {number}.dismissed_comment\"\n            )\n            if not comment.startswith(\"Codex triage verdict: not_actionable\"):\n                raise WritebackError(f\"alert {number}: dismissal comment lost verdict\")\n            if len(comment) > MAX_DISMISSED_COMMENT_LENGTH:\n                raise WritebackError(\n                    f\"alert {number}: dismissal comment exceeds GitHub's \"\n                    f\"{MAX_DISMISSED_COMMENT_LENGTH}-character limit\"\n                )\n            selected.append(item)\n        else:\n            raise WritebackError(f\"alert {number}: invalid action {action!r}\")\n\n    if require_selection and not selected:\n        raise WritebackError(\"plan has no selected dismissal candidates\")\n    return selected\n\n\ndef plan_summary(plan: dict[str, Any], path: Path) -> dict[str, Any]:\n    counts = {\"keep_open\": 0, \"pending\": 0, \"request_dismissal\": 0}\n    for item in plan[\"items\"]:\n        counts[item[\"action\"]] += 1\n    return {\n        \"plan_path\": str(path),\n        \"repository\": plan[\"repository\"],\n        \"branch\": plan[\"branch\"],\n        \"triage_revision\": plan[\"triage_revision\"],\n        \"write_mode\": plan[\"write_mode\"],\n        \"action_counts\": counts,\n        \"disposition_counts\": disposition_counts(plan),\n        \"disposition_alerts\": disposition_alerts(plan),\n        \"github_modified\": False,\n    }\n\n\ndef disposition_key(item: dict[str, Any]) -> str:\n    if item[\"action\"] == \"keep_open\":\n        return \"keep_open\"\n    reason = item.get(\"dismissed_reason\")\n    if reason == \"false positive\":\n        return \"false_positive\"\n    if reason == \"used in tests\":\n        return \"used_in_tests\"\n    if reason == \"won't fix\":\n        return \"wont_fix\"\n    return \"pending\"\n\n\ndef disposition_alerts(plan: dict[str, Any]) -> dict[str, list[int]]:\n    alerts = {\n        \"false_positive\": [],\n        \"used_in_tests\": [],\n        \"wont_fix\": [],\n        \"pending\": [],\n        \"keep_open\": [],\n    }\n    for item in plan[\"items\"]:\n        alerts[disposition_key(item)].append(item[\"alert_number\"])\n    return alerts\n\n\ndef disposition_counts(plan: dict[str, Any]) -> dict[str, int]:\n    return {\n        disposition: len(alerts)\n        for disposition, alerts in disposition_alerts(plan).items()\n    }\n\n\ndef select_items(args: argparse.Namespace) -> int:\n    plan_path = Path(args.plan)\n    plan, _ = read_json(plan_path)\n    validate_plan(plan, require_selection=False)\n    requested = set(args.alert)\n    found: set[int] = set()\n    for item in plan[\"items\"]:\n        number = item[\"alert_number\"]\n        if number not in requested:\n            continue\n        found.add(number)\n        if item[\"verdict\"] != \"not_actionable\":\n            raise WritebackError(\n                f\"alert {number}: only not_actionable findings may be dismissed\"\n            )\n        item[\"action\"] = \"request_dismissal\"\n        item[\"selected\"] = True\n        item[\"dismissed_reason\"] = args.reason\n        item[\"dismissed_comment\"] = build_dismissed_comment(\n            plan, item, args.reason\n        )\n\n    missing = sorted(requested - found)\n    if missing:\n        raise WritebackError(f\"alert numbers not found in plan: {missing}\")\n    validate_plan(plan, require_selection=True)\n    atomic_write(plan_path, json_bytes(plan))\n    print(json.dumps(plan_summary(plan, plan_path), indent=2, sort_keys=True))\n    return 0\n\n\ndef preview_plan(args: argparse.Namespace) -> int:\n    plan_path = Path(args.plan)\n    plan, raw = read_json(plan_path)\n    selected = validate_plan(plan, require_selection=True)\n    preview = {\n        \"schema_version\": PLAN_SCHEMA,\n        \"repository\": plan[\"repository\"],\n        \"branch\": plan[\"branch\"],\n        \"triage_revision\": plan[\"triage_revision\"],\n        \"write_mode\": plan[\"write_mode\"],\n        \"approval_token\": sha256(raw),\n        \"disposition_counts\": disposition_counts(plan),\n        \"disposition_alerts\": disposition_alerts(plan),\n        \"requests\": [\n            {\n                \"method\": \"PATCH\",\n                \"endpoint\": (\n                    f\"/repos/{plan['repository']}/code-scanning/alerts/\"\n                    f\"{item['alert_number']}\"\n                ),\n                \"alert_url\": item[\"alert_url\"],\n                \"body\": {\n                    \"state\": \"dismissed\",\n                    \"dismissed_reason\": item[\"dismissed_reason\"],\n                    \"dismissed_comment\": item[\"dismissed_comment\"],\n                    \"create_request\": True,\n                },\n            }\n            for item in selected\n        ],\n        \"keep_open_count\": sum(\n            item[\"action\"] == \"keep_open\" for item in plan[\"items\"]\n        ),\n        \"pending_count\": sum(item[\"action\"] == \"pending\" for item in plan[\"items\"]),\n        \"github_modified\": False,\n    }\n    print(json.dumps(preview, indent=2, sort_keys=True))\n    return 0\n\n\ndef gh_api(method: str, endpoint: str, body: dict[str, Any] | None = None) -> Any:\n    if shutil.which(\"gh\") is None:\n        raise WritebackError(\"GitHub CLI is not installed\")\n    command = [\n        \"gh\",\n        \"api\",\n        \"--method\",\n        method,\n        endpoint,\n        \"-H\",\n        \"Accept: application/vnd.github+json\",\n        \"-H\",\n        f\"X-GitHub-Api-Version: {GITHUB_API_VERSION}\",\n    ]\n    if body is not None:\n        command.extend([\"--input\", \"-\"])\n    result = subprocess.run(\n        command,\n        input=json.dumps(body) if body is not None else None,\n        capture_output=True,\n        text=True,\n        check=False,\n    )\n    if result.returncode != 0:\n        message = result.stderr.strip() or \"GitHub API request failed\"\n        raise WritebackError(f\"{method} {endpoint}: {message}\")\n    try:\n        return json.loads(result.stdout)\n    except json.JSONDecodeError as error:\n        raise WritebackError(f\"{method} {endpoint}: invalid JSON response\") from error\n\n\ndef normalized_ref(branch: str) -> str:\n    return branch if branch.startswith(\"refs/\") else f\"refs/heads/{branch}\"\n\n\ndef normalized_alert_state(alert: dict[str, Any]) -> str | None:\n    state = alert.get(\"state\")\n    if isinstance(state, str):\n        return state\n\n    if alert.get(\"dismissed_at\") is not None:\n        return \"dismissed\"\n    if alert.get(\"fixed_at\") is not None:\n        return \"fixed\"\n\n    most_recent_instance = alert.get(\"most_recent_instance\")\n    if (\n        isinstance(most_recent_instance, dict)\n        and most_recent_instance.get(\"state\") == \"open\"\n    ):\n        return \"open\"\n    return None\n\n\ndef open_alerts_for_ref(repository: str, target_ref: str) -> list[dict[str, Any]]:\n    alerts: list[dict[str, Any]] = []\n    page = 1\n    while True:\n        endpoint = (\n            f\"repos/{repository}/code-scanning/alerts\"\n            f\"?state=open&ref={target_ref}&per_page=100&page={page}\"\n        )\n        batch = gh_api(\"GET\", endpoint)\n        if not isinstance(batch, list) or not all(\n            isinstance(alert, dict) for alert in batch\n        ):\n            raise WritebackError(\"invalid branch-filtered open alerts response\")\n        alerts.extend(batch)\n        if len(batch) < 100:\n            return alerts\n        page += 1\n\n\ndef request_entry_for_alert(\n    request: dict[str, Any], alert_number: int\n) -> dict[str, Any] | None:\n    data = request.get(\"data\")\n    if not isinstance(data, list):\n        return None\n    for entry in data:\n        if isinstance(entry, dict) and entry.get(\"alert_number\") == alert_number:\n            return entry\n    return None\n\n\ndef dismissal_request_record(\n    request: dict[str, Any], item: dict[str, Any]\n) -> dict[str, Any]:\n    number = item[\"alert_number\"]\n    if request.get(\"request_type\") != \"code_scanning_alert_dismissal\":\n        raise WritebackError(f\"alert {number}: unexpected dismissal request type\")\n    if request.get(\"status\") != \"open\":\n        raise WritebackError(\n            f\"alert {number}: dismissal request is not open: \"\n            f\"{request.get('status')!r}\"\n        )\n    entry = request_entry_for_alert(request, number)\n    if entry is None:\n        raise WritebackError(\n            f\"alert {number}: dismissal request does not reference the alert\"\n        )\n    if entry.get(\"reason\") != item[\"dismissed_reason\"]:\n        raise WritebackError(\n            f\"alert {number}: dismissal request reason does not match the plan\"\n        )\n    if request.get(\"requester_comment\") != item[\"dismissed_comment\"]:\n        raise WritebackError(\n            f\"alert {number}: dismissal request comment does not match the plan\"\n        )\n\n    requester = request.get(\"requester\")\n    return {\n        \"id\": request.get(\"id\"),\n        \"number\": request.get(\"number\"),\n        \"status\": request[\"status\"],\n        \"reason\": entry[\"reason\"],\n        \"requester_comment\": request[\"requester_comment\"],\n        \"requester\": (\n            requester.get(\"actor_name\") if isinstance(requester, dict) else None\n        ),\n        \"created_at\": request.get(\"created_at\"),\n        \"expires_at\": request.get(\"expires_at\"),\n        \"url\": request.get(\"url\"),\n        \"html_url\": request.get(\"html_url\"),\n    }\n\n\ndef open_dismissal_requests(repository: str) -> list[dict[str, Any]]:\n    requests: list[dict[str, Any]] = []\n    page = 1\n    while True:\n        endpoint = (\n            f\"repos/{repository}/dismissal-requests/code-scanning\"\n            f\"?request_status=open&per_page=100&page={page}\"\n        )\n        try:\n            batch = gh_api(\"GET\", endpoint)\n        except WritebackError as error:\n            raise WritebackError(\n                \"cannot verify delegated CodeQL dismissal requests; ensure the \"\n                \"feature is enabled and the token can read organization dismissal \"\n                f\"requests: {error}\"\n            ) from error\n        if not isinstance(batch, list) or not all(\n            isinstance(request, dict) for request in batch\n        ):\n            raise WritebackError(\"invalid open dismissal requests response\")\n        requests.extend(batch)\n        if len(batch) < 100:\n            return requests\n        page += 1\n\n\ndef preflight(plan: dict[str, Any], selected: list[dict[str, Any]]) -> list[dict[str, Any]]:\n    repository = plan[\"repository\"]\n    target_ref = normalized_ref(plan[\"branch\"])\n    existing_requests: dict[int, dict[str, Any]] = {}\n    for request in open_dismissal_requests(repository):\n        data = request.get(\"data\")\n        if not isinstance(data, list):\n            raise WritebackError(\"open dismissal request has invalid data\")\n        for entry in data:\n            if not isinstance(entry, dict):\n                raise WritebackError(\"open dismissal request has invalid data entry\")\n            alert_number = entry.get(\"alert_number\")\n            if not isinstance(alert_number, int):\n                raise WritebackError(\"open dismissal request has invalid alert number\")\n            if alert_number in existing_requests:\n                raise WritebackError(\n                    f\"alert {alert_number}: multiple open dismissal requests found\"\n                )\n            existing_requests[alert_number] = request\n\n    open_alerts = open_alerts_for_ref(repository, target_ref)\n    open_by_number = {alert.get(\"number\"): alert for alert in open_alerts}\n    records = []\n    for item in selected:\n        number = item[\"alert_number\"]\n        endpoint = f\"repos/{repository}/code-scanning/alerts/{number}\"\n        alert = open_by_number.get(number)\n        if alert is None:\n            alert = gh_api(\"GET\", endpoint)\n        if not isinstance(alert, dict) or alert.get(\"number\") != number:\n            raise WritebackError(f\"alert {number}: GitHub identity check failed\")\n        actual_url = alert.get(\"html_url\")\n        expected_url = item.get(\"alert_url\")\n        if isinstance(actual_url, str) and isinstance(expected_url, str):\n            if actual_url.rstrip(\"/\").lower() != expected_url.rstrip(\"/\").lower():\n                raise WritebackError(f\"alert {number}: GitHub URL does not match plan\")\n\n        state = normalized_alert_state(alert)\n        if state != \"open\":\n            raise WritebackError(\n                f\"alert {number}: expected open state, found {state!r}\"\n            )\n\n        existing_request = existing_requests.get(number)\n        existing_request_record = (\n            dismissal_request_record(existing_request, item)\n            if existing_request is not None\n            else None\n        )\n\n        most_recent_instance = alert.get(\"most_recent_instance\")\n        matching = (\n            [most_recent_instance]\n            if isinstance(most_recent_instance, dict)\n            and most_recent_instance.get(\"ref\") == target_ref\n            else []\n        )\n        if not matching:\n            instances_endpoint = f\"{endpoint}/instances?per_page=100\"\n            instances = gh_api(\"GET\", instances_endpoint)\n            if not isinstance(instances, list):\n                raise WritebackError(f\"alert {number}: invalid instances response\")\n            matching = [\n                instance for instance in instances if instance.get(\"ref\") == target_ref\n            ]\n        if not matching:\n            raise WritebackError(\n                f\"alert {number}: no instance found for requested ref {target_ref}\"\n            )\n        records.append(\n            {\n                \"alert_number\": number,\n                \"state_before\": state,\n                \"already_requested\": existing_request_record is not None,\n                \"dismissal_request_before\": existing_request_record,\n                \"matching_ref\": target_ref,\n                \"instance_commits\": sorted(\n                    {\n                        instance.get(\"commit_sha\")\n                        for instance in matching\n                        if isinstance(instance.get(\"commit_sha\"), str)\n                    }\n                ),\n            }\n        )\n    return records\n\n\ndef receipt_paths(plan_path: Path, receipt_root: str | None) -> tuple[Path, Path]:\n    root = Path(receipt_root) if receipt_root else plan_path.parent / \"receipts\"\n    timestamp = utc_timestamp()\n    history = root / \"history\" / f\"{timestamp}.json\"\n    current = root / \"current.json\"\n    return current, history\n\n\ndef persist_receipt(\n    receipt: dict[str, Any], current_path: Path, history_path: Path\n) -> None:\n    content = json_bytes(receipt)\n    atomic_write(history_path, content, exclusive=True)\n    atomic_write(current_path, content)\n\n\ndef apply_plan(args: argparse.Namespace) -> int:\n    plan_path = Path(args.plan)\n    plan, raw = read_json(plan_path)\n    selected = validate_plan(plan, require_selection=True)\n    actual_token = sha256(raw)\n    if args.approval_token != actual_token:\n        raise WritebackError(\n            \"approval token does not match the current plan; preview it again\"\n        )\n\n    preflight_records = preflight(plan, selected)\n    current_receipt, history_receipt = receipt_paths(plan_path, args.receipt_root)\n    receipt = {\n        \"schema_version\": RECEIPT_SCHEMA,\n        \"repository\": plan[\"repository\"],\n        \"branch\": plan[\"branch\"],\n        \"triage_revision\": plan[\"triage_revision\"],\n        \"triage_sha256\": plan[\"triage_sha256\"],\n        \"plan_sha256\": actual_token,\n        \"write_mode\": plan[\"write_mode\"],\n        \"started_at\": utc_timestamp(),\n        \"completed_at\": None,\n        \"complete\": False,\n        \"results\": [],\n    }\n\n    for item, check in zip(selected, preflight_records):\n        number = item[\"alert_number\"]\n        endpoint = f\"repos/{plan['repository']}/code-scanning/alerts/{number}\"\n        request_endpoint = (\n            f\"repos/{plan['repository']}/dismissal-requests/code-scanning/{number}\"\n        )\n        if check[\"already_requested\"]:\n            result_record = {\n                **check,\n                \"outcome\": \"already_pending\",\n                \"state_after\": check[\"state_before\"],\n                \"dismissal_request\": check[\"dismissal_request_before\"],\n            }\n        else:\n            body = {\n                \"state\": \"dismissed\",\n                \"dismissed_reason\": item[\"dismissed_reason\"],\n                \"dismissed_comment\": item[\"dismissed_comment\"],\n                \"create_request\": True,\n            }\n            try:\n                gh_api(\"PATCH\", endpoint, body)\n                readback = gh_api(\"GET\", endpoint)\n                request_readback = gh_api(\"GET\", request_endpoint)\n                readback_state = normalized_alert_state(readback)\n                if (\n                    readback_state != \"open\"\n                    or readback.get(\"dismissed_at\") is not None\n                    or readback.get(\"dismissed_reason\") is not None\n                    or readback.get(\"dismissed_comment\") is not None\n                ):\n                    raise WritebackError(\n                        f\"alert {number}: expected open after dismissal request, \"\n                        f\"found {readback_state!r}\"\n                    )\n                request_record = dismissal_request_record(request_readback, item)\n                result_record = {\n                    **check,\n                    \"outcome\": \"request_submitted\",\n                    \"state_after\": readback_state,\n                    \"dismissed_reason_after\": readback.get(\"dismissed_reason\"),\n                    \"dismissed_comment_after\": readback.get(\"dismissed_comment\"),\n                    \"dismissed_at\": readback.get(\"dismissed_at\"),\n                    \"dismissal_request\": request_record,\n                }\n            except WritebackError as error:\n                receipt[\"results\"].append(\n                    {\n                        **check,\n                        \"outcome\": \"request_verification_failed\",\n                        \"error\": str(error),\n                    }\n                )\n                receipt[\"completed_at\"] = utc_timestamp()\n                persist_receipt(receipt, current_receipt, history_receipt)\n                raise\n        receipt[\"results\"].append(result_record)\n\n    receipt[\"complete\"] = True\n    receipt[\"completed_at\"] = utc_timestamp()\n    persist_receipt(receipt, current_receipt, history_receipt)\n    print(\n        json.dumps(\n            {\n                \"receipt_path\": str(current_receipt),\n                \"history_receipt_path\": str(history_receipt),\n                \"request_submitted_count\": sum(\n                    result[\"outcome\"] == \"request_submitted\"\n                    for result in receipt[\"results\"]\n                ),\n                \"already_pending_count\": sum(\n                    result[\"outcome\"] == \"already_pending\"\n                    for result in receipt[\"results\"]\n                ),\n                \"complete\": True,\n            },\n            indent=2,\n            sort_keys=True,\n        )\n    )\n    return 0\n\n\ndef parse_args() -> argparse.Namespace:\n    parser = argparse.ArgumentParser(\n        description=\"Plan and submit approval-gated CodeQL dismissal requests.\"\n    )\n    subparsers = parser.add_subparsers(dest=\"command\", required=True)\n\n    plan_parser = subparsers.add_parser(\"plan\", help=\"Generate a local writeback plan.\")\n    plan_parser.add_argument(\"--triage\", required=True)\n    plan_parser.add_argument(\"--repository\", required=True)\n    plan_parser.add_argument(\"--branch\", required=True)\n    plan_parser.add_argument(\"--output\", required=True)\n    plan_parser.add_argument(\"--write-mode\", choices=[WRITE_MODE], default=WRITE_MODE)\n    plan_parser.set_defaults(handler=build_plan)\n\n    select_parser = subparsers.add_parser(\n        \"select\", help=\"Select not_actionable alerts for a dismissal request.\"\n    )\n    select_parser.add_argument(\"--plan\", required=True)\n    select_parser.add_argument(\"--alert\", action=\"append\", type=int, required=True)\n    select_parser.add_argument(\"--reason\", choices=sorted(DISMISSAL_REASONS), required=True)\n    select_parser.set_defaults(handler=select_items)\n\n    preview_parser = subparsers.add_parser(\n        \"preview\", help=\"Print exact requests and an approval token.\"\n    )\n    preview_parser.add_argument(\"--plan\", required=True)\n    preview_parser.set_defaults(handler=preview_plan)\n\n    apply_parser = subparsers.add_parser(\n        \"apply\", help=\"Submit an explicitly approved plan through GitHub REST.\"\n    )\n    apply_parser.add_argument(\"--plan\", required=True)\n    apply_parser.add_argument(\"--approval-token\", required=True)\n    apply_parser.add_argument(\"--receipt-root\")\n    apply_parser.set_defaults(handler=apply_plan)\n\n    return parser.parse_args()\n\n\ndef main() -> int:\n    args = parse_args()\n    try:\n        return args.handler(args)\n    except WritebackError as error:\n        print(f\"error: {error}\", file=sys.stderr)\n        return 2\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n"}]};
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+  <script>
+    const data = EXPLANATION_DATA;
+    const sectionTabsEl = document.getElementById('section-tabs');
+    const sectionContentEl = document.getElementById('section-content');
+    const pageTitleEl = document.getElementById('page-title');
+    const explanationScrollEl = document.querySelector('.explanation-scroll');
+    const mermaidModalEl = document.getElementById('mermaid-modal');
+    const mermaidModalContentEl = document.getElementById('mermaid-modal-content');
+    const mermaidModalCloseEl = document.getElementById('mermaid-modal-close');
+    const codeFilePathEl = document.getElementById('code-file-path');
+    const codeLineRangeEl = document.getElementById('code-line-range');
+    const codeMetaEl = document.getElementById('code-meta');
+    const codeFooterEl = document.getElementById('code-footer');
+
+    const referencePattern = /\[\[((?:[A-Za-z0-9._-]+\/)*[A-Za-z0-9._-]+(?:\.[A-Za-z0-9._-]+)?:(?:\d+)(?:-\d+)?)\]\]/g;
+    const referencesById = new Map(data.references.map(ref => [ref.id, ref]));
+    const referencesByLiteral = new Map(data.references.map(ref => [ref.literal, ref]));
+    const filesById = new Map(data.files.map(file => [file.id, file]));
+
+    let headings = [];
+    let activeHeadingId = null;
+    let activeReferenceId = null;
+    let editor = null;
+    let currentModel = null;
+    let currentDecorations = [];
+    const modelsByFileId = new Map();
+
+    pageTitleEl.textContent = data.title || 'Code Explanation';
+    document.title = data.title || 'Code Explanation Viewer';
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function slugify(value) {
+      return value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'section';
+    }
+
+    function createReferenceButton(ref) {
+      const button = document.createElement('button');
+      button.className = `ref-chip${activeReferenceId === ref.id ? ' active' : ''}`;
+      button.type = 'button';
+      button.dataset.refId = ref.id;
+      button.textContent = ref.literal;
+      return button;
+    }
+
+    function replaceReferencesInTextNode(textNode) {
+      const text = textNode.nodeValue;
+      if (!text || !referencesByLiteral.size) {
+        return;
+      }
+
+      referencePattern.lastIndex = 0;
+      let match = null;
+      let lastIndex = 0;
+      let changed = false;
+      const fragment = document.createDocumentFragment();
+
+      while ((match = referencePattern.exec(text)) !== null) {
+        const literal = match[0];
+        const ref = referencesByLiteral.get(literal);
+        if (!ref) {
+          continue;
+        }
+
+        const fullStart = match.index;
+        const literalEnd = fullStart + literal.length;
+
+        if (fullStart > lastIndex) {
+          fragment.appendChild(document.createTextNode(text.slice(lastIndex, fullStart)));
+        }
+        fragment.appendChild(createReferenceButton(ref));
+        lastIndex = literalEnd;
+        changed = true;
+      }
+
+      if (!changed) {
+        return;
+      }
+
+      if (lastIndex < text.length) {
+        fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+
+      textNode.parentNode.replaceChild(fragment, textNode);
+    }
+
+    function enhanceInlineReferences() {
+      const textNodes = [];
+      const walker = document.createTreeWalker(sectionContentEl, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          if (!node.nodeValue || !node.nodeValue.trim()) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          const parent = node.parentElement;
+          if (!parent) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          if (parent.closest('pre, code, button, a, script, style')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+
+      while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+      }
+
+      textNodes.forEach(replaceReferencesInTextNode);
+
+      sectionContentEl.querySelectorAll('code').forEach(codeEl => {
+        if (codeEl.closest('pre')) {
+          return;
+        }
+        const literal = codeEl.textContent.trim();
+        const ref = referencesByLiteral.get(literal);
+        if (!ref) {
+          return;
+        }
+        codeEl.replaceWith(createReferenceButton(ref));
+      });
+    }
+
+    function captureHeadings() {
+      const usedIds = new Set();
+      const headingNodes = Array.from(sectionContentEl.querySelectorAll('h2, h3'));
+      headings = headingNodes.map(heading => {
+        const baseId = slugify(heading.textContent || 'section');
+        let id = baseId;
+        let counter = 2;
+        while (usedIds.has(id)) {
+          id = `${baseId}-${counter}`;
+          counter += 1;
+        }
+        usedIds.add(id);
+        heading.id = id;
+        return {
+          id,
+          title: heading.textContent || 'Untitled section',
+          level: heading.tagName === 'H3' ? 3 : 2,
+          element: heading,
+        };
+      });
+
+      activeHeadingId = headings[0]?.id || null;
+    }
+
+    function closeMermaidModal() {
+      mermaidModalEl.classList.remove('open');
+      mermaidModalEl.setAttribute('aria-hidden', 'true');
+      mermaidModalContentEl.innerHTML = '';
+    }
+
+    function openMermaidModal(sourceNode) {
+      mermaidModalContentEl.innerHTML = '';
+      const clone = sourceNode.cloneNode(true);
+      const expandButton = clone.querySelector('.mermaid-expand');
+      if (expandButton) {
+        expandButton.remove();
+      }
+      mermaidModalContentEl.appendChild(clone);
+      mermaidModalEl.classList.add('open');
+      mermaidModalEl.setAttribute('aria-hidden', 'false');
+    }
+
+    function renderSectionTabs() {
+      if (!headings.length) {
+        sectionTabsEl.innerHTML = '<div class="section-empty">Add `##` headings to create section navigation.</div>';
+        return;
+      }
+
+      sectionTabsEl.innerHTML = headings.map(heading => `
+        <button
+          class="section-tab${heading.id === activeHeadingId ? ' active' : ''}"
+          data-heading-id="${escapeHtml(heading.id)}"
+          style="margin-left:${heading.level === 3 ? '12px' : '0'}"
+        >
+          ${escapeHtml(heading.title)}
+        </button>
+      `).join('');
+    }
+
+    function updateActiveHeadingFromScroll() {
+      if (!headings.length) {
+        return;
+      }
+
+      const scrollTop = explanationScrollEl.scrollTop;
+      let currentHeading = headings[0];
+      for (const heading of headings) {
+        if (heading.element.offsetTop - scrollTop <= 80) {
+          currentHeading = heading;
+        } else {
+          break;
+        }
+      }
+
+      if (currentHeading && currentHeading.id !== activeHeadingId) {
+        activeHeadingId = currentHeading.id;
+        renderSectionTabs();
+      }
+    }
+
+    function ensureEditor() {
+      return new Promise((resolve, reject) => {
+        if (window.monaco && window.monaco.editor && editor) {
+          resolve();
+          return;
+        }
+
+        if (!(window.require && window.require.config)) {
+          reject(new Error('Monaco loader did not initialize.'));
+          return;
+        }
+
+        window.require.config({
+          paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs' }
+        });
+
+        window.require(['vs/editor/editor.main'], () => {
+          if (!editor) {
+            editor = monaco.editor.create(document.getElementById('editor'), {
+              value: '',
+              language: 'plaintext',
+              theme: 'vs-dark',
+              readOnly: true,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              wordWrap: 'off',
+              renderLineHighlight: 'all',
+              fontSize: 13,
+              fontFamily: 'IBM Plex Mono, Menlo, monospace'
+            });
+
+            const style = document.createElement('style');
+            style.textContent = `
+              .highlighted-reference-line {
+                background: rgba(124, 199, 255, 0.16);
+              }
+              .highlighted-reference-gutter {
+                border-left: 3px solid rgba(124, 199, 255, 0.92);
+                margin-left: 4px;
+              }
+            `;
+            document.head.appendChild(style);
+          }
+          resolve();
+        }, error => reject(error));
+      });
+    }
+
+    function modelForFile(file) {
+      if (modelsByFileId.has(file.id)) {
+        return modelsByFileId.get(file.id);
+      }
+
+      const uri = monaco.Uri.parse(`inmemory://model/${file.path}`);
+      const model = monaco.editor.createModel(file.content, file.language || 'plaintext', uri);
+      modelsByFileId.set(file.id, model);
+      return model;
+    }
+
+    async function openReference(refId) {
+      const ref = referencesById.get(refId);
+      if (!ref) {
+        return;
+      }
+
+      activeReferenceId = refId;
+      sectionContentEl.querySelectorAll('[data-ref-id]').forEach(button => {
+        button.classList.toggle('active', button.getAttribute('data-ref-id') === refId);
+      });
+
+      try {
+        await ensureEditor();
+      } catch (error) {
+        document.getElementById('editor-wrap').innerHTML = `<div class="monaco-error">Unable to load Monaco from CDN.<br>${escapeHtml(String(error))}</div>`;
+        return;
+      }
+
+      const file = filesById.get(ref.file_id);
+      if (!file) {
+        return;
+      }
+
+      const model = modelForFile(file);
+      if (currentModel !== model) {
+        editor.setModel(model);
+        currentModel = model;
+      }
+
+      currentDecorations = editor.deltaDecorations(currentDecorations, [
+        {
+          range: new monaco.Range(ref.start_line, 1, ref.end_line, 1),
+          options: {
+            isWholeLine: true,
+            className: 'highlighted-reference-line',
+            linesDecorationsClassName: 'highlighted-reference-gutter'
+          }
+        }
+      ]);
+
+      editor.revealLineInCenter(ref.start_line);
+      editor.setPosition({ lineNumber: ref.start_line, column: 1 });
+
+      codeFilePathEl.textContent = ref.file_path;
+      codeLineRangeEl.textContent = ref.start_line === ref.end_line
+        ? `line ${ref.start_line}`
+        : `lines ${ref.start_line}-${ref.end_line}`;
+      codeMetaEl.textContent = ref.literal;
+      codeFooterEl.textContent = `${ref.file_path}:${ref.start_line}${ref.end_line !== ref.start_line ? '-' + ref.end_line : ''} | repo root ${data.repoRoot}`;
+    }
+
+    async function renderMarkdown() {
+      if (!(window.markdownit && window.markdownit)) {
+        sectionContentEl.innerHTML = '<div class="empty-state">Unable to load markdown renderer.</div>';
+        return;
+      }
+
+      const md = window.markdownit({
+        html: false,
+        linkify: true,
+        typographer: true,
+      });
+
+      sectionContentEl.innerHTML = md.render(data.markdown || '');
+
+      const firstHeading = sectionContentEl.querySelector('h1');
+      if (firstHeading) {
+        pageTitleEl.textContent = firstHeading.textContent || data.title || 'Code Explanation';
+        firstHeading.remove();
+      }
+
+      enhanceInlineReferences();
+      await renderMermaid();
+      captureHeadings();
+      renderSectionTabs();
+      updateActiveHeadingFromScroll();
+    }
+
+    async function renderMermaid() {
+      const mermaidBlocks = Array.from(sectionContentEl.querySelectorAll('pre > code.language-mermaid'));
+      if (!mermaidBlocks.length || !window.mermaid) {
+        return;
+      }
+
+      window.mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+      });
+
+      const containers = [];
+      mermaidBlocks.forEach((codeBlock, index) => {
+        const pre = codeBlock.parentElement;
+        if (!pre) {
+          return;
+        }
+        const container = document.createElement('div');
+        container.className = 'mermaid-wrap';
+        const expandButton = document.createElement('button');
+        expandButton.className = 'mermaid-expand';
+        expandButton.type = 'button';
+        expandButton.textContent = 'Expand';
+        expandButton.addEventListener('click', () => openMermaidModal(container));
+        container.appendChild(expandButton);
+        const diagram = document.createElement('div');
+        diagram.className = 'mermaid mermaid-diagram';
+        diagram.id = `mermaid-${index + 1}`;
+        diagram.textContent = codeBlock.textContent;
+        container.appendChild(diagram);
+        pre.replaceWith(container);
+        containers.push(diagram);
+      });
+
+      try {
+        await window.mermaid.run({ nodes: containers });
+      } catch (error) {
+        containers.forEach(container => {
+          container.classList.add('mermaid-error');
+          container.textContent = `Unable to render mermaid diagram.\n${String(error)}`;
+        });
+      }
+    }
+
+    async function initialize() {
+      await renderMarkdown();
+
+      if (data.references.length > 0) {
+        openReference(data.references[0].id);
+      }
+    }
+
+    sectionTabsEl.addEventListener('click', event => {
+      const button = event.target.closest('[data-heading-id]');
+      if (!button) {
+        return;
+      }
+
+      const headingId = button.getAttribute('data-heading-id');
+      const heading = headings.find(item => item.id === headingId);
+      if (!heading) {
+        return;
+      }
+
+      activeHeadingId = headingId;
+      renderSectionTabs();
+      explanationScrollEl.scrollTo({ top: Math.max(heading.element.offsetTop - 18, 0), behavior: 'smooth' });
+    });
+
+    sectionContentEl.addEventListener('click', event => {
+      const button = event.target.closest('[data-ref-id]');
+      if (!button) {
+        return;
+      }
+
+      openReference(button.getAttribute('data-ref-id'));
+    });
+
+    explanationScrollEl.addEventListener('scroll', updateActiveHeadingFromScroll);
+    mermaidModalCloseEl.addEventListener('click', closeMermaidModal);
+    mermaidModalEl.addEventListener('click', event => {
+      if (event.target === mermaidModalEl) {
+        closeMermaidModal();
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && mermaidModalEl.classList.contains('open')) {
+        closeMermaidModal();
+      }
+    });
+
+    initialize();
+  </script>
+</body>
+</html>
