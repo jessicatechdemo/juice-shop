@@ -86,7 +86,8 @@ jobs:
         with:
           script: |
             const pr = JSON.parse(process.env.PR_JSON);
-            const wrongBranch = pr.base.ref === 'master';
+            const allowedBranches = ['develop', 'master'];
+            const wrongBranch = !allowedBranches.includes(pr.base.ref);
             core.setOutput('violation', wrongBranch ? 'true' : 'false');
             console.log(`Target branch check: ${wrongBranch ? '❌ FAILED' : '✅ PASSED'}`);
         env:
@@ -333,9 +334,9 @@ jobs:
             }
             if (wrongBranch) {
               violations.push(
-                '🎯 **Wrong target branch:** This PR targets the `master` branch. ' +
+                '🎯 **Wrong target branch:** This PR targets an invalid branch. ' +
                 'Per our [contributing guidelines](https://github.com/juice-shop/juice-shop/blob/develop/CONTRIBUTING.md), ' +
-                'all PRs must be based on the `develop` branch. Please re-open this PR against `develop`.'
+                'all PRs must be based on the `develop` or `master` branch. Please re-open this PR against the correct branch.'
               );
             }
             if (aiMissing) {
