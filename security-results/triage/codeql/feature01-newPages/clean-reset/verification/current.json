@@ -1,0 +1,236 @@
+{
+  "alerts": [
+    {
+      "alert_number": 58,
+      "state": null
+    },
+    {
+      "alert_number": 56,
+      "state": null
+    },
+    {
+      "alert_number": 55,
+      "state": null
+    },
+    {
+      "alert_number": 54,
+      "state": null
+    },
+    {
+      "alert_number": 53,
+      "state": null
+    },
+    {
+      "alert_number": 52,
+      "state": null
+    },
+    {
+      "alert_number": 51,
+      "state": null
+    },
+    {
+      "alert_number": 50,
+      "state": null
+    },
+    {
+      "alert_number": 49,
+      "state": null
+    },
+    {
+      "alert_number": 48,
+      "state": null
+    },
+    {
+      "alert_number": 47,
+      "state": null
+    },
+    {
+      "alert_number": 44,
+      "state": null
+    },
+    {
+      "alert_number": 43,
+      "state": null
+    },
+    {
+      "alert_number": 42,
+      "state": null
+    },
+    {
+      "alert_number": 41,
+      "state": null
+    },
+    {
+      "alert_number": 39,
+      "state": null
+    },
+    {
+      "alert_number": 38,
+      "state": null
+    },
+    {
+      "alert_number": 37,
+      "state": null
+    },
+    {
+      "alert_number": 36,
+      "state": null
+    },
+    {
+      "alert_number": 35,
+      "state": null
+    },
+    {
+      "alert_number": 34,
+      "state": null
+    },
+    {
+      "alert_number": 33,
+      "state": null
+    },
+    {
+      "alert_number": 32,
+      "state": null
+    },
+    {
+      "alert_number": 31,
+      "state": null
+    },
+    {
+      "alert_number": 30,
+      "state": null
+    },
+    {
+      "alert_number": 29,
+      "state": null
+    },
+    {
+      "alert_number": 28,
+      "state": null
+    },
+    {
+      "alert_number": 27,
+      "state": null
+    },
+    {
+      "alert_number": 26,
+      "state": null
+    },
+    {
+      "alert_number": 25,
+      "state": null
+    },
+    {
+      "alert_number": 24,
+      "state": null
+    },
+    {
+      "alert_number": 23,
+      "state": null
+    },
+    {
+      "alert_number": 22,
+      "state": null
+    },
+    {
+      "alert_number": 21,
+      "state": null
+    },
+    {
+      "alert_number": 20,
+      "state": null
+    },
+    {
+      "alert_number": 19,
+      "state": null
+    },
+    {
+      "alert_number": 18,
+      "state": null
+    },
+    {
+      "alert_number": 17,
+      "state": null
+    },
+    {
+      "alert_number": 16,
+      "state": null
+    },
+    {
+      "alert_number": 15,
+      "state": null
+    },
+    {
+      "alert_number": 14,
+      "state": null
+    },
+    {
+      "alert_number": 13,
+      "state": null
+    },
+    {
+      "alert_number": 12,
+      "state": null
+    },
+    {
+      "alert_number": 11,
+      "state": null
+    },
+    {
+      "alert_number": 10,
+      "state": null
+    },
+    {
+      "alert_number": 9,
+      "state": null
+    },
+    {
+      "alert_number": 4,
+      "state": null
+    },
+    {
+      "alert_number": 3,
+      "state": null
+    },
+    {
+      "alert_number": 2,
+      "state": null
+    }
+  ],
+  "all_reopened": true,
+  "branch": "feature01-newPages",
+  "replacement_analyses": [
+    {
+      "analysis_key": ".github/workflows/codeql-analysis.yml:analyze",
+      "category": ".github/workflows/codeql-analysis.yml:analyze/language:javascript-typescript",
+      "commit_sha": "ea23faea24259263005a209adb03975347f92fd8",
+      "created_at": "2026-08-03T07:52:11Z",
+      "deletable": true,
+      "environment": "{\"language\":\"javascript-typescript\"}",
+      "error": "",
+      "id": 1562592859,
+      "ref": "refs/heads/feature01-newPages",
+      "results_count": 58,
+      "rules_count": 102,
+      "sarif_id": "3b8feb52-8f10-11f1-9377-a73700864d90",
+      "tool": {
+        "guid": null,
+        "name": "CodeQL",
+        "version": "2.26.2"
+      },
+      "url": "https://api.github.com/repos/jessicatechdemo/juice-shop/code-scanning/analyses/1562592859",
+      "warning": ""
+    }
+  ],
+  "repository": "jessicatechdemo/juice-shop",
+  "schema_version": "codeql-clean-reset-receipt/v0",
+  "verified_at": "20260803T075552.306274Z",
+  "workflow_run": {
+    "attempt": 3,
+    "conclusion": "success",
+    "headBranch": "feature01-newPages",
+    "headSha": "ea23faea24259263005a209adb03975347f92fd8",
+    "status": "completed",
+    "url": "https://github.com/jessicatechdemo/juice-shop/actions/runs/30737229448"
+  }
+}

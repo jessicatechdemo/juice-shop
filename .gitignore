@@ -69,5 +69,6 @@ config/*.yml
 .DS_Store
 
 # Misc
+.venv/
 .playwright-mcp/
 cypress/screenshots/

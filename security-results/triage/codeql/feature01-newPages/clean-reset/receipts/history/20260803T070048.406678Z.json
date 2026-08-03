@@ -1,0 +1,13 @@
+{
+  "branch": "feature01-newPages",
+  "complete": false,
+  "completed_at": "20260803T070049.983152Z",
+  "deleted_analysis": null,
+  "error": "alert 58: expected open, found None",
+  "plan_sha256": "9a1b65f46eabecd2a022b02a7a897ba1c22c222f82364cebe5e21e7864c2e380",
+  "reopened_alerts": [],
+  "repository": "jessicatechdemo/juice-shop",
+  "rerun": null,
+  "schema_version": "codeql-clean-reset-receipt/v0",
+  "started_at": "20260803T070048.407141Z"
+}

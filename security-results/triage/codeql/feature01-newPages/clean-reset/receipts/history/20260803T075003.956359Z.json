@@ -1,0 +1,267 @@
+{
+  "branch": "feature01-newPages",
+  "complete": true,
+  "completed_at": "20260803T075032.355696Z",
+  "deleted_analysis": {
+    "id": 1562487988,
+    "response": {
+      "confirm_delete_url": null,
+      "next_analysis_url": null
+    }
+  },
+  "plan_sha256": "f9c25bd5da973bac12f2734409798fffc93b9d07a990dd08a01f713c26938438",
+  "reopened_alerts": [
+    {
+      "alert_number": 58,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 56,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 55,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 54,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 53,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 52,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 51,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 50,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 49,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 48,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 47,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 44,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 43,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 42,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 41,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 39,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 38,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 37,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 36,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 35,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 34,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 33,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 32,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 31,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 30,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 29,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 28,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 27,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 26,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 25,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 24,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 23,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 22,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 21,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 20,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 19,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 18,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 17,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 16,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 15,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 14,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 13,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 12,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 11,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 10,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 9,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 4,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 3,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 2,
+      "outcome": "already_open",
+      "state_after": "open"
+    }
+  ],
+  "repository": "jessicatechdemo/juice-shop",
+  "rerun": {
+    "run_id": 30737229448,
+    "status": "requested"
+  },
+  "schema_version": "codeql-clean-reset-receipt/v0",
+  "started_at": "20260803T075003.957014Z"
+}

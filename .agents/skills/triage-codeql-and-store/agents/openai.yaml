@@ -1,0 +1,6 @@
+interface:
+  display_name: "Triage CodeQL and Store"
+  short_description: "Triage, store, and request CodeQL dismissals"
+  default_prompt: "Use $triage-codeql-and-store to triage open CodeQL alerts, persist the result, preview reviewer-gated dismissal requests, and pause for my approval before submitting them."
+policy:
+  allow_implicit_invocation: false

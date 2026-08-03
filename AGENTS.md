@@ -199,12 +199,25 @@ npm run rsn
 - **Project Documentation**: [pwning.owasp-juice.shop](https://pwning.owasp-juice.shop/)
 - **Community**: GitHub issues and discussions.
 
+### GitHub CLI Authentication
+
+On this macOS workspace, `gh` credentials are stored in the system keyring,
+which is not accessible from the command sandbox. A sandboxed `gh auth status`
+or `gh api` call can therefore return an invalid-token error or HTTP 401 even
+when the user is authenticated. Do not treat that sandbox result as proof that
+authentication has expired. For authenticated GitHub CLI operations, request
+approval to run the command outside the sandbox so `gh` can access the keyring,
+then verify the active account with `gh auth status`. Never print or persist the
+token itself.
+
 ## Skills
 
 - [add-reference skill](./.ai/skills/add-reference/SKILL.md): Instructions for adding new blog posts, talks, or other references to `REFERENCES.md`
 - [add-solution skill](./.ai/skills/add-solution/SKILL.md): Instructions for adding new hacking guides, videos, or tools to `SOLUTIONS.md`
 - [create-m3-theme skill](./.ai/skills/create-m3-theme/SKILL.md): Instructions for creating new Angular Material M3 themes
 - [generate-release-notes skill](./.ai/skills/generate-release-notes/SKILL.md): Instructions for generating release notes.
+- [triage-codeql-and-store skill](./.agents/skills/triage-codeql-and-store/SKILL.md): Instructions for triaging GitHub CodeQL alerts, persisting validated results, and applying approval-gated status updates to existing GitHub alerts
+- [clean-reset-codeql-and-retriage skill](./.agents/skills/clean-reset-codeql-and-retriage/SKILL.md): Instructions for approval-gated reopening, final-analysis deletion, CodeQL rerun verification, and fresh triage
 - [verify-challenge skill](./.ai/skills/verify-challenge/SKILL.md): Instructions for verifying new challenges fulfill all project requirements and metadata
 - [verify-rsn-fix skill](./.ai/skills/verify-rsn-fix/SKILL.md): Instructions for identifying and fixing broken RSN caused by code changes
 

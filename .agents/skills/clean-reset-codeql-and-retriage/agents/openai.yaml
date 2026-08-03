@@ -1,0 +1,6 @@
+interface:
+  display_name: "Clean Reset CodeQL and Retriage"
+  short_description: "Reset CodeQL analyses and retriage safely"
+  default_prompt: "Use $clean-reset-codeql-and-retriage to preview and run an approval-gated CodeQL branch reset, rescan, and retriage."
+policy:
+  allow_implicit_invocation: false
