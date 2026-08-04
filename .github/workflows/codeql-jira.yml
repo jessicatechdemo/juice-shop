@@ -1,5 +1,6 @@
 name: "Publish CodeQL triage to Jira"
 
+# Triggered automatically when CodeQL scan workflows complete, or manually for Jira approval.
 on:
   workflow_run:
     workflows: ["CodeQL Scan", "CodeQL Scheduled Scan"]
