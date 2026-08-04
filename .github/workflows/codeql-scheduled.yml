@@ -59,12 +59,14 @@ jobs:
       alert-count: ${{ steps.codeql-intake.outputs.count }}
     env:
       CODEX_HOME: ${{ github.workspace }}/.ci-temp/${{ github.run_id }}-${{ github.run_attempt }}/codex-home
-      CODEQL_RAW_DIR: ${{ runner.temp }}/codeql-scheduled-triage-raw
-      CODEQL_INTAKE_FILE: ${{ runner.temp }}/codeql-scheduled-triage-raw/intake.json
-      CODEQL_TRIAGE_FILE: ${{ runner.temp }}/codeql-scheduled-triage-raw/triage.json
       CODEX_SECURITY_PLUGIN_REPOSITORY: ${{ github.workspace }}/.ci-temp/${{ github.run_id }}-${{ github.run_attempt }}/openai-plugins
       CODEX_SECURITY_PLUGIN_REVISION: 11c74d6ba24d3a6d48f54a194cd00ef3beea18f9
     steps:
+    - name: Set temp paths
+      run: |
+        echo "CODEQL_RAW_DIR=$RUNNER_TEMP/codeql-scheduled-triage-raw" >> "$GITHUB_ENV"
+        echo "CODEQL_INTAKE_FILE=$RUNNER_TEMP/codeql-scheduled-triage-raw/intake.json" >> "$GITHUB_ENV"
+        echo "CODEQL_TRIAGE_FILE=$RUNNER_TEMP/codeql-scheduled-triage-raw/triage.json" >> "$GITHUB_ENV"
     - name: Checkout scanned main revision
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
@@ -172,11 +174,12 @@ jobs:
     permissions:
       actions: read
       contents: read
-    env:
-      CODEQL_RAW_DIR: ${{ runner.temp }}/codeql-scheduled-triage-raw
-      CODEQL_OUTPUT_ROOT: ${{ runner.temp }}/codeql-triage-results
-      CODEQL_HANDOFF_DIR: ${{ runner.temp }}/codeql-jira-handoff
     steps:
+    - name: Set temp paths
+      run: |
+        echo "CODEQL_RAW_DIR=$RUNNER_TEMP/codeql-scheduled-triage-raw" >> "$GITHUB_ENV"
+        echo "CODEQL_OUTPUT_ROOT=$RUNNER_TEMP/codeql-triage-results" >> "$GITHUB_ENV"
+        echo "CODEQL_HANDOFF_DIR=$RUNNER_TEMP/codeql-jira-handoff" >> "$GITHUB_ENV"
     - name: Checkout scanned main revision
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
