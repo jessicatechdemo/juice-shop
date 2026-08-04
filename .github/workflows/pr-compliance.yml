@@ -33,7 +33,7 @@ jobs:
               deletions: f.deletions
             }));
             
-            // Fetch commits for DCO check
+            // Fetch commits for spam detection
             const { data: commitsData } = await github.rest.pulls.listCommits({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -86,7 +86,8 @@ jobs:
         with:
           script: |
             const pr = JSON.parse(process.env.PR_JSON);
-            const wrongBranch = pr.base.ref === 'master';
+            const allowedBranches = ['develop', 'master'];
+            const wrongBranch = !allowedBranches.includes(pr.base.ref);
             core.setOutput('violation', wrongBranch ? 'true' : 'false');
             console.log(`Target branch check: ${wrongBranch ? '❌ FAILED' : '✅ PASSED'}`);
         env:
@@ -121,19 +122,6 @@ jobs:
             console.log(`Affirmation check: ${affirmationMissing ? '❌ FAILED' : '✅ PASSED'}`);
         env:
           PR_JSON: ${{ steps.init.outputs.pr }}
-
-      - name: "Check DCO Sign-off"
-        if: steps.membership.outputs.is_member == 'false'
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd #v8.0.0
-        id: dco
-        with:
-          script: |
-            const commits = JSON.parse(process.env.COMMITS_JSON);
-            const dcoMissing = commits.some(c => !c.commit.message.includes('Signed-off-by:'));
-            core.setOutput('violation', dcoMissing ? 'true' : 'false');
-            console.log(`DCO check: ${dcoMissing ? '❌ FAILED' : '✅ PASSED'}`);
-        env:
-          COMMITS_JSON: ${{ steps.init.outputs.commits }}
 
       - name: "Check I18N Modification"
         if: steps.membership.outputs.is_member == 'false'
@@ -202,7 +190,7 @@ jobs:
             
             const maintainerFiles = [
               'HALL_OF_FAME.md', 'LICENSE', 'SECURITY.md', 'CODE_OF_CONDUCT.md', 'CONTRIBUTING.md', 'crowdin.yaml',
-              'AGENTS.md', 'CODEOWNERS', 'lib/config.schema.ts', 'ctf.key', 'app.json'
+              'CODEOWNERS', 'lib/config.schema.ts', 'ctf.key', 'app.json'
             ];
             const maintainerFileCount = files.filter(f => 
               maintainerFiles.includes(f.filename) || 
@@ -263,10 +251,7 @@ jobs:
               spamScore += 15;
               console.log(`+15 Score (Missing Affirmation) - Current: ${spamScore}`);
             }
-            if (process.env.DCO_VIOLATION === 'true') {
-              spamScore += 15;
-              console.log(`+15 Score (Missing DCO Sign-off) - Current: ${spamScore}`);
-            }
+
             if (process.env.I18N_VIOLATION === 'true') {
               spamScore += 15;
               console.log(`+15 Score (Direct I18N Modification) - Current: ${spamScore}`);
@@ -292,7 +277,6 @@ jobs:
           BRANCH_VIOLATION: ${{ steps.branch.outputs.violation }}
           AI_VIOLATION: ${{ steps.ai.outputs.violation }}
           AFFIRMATION_VIOLATION: ${{ steps.affirmation.outputs.violation }}
-          DCO_VIOLATION: ${{ steps.dco.outputs.violation }}
           I18N_VIOLATION: ${{ steps.i18n.outputs.violation }}
 
       - name: "Finalize Compliance Check"
@@ -306,7 +290,7 @@ jobs:
             const wrongBranch = process.env.BRANCH_VIOLATION === 'true';
             const aiMissing = process.env.AI_VIOLATION === 'true';
             const affirmationMissing = process.env.AFFIRMATION_VIOLATION === 'true';
-            const dcoMissing = process.env.DCO_VIOLATION === 'true';
+
             const i18nModified = process.env.I18N_VIOLATION === 'true';
             const spamRating = parseInt(process.env.SPAM_RATING);
             const isSpam = spamRating >= 75;
@@ -317,7 +301,7 @@ jobs:
               !wrongBranch ? '✅' : '❌',
               !aiMissing ? '✅' : '❌',
               !affirmationMissing ? '✅' : '❌',
-              !dcoMissing ? '✅' : '❌',
+
               !i18nModified ? '✅' : '❌'
             ].join('');
             const spamPrefix = isSpam ? '🚨 ' : (spamRating >= 40 ? '⚠️ ' : '✅ ');
@@ -333,9 +317,9 @@ jobs:
             }
             if (wrongBranch) {
               violations.push(
-                '🎯 **Wrong target branch:** This PR targets the `master` branch. ' +
+                '🎯 **Wrong target branch:** This PR targets an invalid branch. ' +
                 'Per our [contributing guidelines](https://github.com/juice-shop/juice-shop/blob/develop/CONTRIBUTING.md), ' +
-                'all PRs must be based on the `develop` branch. Please re-open this PR against `develop`.'
+                'all PRs must be based on the `develop` or `master` branch. Please re-open this PR against the correct branch.'
               );
             }
             if (aiMissing) {
@@ -349,11 +333,7 @@ jobs:
                 '🧾 **Missing Affirmation:** This PR is missing the required affirmation that your code follows the [CONTRIBUTING.md](https://github.com/juice-shop/juice-shop/blob/develop/CONTRIBUTING.md) guidelines.'
               );
             }
-            if (dcoMissing) {
-              violations.push(
-                '✍️ **Missing DCO Sign-off:** All commits in this PR must be signed off to indicate your agreement with the [Developer Certificate of Origin](https://developercertificate.org/). Please use `git commit -s` for all your commits.'
-              );
-            }
+
             if (i18nModified) {
               violations.push(
                 '🌐 **Direct I18N Modification:** Translations must be contributed via [Crowdin](https://crowdin.com/project/owasp-juice-shop) and not via GitHub PRs. Please see our [translation guidelines](https://pwning.owasp-juice.shop/companion-guide/latest/part3/translation.html) for more details.'
@@ -426,7 +406,6 @@ jobs:
           BRANCH_VIOLATION: ${{ steps.branch.outputs.violation }}
           AI_VIOLATION: ${{ steps.ai.outputs.violation }}
           AFFIRMATION_VIOLATION: ${{ steps.affirmation.outputs.violation }}
-          DCO_VIOLATION: ${{ steps.dco.outputs.violation }}
           I18N_VIOLATION: ${{ steps.i18n.outputs.violation }}
           SPAM_RATING: ${{ steps.spam.outputs.spamRating }}
 

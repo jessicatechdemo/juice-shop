@@ -1,0 +1,374 @@
+{
+  "alerts": [
+    {
+      "alert_number": 58,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-001\nRevision: ea23faea2425\nEvidence: No attacker-controlled value is written and file reads use names returned by fs.readdirSync, not a path supplied...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 56,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-003\nRevision: ea23faea2425\nEvidence: The value written is a server-created or signature-verified decoded token, and later lookup unquotes the token wi...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 55,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-004\nRevision: ea23faea2425\nEvidence: User ids originate from persisted user records and tokens are issued or verified by the server.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 54,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-005\nRevision: ea23faea2425\nEvidence: The state value and nested field names are fixed booleans/counters and valid challenge keys come from repository...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 53,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-006\nRevision: ea23faea2425\nEvidence: The uploaded filename is never used; the attacker controls file bytes, not the destination path, and the extensio...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 52,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-007\nRevision: ea23faea2425\nEvidence: A remote request does not choose or mutate these paths; exploiting the race requires local filesystem write acces...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 51,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: used in tests\nTriage item: triage-008\nRevision: ea23faea2425\nEvidence: No production import or hosted request handler path exists from this test expression.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "used in tests",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 50,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-009\nRevision: ea23faea2425\nEvidence: A user value does not decide the security result: err must be null and the verified token must match the required...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 49,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-010\nRevision: ea23faea2425\nEvidence: Forward slashes are rejected earlier and the branch does not grant a user identity or privilege.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 48,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-011\nRevision: ea23faea2425\nEvidence: A request cannot make err null merely by choosing token content.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 47,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-012\nRevision: ea23faea2425\nEvidence: The verification key is loaded from the repository public key and is not request-controlled.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 44,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-015\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 43,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-016\nRevision: ea23faea2425\nEvidence: Stack is not selected or serialized by this route.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 42,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-017\nRevision: ea23faea2425\nEvidence: Stack is not selected or serialized by this route.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 41,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-018\nRevision: ea23faea2425\nEvidence: Stack is not selected or serialized by this route.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 39,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-020\nRevision: ea23faea2425\nEvidence: Stack is not selected or serialized by this route.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 38,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-021\nRevision: ea23faea2425\nEvidence: Stack is not selected or serialized by this route.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 37,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-022\nRevision: ea23faea2425\nEvidence: Stack is not selected or serialized by this route.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 36,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-023\nRevision: ea23faea2425\nEvidence: CodeQL's named sensitive sources are Challenge metadata properties, while the concrete interpolated value is chal...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 35,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-024\nRevision: ea23faea2425\nEvidence: CodeQL's named sensitive sources are Challenge metadata properties, while the concrete interpolated value is chal...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 34,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-025\nRevision: ea23faea2425\nEvidence: matchedUrl comes from generated anchor markup and the result is emitted as a link only.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 33,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-026\nRevision: ea23faea2425\nEvidence: The returned string is used for containment comparisons, not emitted into HTML, SQL, shell, or filesystem sinks.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 32,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-027\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 31,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-028\nRevision: ea23faea2425\nEvidence: The function returns only a boolean and does not copy properties or execute input.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 30,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-029\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 29,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-030\nRevision: ea23faea2425\nEvidence: The request cannot provide an arbitrary object value, and unknown keys return before accuracy storage.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 28,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-031\nRevision: ea23faea2425\nEvidence: The scanner has modeled the presence of cookie parsing as ambient cookie authentication, but parsing itself grant...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 27,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: used in tests\nTriage item: triage-032\nRevision: ea23faea2425\nEvidence: No production import or hosted request handler path exists from this test expression.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "used in tests",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 26,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: used in tests\nTriage item: triage-033\nRevision: ea23faea2425\nEvidence: No production import or hosted request handler path exists from this test expression.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "used in tests",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 25,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-034\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 24,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-035\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 23,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-036\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 22,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-037\nRevision: ea23faea2425\nEvidence: The request id is placed as the value of the fixed _id key and query operator/property names are not constructed...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 21,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-038\nRevision: ea23faea2425\nEvidence: The request id is the value of a fixed _id key rather than executable SQL text.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 20,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-039\nRevision: ea23faea2425\nEvidence: The request id is the value of a fixed _id key rather than executable SQL text.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 19,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-040\nRevision: ea23faea2425\nEvidence: The request id is the value of a fixed _id key rather than executable SQL text.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 18,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-041\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 17,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-042\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 16,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-043\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 15,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-044\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 14,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-045\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 13,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-046\nRevision: ea23faea2425\nEvidence: The metadata suffix is used only after retrieveCodeSnippet confirms a repository-defined key.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 12,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-047\nRevision: ea23faea2425\nEvidence: The metadata suffix is used only after retrieveCodeSnippet confirms a repository-defined key.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 11,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-048\nRevision: ea23faea2425\nEvidence: The later metadata read is reached only when enumerated fixes exist for a repository-defined key.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 10,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-049\nRevision: ea23faea2425\nEvidence: The later metadata read is reached only when enumerated fixes exist for a repository-defined key.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 9,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: false positive\nTriage item: triage-050\nRevision: ea23faea2425\nEvidence: The URL is not used as a filesystem path; unknown suffixes fall back to jpg.\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "false positive",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 4,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-055\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 3,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-056\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    },
+    {
+      "alert_number": 2,
+      "current_state": "open",
+      "expected_comment": "Codex triage verdict: not_actionable\nGitHub disposition: won't fix\nTriage item: triage-057\nRevision: ea23faea2425\nEvidence: The security impact is real, but it is the intended product behavior of this training application rather than an unexp...\nArtifact SHA-256: b77b610884cf1feb",
+      "expected_reason": "won't fix",
+      "expected_state": "dismissed"
+    }
+  ],
+  "analysis": {
+    "analysis_key": ".github/workflows/codeql-analysis.yml:analyze",
+    "category": ".github/workflows/codeql-analysis.yml:analyze/language:javascript-typescript",
+    "commit_sha": "ea23faea24259263005a209adb03975347f92fd8",
+    "created_at": "2026-08-03T07:23:49Z",
+    "deletable": true,
+    "id": 1562487988,
+    "ref": "refs/heads/feature01-newPages",
+    "results_count": 58
+  },
+  "branch": "feature01-newPages",
+  "created_at": "20260803T074357.291502Z",
+  "repository": "jessicatechdemo/juice-shop",
+  "schema_version": "codeql-clean-reset/v0",
+  "source_receipt_path": "security-results/triage/codeql/feature01-newPages/github-writeback/receipts/current.json",
+  "source_receipt_sha256": "2852463b3b00ed0d6ee1a6ce3c5013ce1c4c2122b7bcfe1056aba2346e1ac05c",
+  "workflow": "codeql-analysis.yml",
+  "workflow_run": {
+    "conclusion": "success",
+    "createdAt": "2026-08-02T07:08:34Z",
+    "databaseId": 30737229448,
+    "event": "push",
+    "headBranch": "feature01-newPages",
+    "headSha": "ea23faea24259263005a209adb03975347f92fd8",
+    "status": "completed",
+    "url": "https://github.com/jessicatechdemo/juice-shop/actions/runs/30737229448"
+  }
+}

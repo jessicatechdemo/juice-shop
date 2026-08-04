@@ -29,7 +29,31 @@ void describe('challengeUtils', () => {
 
   void describe('findChallengeByName', () => {
     void it('returns undefined for non-existing challenge', () => {
-      assert.equal(challengeUtils.findChallengeByName('blubbChallenge'), undefined)
+      const originalLoggerWarn = logger.warn
+      logger.warn = mock.fn()
+
+      try {
+        assert.equal(challengeUtils.findChallengeByName('blubbChallenge'), undefined)
+        assert.equal(logger.warn.mock.calls[0].arguments[0], 'Missing challenge with name: blubbChallenge')
+      } finally {
+        logger.warn = originalLoggerWarn
+      }
+    })
+
+    void it('does not allow line breaks in logged missing challenge names', () => {
+      const originalLoggerWarn = logger.warn
+      logger.warn = mock.fn()
+
+      try {
+        for (const challengeName of ['missing\nforged', 'missing\rforged', 'missing\r\nforged', 'missing\n\nforged']) {
+          assert.equal(challengeUtils.findChallengeByName(challengeName), undefined)
+        }
+        for (const call of logger.warn.mock.calls) {
+          assert.doesNotMatch(call.arguments[0], /[\r\n]/)
+        }
+      } finally {
+        logger.warn = originalLoggerWarn
+      }
     })
 
     void it('returns existing challenge', () => {

@@ -1,0 +1,267 @@
+{
+  "branch": "feature01-newPages",
+  "complete": true,
+  "completed_at": "20260803T072206.521837Z",
+  "deleted_analysis": {
+    "id": 1559859183,
+    "response": {
+      "confirm_delete_url": null,
+      "next_analysis_url": null
+    }
+  },
+  "plan_sha256": "9a1b65f46eabecd2a022b02a7a897ba1c22c222f82364cebe5e21e7864c2e380",
+  "reopened_alerts": [
+    {
+      "alert_number": 58,
+      "outcome": "already_open",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 56,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 55,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 54,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 53,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 52,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 51,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 50,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 49,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 48,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 47,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 44,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 43,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 42,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 41,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 39,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 38,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 37,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 36,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 35,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 34,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 33,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 32,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 31,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 30,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 29,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 28,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 27,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 26,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 25,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 24,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 23,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 22,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 21,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 20,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 19,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 18,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 17,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 16,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 15,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 14,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 13,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 12,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 11,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 10,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 9,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 4,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 3,
+      "outcome": "reopened",
+      "state_after": "open"
+    },
+    {
+      "alert_number": 2,
+      "outcome": "reopened",
+      "state_after": "open"
+    }
+  ],
+  "repository": "jessicatechdemo/juice-shop",
+  "rerun": {
+    "run_id": 30737229448,
+    "status": "requested"
+  },
+  "schema_version": "codeql-clean-reset-receipt/v0",
+  "started_at": "20260803T072051.242768Z"
+}

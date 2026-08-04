@@ -1,0 +1,6 @@
+interface:
+  display_name: "Triage CodeQL and Store"
+  short_description: "Triage every CodeQL finding into Jira"
+  default_prompt: "Use $triage-codeql-and-store to triage every CodeQL alert on my current branch, save the report, and prepare one approval-gated Jira tracking preview."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fix Finding and Open PR"
+  short_description: "Verify a security fix before PR approval"
+  default_prompt: "Use $fix-finding-and-open-pr to fix and verify a security finding, show regression proof, and request permission before opening a PR."

@@ -1,0 +1,39 @@
+{
+  "branch": "feature01-newPages",
+  "created_at": "20260803T155939.892004Z",
+  "github": {
+    "host": "github.com",
+    "login": "jessicatechdemo",
+    "repository": "jessicatechdemo/juice-shop",
+    "repository_url": "https://github.com/jessicatechdemo/juice-shop",
+    "viewer_permission": "ADMIN",
+    "visibility": "PUBLIC"
+  },
+  "items": [
+    {
+      "action": "create",
+      "alert_number": 4,
+      "alert_url": "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/4",
+      "comment": "<!-- codex-codeql-triage:v1 finding-id=github-codeql-alert-4 -->\n## Codex Security CodeQL triage\n\nComment destination: `GitHub tracking issue` (not the Code Scanning alert)\nStatus: `not_actionable`\nFinding ID: `github-codeql-alert-4`\nTriage item ID: `triage-056`\nFinding fingerprint: `1ff2bdabe68a6b1877d4a2aaed42fbc8d82113fbc0ae331930696f7ef4e73846`\nReport path: `security-results/triage/codeql/feature01-newPages/report.html`\nCode scanning alert: [#4](https://github.com/jessicatechdemo/juice-shop/security/code-scanning/4)\nRepository: `jessicatechdemo/juice-shop`\nBranch: `feature01-newPages`\nRevision: `840220e9a18d8bc51b034d7858c85072c45d0629`\nConfidence: `high`\n\n### Affected locations\n- scanner location: `routes/trackOrder.ts:18-18`\n\n### Evidence\n- routes/trackOrder.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.\n- data/static/challenges.yml documents the corresponding attack and mitigation context.\n\n### Counterevidence\n- The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.\n\n### Proof gaps\n- None recorded.\n\nRecommended next step: `no-action`\nFix-finding handoff: not applicable\n",
+      "finding_fingerprint": "1ff2bdabe68a6b1877d4a2aaed42fbc8d82113fbc0ae331930696f7ef4e73846",
+      "finding_id": "github-codeql-alert-4",
+      "issue_body": "This issue tracks one GitHub Code Scanning finding without changing the alert state.\n\nFinding ID: `github-codeql-alert-4`\nFinding fingerprint: `1ff2bdabe68a6b1877d4a2aaed42fbc8d82113fbc0ae331930696f7ef4e73846`\nCode scanning alert: https://github.com/jessicatechdemo/juice-shop/security/code-scanning/4\nReport path: `security-results/triage/codeql/feature01-newPages/report.html`\n\nAfter creation, link this issue from the alert's **Tracking** section in the GitHub UI. GitHub does not currently expose that relationship through its public REST or GraphQL APIs.\n",
+      "issue_number": null,
+      "issue_title": "[CodeQL][not_actionable][#4] js/code-injection in routes/trackOrder.ts",
+      "issue_url": null,
+      "manual_link_required": true,
+      "title": "js/code-injection in routes/trackOrder.ts",
+      "triage_item_id": "triage-056",
+      "verdict": "not_actionable"
+    }
+  ],
+  "manual_link_required": true,
+  "report_path": "security-results/triage/codeql/feature01-newPages/report.html",
+  "report_sha256": "a6e8c090df3d8c63937169ec344cc43e0d32e1294e64f0c8ba74d94655087298",
+  "repository": "jessicatechdemo/juice-shop",
+  "schema_version": "codeql-triage-issue-comments/v1",
+  "triage_path": "security-results/triage/codeql/feature01-newPages/current.json",
+  "triage_revision": "840220e9a18d8bc51b034d7858c85072c45d0629",
+  "triage_sha256": "5b35487d90590840a86963c0d3da56fd185108ec139371d8444ea36b57fe00e1",
+  "write_mode": "github_issue_comment"
+}

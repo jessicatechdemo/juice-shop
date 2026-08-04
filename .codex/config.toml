@@ -1,0 +1,23 @@
+# Project-local Codex defaults for OWASP Juice Shop.
+model = "gpt-5.6-sol"
+approval_policy = "on-request"
+model_reasoning_effort = "high"
+default_permissions = "project-edit"
+
+[permissions.project-edit]
+description = "Edit files within the Juice Shop workspace."
+extends = ":workspace"
+
+[permissions.project-edit.filesystem.":workspace_roots"]
+".codex" = "read"
+".devcontainer"= "read"
+".frontend" = "write"
+".routes" = "write"
+".test" = "write"
+
+[permissions.project-edit.network]
+enabled = true
+
+[permissions.project-edit.network.domains]
+"api.openai.com" = "allow"
+"*.github.com" = "allow"

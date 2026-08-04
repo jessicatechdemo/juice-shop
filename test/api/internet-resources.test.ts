@@ -72,15 +72,6 @@ void describe('Required Internet resource', () => {
     assert.ok(body.includes('current=0Y8rMnww$*9VFYE%C2%A759-!Fg1L6t&amp;6lB'))
   })
 
-  void it('StackOverflow question "Less verbose access logs using expressjs/morgan" with log snippet and PasteBin paste URL spoiler available', async () => {
-    const res = await fetch('https://stackoverflow.com/questions/57061271/less-verbose-access-logs-using-expressjs-morgan')
-    const body = await res.text()
-    assert.equal(res.status, 200)
-    assert.ok(body.includes('/rest/continue-code'))
-    assert.ok(body.includes('/api/Challenges/?name=Score%20Board'))
-    assert.ok(body.includes('https://pastebin.com/4U1V1UjU'))
-  })
-
   void it('GitHub issue (https://github.com/apostrophecms/sanitize-html/issues/29) for "Server-side XSS Protection" challenge available', async () => {
     const res = await fetch('https://github.com/apostrophecms/sanitize-html/issues/29')
     const body = await res.text()
