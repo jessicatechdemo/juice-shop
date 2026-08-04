@@ -154,6 +154,40 @@ jobs:
           locations, evidence, counterevidence, proof gaps, boundary assessment,
           exploitability rank, reachable path, and recommended next step for
           every alert.
+    - name: Recover triage output from final message
+      if: steps.codeql-intake.outputs.count != '0'
+      env:
+        EXPECTED_COUNT: ${{ steps.codeql-intake.outputs.count }}
+        FINAL_MESSAGE: ${{ steps.triage.outputs.final-message }}
+      run: |
+        set -euo pipefail
+        actual="$(jq '.findings | length' "$CODEQL_TRIAGE_FILE")"
+        if [ "$actual" -eq "$EXPECTED_COUNT" ]; then
+          echo "Triage output file already has $actual findings."
+          exit 0
+        fi
+        echo "::warning::output-file has $actual findings, expected $EXPECTED_COUNT. Attempting recovery from final-message output."
+        recovered="$RUNNER_TEMP/codex-final-message.json"
+        printf '%s' "$FINAL_MESSAGE" > "$recovered"
+        # The final message may contain the JSON object directly or wrapped in markdown fences
+        if jq -e '.findings | length' "$recovered" >/dev/null 2>&1; then
+          cp "$recovered" "$CODEQL_TRIAGE_FILE"
+        else
+          # Try extracting JSON from markdown code fences
+          sed -n '/^```\(json\)\?$/,/^```$/{/^```/d;p}' "$recovered" > "$RUNNER_TEMP/extracted.json"
+          if jq -e '.findings | length' "$RUNNER_TEMP/extracted.json" >/dev/null 2>&1; then
+            cp "$RUNNER_TEMP/extracted.json" "$CODEQL_TRIAGE_FILE"
+          else
+            echo "::error::Could not recover triage findings from Codex final-message output."
+            exit 1
+          fi
+        fi
+        new_count="$(jq '.findings | length' "$CODEQL_TRIAGE_FILE")"
+        if [ "$new_count" -ne "$EXPECTED_COUNT" ]; then
+          echo "::error::Recovered triage has $new_count findings but expected $EXPECTED_COUNT."
+          exit 1
+        fi
+        echo "Recovered $new_count findings from final-message output."
     - name: Report empty scheduled triage
       if: steps.codeql-intake.outputs.count == '0'
       run: echo "No open CodeQL alerts exist for master." >> "$GITHUB_STEP_SUMMARY"
