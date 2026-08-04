@@ -174,7 +174,7 @@ jobs:
           cp "$recovered" "$CODEQL_TRIAGE_FILE"
         else
           # Try extracting JSON from markdown code fences
-          sed -n '/^```\(json\)\?$/,/^```$/{/^```/d;p}' "$recovered" > "$RUNNER_TEMP/extracted.json"
+          grep -v '^```' "$recovered" > "$RUNNER_TEMP/extracted.json" || true
           if jq -e '.findings | length' "$RUNNER_TEMP/extracted.json" >/dev/null 2>&1; then
             cp "$RUNNER_TEMP/extracted.json" "$CODEQL_TRIAGE_FILE"
           else
