@@ -84,6 +84,8 @@ class RenderTriageReportTest(unittest.TestCase):
         self.assertIn(
             "https://github.com/example/repo/security/code-scanning/1", report
         )
+        self.assertIn("<strong>Finding ID:</strong> github-codeql-alert-1", report)
+        self.assertIn("<strong>Triage item ID:</strong> triage-1", report)
 
     def test_empty_report_is_explicit(self):
         payload = self.payload()

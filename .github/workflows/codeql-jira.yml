@@ -1,0 +1,294 @@
+name: "Publish CodeQL triage to Jira"
+
+on:
+  workflow_run:
+    workflows: ["CodeQL Scan", "CodeQL Scheduled Scan"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      plan_run_id:
+        description: "Run ID that produced the reviewed codeql-jira-preview artifact"
+        required: true
+        type: string
+      approval_token:
+        description: "SHA-256 approval token shown in the reviewed Jira preview"
+        required: true
+        type: string
+
+jobs:
+  plan-jira:
+    name: Prepare Jira approval preview
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      (
+        (
+          github.event.workflow_run.name == 'CodeQL Scan' &&
+          github.event.workflow_run.event == 'pull_request'
+        ) ||
+        (
+          github.event.workflow_run.name == 'CodeQL Scheduled Scan' &&
+          (
+            github.event.workflow_run.event == 'schedule' ||
+            github.event.workflow_run.event == 'workflow_dispatch'
+          )
+        )
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    env:
+      JIRA_PROJECT: KAN
+      JIRA_SITE: https://jesssg50mail.atlassian.net
+      HANDOFF_DIR: ${{ runner.temp }}/codeql-jira-handoff
+    steps:
+    - name: Checkout trusted Jira tooling
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      with:
+        ref: ${{ github.event.repository.default_branch }}
+        path: trusted
+        persist-credentials: false
+    - name: Locate validated triage handoff
+      id: handoff-artifact
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd #v8.0.0
+      with:
+        github-token: ${{ github.token }}
+        script: |
+          const artifacts = await github.paginate(
+            github.rest.actions.listWorkflowRunArtifacts,
+            {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+              per_page: 100
+            }
+          )
+          const matches = artifacts.filter(artifact =>
+            artifact.name === 'codeql-jira-handoff' && !artifact.expired
+          )
+          if (matches.length > 1) {
+            core.setFailed('The CodeQL run contains multiple Jira handoff artifacts.')
+            return
+          }
+          core.setOutput('available', matches.length === 1 ? 'true' : 'false')
+    - name: Report no triage handoff
+      if: steps.handoff-artifact.outputs.available != 'true'
+      run: echo "The completed CodeQL run produced no Jira handoff, so no preview is required." >> "$GITHUB_STEP_SUMMARY"
+    - name: Download validated triage handoff
+      if: steps.handoff-artifact.outputs.available == 'true'
+      uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 #v4.1.8
+      with:
+        name: codeql-jira-handoff
+        path: ${{ env.HANDOFF_DIR }}
+        github-token: ${{ github.token }}
+        run-id: ${{ github.event.workflow_run.id }}
+    - name: Validate handoff with trusted tooling
+      if: steps.handoff-artifact.outputs.available == 'true'
+      id: handoff
+      env:
+        SOURCE_EVENT: ${{ github.event.workflow_run.event }}
+        SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+        SOURCE_WORKFLOW: ${{ github.event.workflow_run.name }}
+      run: |
+        python3 trusted/.agents/skills/triage-codeql-and-store/scripts/validate_codeql_handoff.py \
+          --directory "$HANDOFF_DIR" \
+          --repository "$GITHUB_REPOSITORY" \
+          --source-workflow "$SOURCE_WORKFLOW" \
+          --source-event "$SOURCE_EVENT" \
+          --source-run-id "$SOURCE_RUN_ID" \
+          --github-output "$GITHUB_OUTPUT"
+    - name: Checkout the triaged revision
+      if: steps.handoff-artifact.outputs.available == 'true'
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      with:
+        ref: ${{ steps.handoff.outputs.revision }}
+        fetch-depth: 0
+        path: source
+        persist-credentials: false
+    - name: Attach the validated source branch
+      if: steps.handoff-artifact.outputs.available == 'true'
+      env:
+        SOURCE_BRANCH: ${{ steps.handoff.outputs.branch }}
+        SOURCE_REVISION: ${{ steps.handoff.outputs.revision }}
+      run: |
+        git check-ref-format --branch "$SOURCE_BRANCH"
+        git -C source switch -C "$SOURCE_BRANCH" "$SOURCE_REVISION"
+        test "$(git -C source symbolic-ref --quiet --short HEAD)" = "$SOURCE_BRANCH"
+        test "$(git -C source rev-parse HEAD)" = "$SOURCE_REVISION"
+    - name: Stage validated Jira inputs
+      if: steps.handoff-artifact.outputs.available == 'true'
+      run: |
+        target="source/security-results/triage/codeql/pr"
+        mkdir -p "$target"
+        for file in intake.json current.json report.html summary.md persist-receipt.json report-receipt.json metadata.json; do
+          install -m 0600 "$HANDOFF_DIR/$file" "$target/$file"
+        done
+    - name: Build duplicate-checked Jira preview
+      if: steps.handoff-artifact.outputs.available == 'true'
+      id: jira-plan
+      working-directory: source
+      env:
+        GH_TOKEN: ${{ github.token }}
+        JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
+        JIRA_USER_EMAIL: ${{ vars.JIRA_USER_EMAIL }}
+        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        HANDOFF_SCOPE: ${{ steps.handoff.outputs.scope }}
+        SOURCE_BRANCH: ${{ steps.handoff.outputs.branch }}
+        PR_URL: ${{ steps.handoff.outputs.pull_request_url }}
+      run: |
+        preview="security-results/triage/codeql/pr/jira-tracking/preview.html"
+        result="$RUNNER_TEMP/jira-plan-result.json"
+        args=(
+          --triage security-results/triage/codeql/pr/current.json
+          --report security-results/triage/codeql/pr/report.html
+          --repository "$GITHUB_REPOSITORY"
+          --branch "$SOURCE_BRANCH"
+          --site "$JIRA_SITE"
+          --project "$JIRA_PROJECT"
+          --issue-type Task
+          --audience-approved
+          --output "$preview"
+        )
+        if [[ "$HANDOFF_SCOPE" == 'pull_request' ]]; then
+          args+=(--pr-url "$PR_URL")
+        fi
+        python3 ../trusted/.agents/skills/triage-codeql-and-store/scripts/jira_writeback.py plan \
+          "${args[@]}" > "$result"
+        install -m 0600 "$result" security-results/triage/codeql/pr/jira-tracking/plan-result.json
+        echo "approval-token=$(jq -er '.approval_token' "$result")" >> "$GITHUB_OUTPUT"
+        echo "finding-count=$(jq -er '.finding_count' "$result")" >> "$GITHUB_OUTPUT"
+    - name: Preserve Jira approval preview
+      if: steps.handoff-artifact.outputs.available == 'true'
+      uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b #v4.5.0
+      with:
+        name: codeql-jira-preview
+        path: source/security-results/triage/codeql/pr
+        if-no-files-found: error
+        retention-days: 14
+    - name: Report pending Jira approval
+      if: steps.handoff-artifact.outputs.available == 'true'
+      env:
+        APPROVAL_TOKEN: ${{ steps.jira-plan.outputs.approval-token }}
+        FINDING_COUNT: ${{ steps.jira-plan.outputs.finding-count }}
+      run: |
+        {
+          echo "## Jira publication pending approval"
+          echo
+          echo 'Review the `codeql-jira-preview` artifact from this run.'
+          echo
+          echo "Findings: $FINDING_COUNT"
+          echo
+          echo "Plan run ID: $GITHUB_RUN_ID"
+          echo
+          printf 'Approval token: `%s`\n' "$APPROVAL_TOKEN"
+          echo
+          echo "Run this workflow manually with that run ID and token to publish to Jira."
+        } >> "$GITHUB_STEP_SUMMARY"
+
+  apply-jira:
+    name: Apply approved Jira preview
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: jira-security
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    env:
+      PLAN_BUNDLE_DIR: ${{ runner.temp }}/codeql-jira-preview
+    steps:
+    - name: Validate approval inputs
+      env:
+        APPROVAL_TOKEN: ${{ inputs.approval_token }}
+        PLAN_RUN_ID: ${{ inputs.plan_run_id }}
+      run: |
+        [[ "$PLAN_RUN_ID" =~ ^[0-9]+$ ]]
+        [[ "$APPROVAL_TOKEN" =~ ^[0-9a-f]{64}$ ]]
+    - name: Checkout trusted Jira tooling
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      with:
+        ref: ${{ github.event.repository.default_branch }}
+        path: trusted
+        persist-credentials: false
+    - name: Verify the selected plan run
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd #v8.0.0
+      env:
+        PLAN_RUN_ID: ${{ inputs.plan_run_id }}
+      with:
+        github-token: ${{ github.token }}
+        script: |
+          const run = await github.rest.actions.getWorkflowRun({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: Number(process.env.PLAN_RUN_ID)
+          })
+          if (
+            run.data.name !== 'Publish CodeQL triage to Jira' ||
+            run.data.event !== 'workflow_run' ||
+            run.data.conclusion !== 'success'
+          ) {
+            core.setFailed('The selected run is not a successful trusted Jira planning run.')
+          }
+    - name: Download reviewed Jira preview
+      uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 #v4.1.8
+      with:
+        name: codeql-jira-preview
+        path: ${{ env.PLAN_BUNDLE_DIR }}
+        github-token: ${{ github.token }}
+        run-id: ${{ inputs.plan_run_id }}
+    - name: Validate reviewed bundle with trusted tooling
+      id: handoff
+      run: |
+        python3 trusted/.agents/skills/triage-codeql-and-store/scripts/validate_codeql_handoff.py \
+          --directory "$PLAN_BUNDLE_DIR" \
+          --repository "$GITHUB_REPOSITORY" \
+          --github-output "$GITHUB_OUTPUT"
+    - name: Checkout the triaged revision
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      with:
+        ref: ${{ steps.handoff.outputs.revision }}
+        fetch-depth: 0
+        path: source
+        persist-credentials: false
+    - name: Attach the validated source branch
+      env:
+        SOURCE_BRANCH: ${{ steps.handoff.outputs.branch }}
+        SOURCE_REVISION: ${{ steps.handoff.outputs.revision }}
+      run: |
+        git check-ref-format --branch "$SOURCE_BRANCH"
+        git -C source switch -C "$SOURCE_BRANCH" "$SOURCE_REVISION"
+        test "$(git -C source symbolic-ref --quiet --short HEAD)" = "$SOURCE_BRANCH"
+        test "$(git -C source rev-parse HEAD)" = "$SOURCE_REVISION"
+    - name: Stage approved Jira plan
+      run: |
+        target="source/security-results/triage/codeql/pr"
+        mkdir -p "$target/jira-tracking"
+        for file in intake.json current.json report.html summary.md persist-receipt.json report-receipt.json metadata.json; do
+          install -m 0600 "$PLAN_BUNDLE_DIR/$file" "$target/$file"
+        done
+        install -m 0600 "$PLAN_BUNDLE_DIR/jira-tracking/preview.html" "$target/jira-tracking/preview.html"
+        install -m 0600 "$PLAN_BUNDLE_DIR/jira-tracking/plan-result.json" "$target/jira-tracking/plan-result.json"
+    - name: Apply and verify Jira writes
+      working-directory: source
+      env:
+        APPROVAL_TOKEN: ${{ inputs.approval_token }}
+        GH_TOKEN: ${{ github.token }}
+        JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
+        JIRA_USER_EMAIL: ${{ vars.JIRA_USER_EMAIL }}
+        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      run: |
+        python3 ../trusted/.agents/skills/triage-codeql-and-store/scripts/jira_writeback.py apply \
+          --preview security-results/triage/codeql/pr/jira-tracking/preview.html \
+          --approval-token "$APPROVAL_TOKEN" \
+          > "$RUNNER_TEMP/jira-apply-result.json"
+        cat "$RUNNER_TEMP/jira-apply-result.json" >> "$GITHUB_STEP_SUMMARY"
+    - name: Preserve Jira receipts
+      if: always()
+      uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b #v4.5.0
+      with:
+        name: codeql-jira-receipts
+        path: source/security-results/triage/codeql/pr/jira-tracking/receipts
+        if-no-files-found: warn
+        retention-days: 30

@@ -32,14 +32,21 @@ class CodeQLBranchIntakeTest(unittest.TestCase):
                         "commit_sha": "a" * 40,
                     },
                 ]
-            return [{"number": 7, "html_url": "https://github.com/example/repo/7"}]
+            return [
+                {
+                    "number": 7,
+                    "state": "open",
+                    "tool": {"name": "CodeQL"},
+                    "html_url": "https://github.com/example/repo/7",
+                }
+            ]
 
         intake = codeql_branch_intake.collect_intake(
             "example/repo", self.context(), request
         )
 
         self.assertIn(
-            "state=open&ref=refs%2Fheads%2Ffeature%2Fcurrent&per_page=100",
+            "state=open&ref=refs%2Fheads%2Ffeature%2Fcurrent&tool_name=CodeQL&per_page=100",
             endpoints[0],
         )
         self.assertEqual(intake["branch"], "feature/current")
@@ -54,7 +61,13 @@ class CodeQLBranchIntakeTest(unittest.TestCase):
         def request(endpoint):
             if "/instances?" in endpoint:
                 return [{"ref": "refs/heads/other", "commit_sha": "b" * 40}]
-            return [{"number": 7}]
+            return [
+                {
+                    "number": 7,
+                    "state": "open",
+                    "tool": {"name": "CodeQL"},
+                }
+            ]
 
         with self.assertRaisesRegex(
             codeql_branch_intake.IntakeError, "no instance matches current branch"
@@ -69,6 +82,23 @@ class CodeQLBranchIntakeTest(unittest.TestCase):
         ):
             codeql_branch_intake.validate_output_path(
                 Path("/repo/intake.json"), Path("/repo")
+            )
+
+    def test_collect_intake_rejects_another_scanning_tool(self):
+        def request(endpoint):
+            return [
+                {
+                    "number": 7,
+                    "state": "open",
+                    "tool": {"name": "Other"},
+                }
+            ]
+
+        with self.assertRaisesRegex(
+            codeql_branch_intake.IntakeError, "not a CodeQL alert"
+        ):
+            codeql_branch_intake.collect_intake(
+                "example/repo", self.context(), request
             )
 
 

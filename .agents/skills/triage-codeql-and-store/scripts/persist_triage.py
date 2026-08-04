@@ -19,8 +19,11 @@ from typing import Any
 
 SCHEMA_VERSION = "triage-finding/v0"
 INTAKE_SCHEMA_VERSION = "codeql-branch-intake/v1"
+PR_INTAKE_SCHEMA_VERSION = "codeql-pr-intake/v1"
 VERDICTS = {"confirmed", "needs_review", "not_actionable"}
 CONFIDENCE_LEVELS = {"high", "medium", "low"}
+CODEQL_SECURITY_SEVERITIES = {"critical", "high", "medium", "low"}
+SECURITY_SEVERITY_REFERENCE_PREFIX = "codeql-security-severity:"
 ALERT_URL_PATTERN = re.compile(
     r"(?:/security/code-scanning/|/code-scanning/alerts/)([0-9]+)(?:$|[/?#])"
 )
@@ -179,9 +182,11 @@ def normalized_branch(branch: str) -> str:
 def validate_intake(
     intake: dict[str, Any], payload: dict[str, Any], branch: str
 ) -> tuple[int, str, dict[int, set[str]]]:
-    if intake.get("schema_version") != INTAKE_SCHEMA_VERSION:
+    intake_schema = intake.get("schema_version")
+    if intake_schema not in {INTAKE_SCHEMA_VERSION, PR_INTAKE_SCHEMA_VERSION}:
         raise ValidationError(
-            f'intake schema_version must be "{INTAKE_SCHEMA_VERSION}"'
+            "intake schema_version must be "
+            f'"{INTAKE_SCHEMA_VERSION}" or "{PR_INTAKE_SCHEMA_VERSION}"'
         )
     intake_branch = require_nonempty_string(intake.get("branch"), "intake.branch")
     if intake_branch != normalized_branch(branch):
@@ -198,9 +203,22 @@ def validate_intake(
     endpoint = require_nonempty_string(
         intake.get("alerts_endpoint"), "intake.alerts_endpoint"
     )
-    encoded_ref = expected_ref.replace("/", "%2F")
-    if f"state=open&ref={encoded_ref}&" not in endpoint:
-        raise ValidationError("intake endpoint is not bound to the current branch ref")
+    if intake_schema == INTAKE_SCHEMA_VERSION:
+        encoded_ref = expected_ref.replace("/", "%2F")
+        if (
+            f"state=open&ref={encoded_ref}&tool_name=CodeQL&"
+            not in endpoint
+        ):
+            raise ValidationError("intake endpoint is not bound to the current branch ref")
+    else:
+        pr_number = intake.get("pull_request_number")
+        if not isinstance(pr_number, int) or pr_number < 1:
+            raise ValidationError("intake.pull_request_number must be positive")
+        if (
+            f"?pr={pr_number}&tool_name=CodeQL&state=open&" not in endpoint
+            or not re.fullmatch(r"[0-9a-fA-F]{40}", str(intake.get("base_revision", "")))
+        ):
+            raise ValidationError("intake endpoint or base revision is not bound to the pull request")
 
     repository = payload.get("repository")
     if not isinstance(repository, dict):
@@ -236,25 +254,34 @@ def validate_intake(
     commits_by_alert: dict[int, set[str]] = {}
     for index, item in enumerate(alerts):
         field = f"intake.alerts[{index}]"
-        if not isinstance(item, dict) or not isinstance(item.get("alert"), dict):
-            raise ValidationError(f"{field}.alert must be an object")
-        number = item["alert"].get("number")
+        alert = item.get("alert") if intake_schema == INTAKE_SCHEMA_VERSION and isinstance(item, dict) else item
+        if not isinstance(alert, dict):
+            raise ValidationError(f"{field} must preserve an alert object")
+        number = alert.get("number")
         if not isinstance(number, int) or number < 1:
-            raise ValidationError(f"{field}.alert.number must be a positive integer")
+            raise ValidationError(f"{field}.number must be a positive integer")
         if number in commits_by_alert:
             raise ValidationError(f"duplicate intake alert number: {number}")
-        instances = item.get("matching_instances")
-        if not isinstance(instances, list) or not instances:
-            raise ValidationError(f"{field}.matching_instances must not be empty")
-        commits = set()
-        for instance in instances:
-            if not isinstance(instance, dict) or instance.get("ref") != expected_ref:
-                raise ValidationError(f"{field} contains an instance for another ref")
-            commit = instance.get("commit_sha")
-            if isinstance(commit, str) and commit:
-                commits.add(commit)
-        if not commits:
-            raise ValidationError(f"{field} does not preserve an instance commit")
+        if alert.get("state") != "open":
+            raise ValidationError(f"{field} is not open")
+        tool = alert.get("tool")
+        if not isinstance(tool, dict) or tool.get("name") != "CodeQL":
+            raise ValidationError(f"{field} is not a CodeQL alert")
+        if intake_schema == INTAKE_SCHEMA_VERSION:
+            instances = item.get("matching_instances")
+            if not isinstance(instances, list) or not instances:
+                raise ValidationError(f"{field}.matching_instances must not be empty")
+            commits = set()
+            for instance in instances:
+                if not isinstance(instance, dict) or instance.get("ref") != expected_ref:
+                    raise ValidationError(f"{field} contains an instance for another ref")
+                commit = instance.get("commit_sha")
+                if isinstance(commit, str) and commit:
+                    commits.add(commit)
+            if not commits:
+                raise ValidationError(f"{field} does not preserve an instance commit")
+        else:
+            commits = {intake_revision}
         commits_by_alert[number] = commits
     return expected_count, expected_ref, commits_by_alert
 
@@ -275,8 +302,27 @@ def finding_alert_number(finding: dict[str, Any], field: str) -> int:
 
 
 def validate_payload_against_intake(
-    payload: dict[str, Any], intake_ref: str, commits_by_alert: dict[int, set[str]]
+    payload: dict[str, Any],
+    intake_ref: str,
+    commits_by_alert: dict[int, set[str]],
+    intake: dict[str, Any] | None = None,
 ) -> None:
+    security_severity_by_alert: dict[int, str | None] = {}
+    if intake is not None:
+        for item in intake["alerts"]:
+            alert = item.get("alert") if intake.get("schema_version") == INTAKE_SCHEMA_VERSION else item
+            if not isinstance(alert, dict):
+                raise ValidationError("intake alert must be an object")
+            rule = alert.get("rule")
+            severity = (
+                rule.get("security_severity_level")
+                if isinstance(rule, dict)
+                else None
+            )
+            if severity not in CODEQL_SECURITY_SEVERITIES:
+                severity = None
+            security_severity_by_alert[alert["number"]] = severity
+
     seen: set[int] = set()
     for index, finding in enumerate(payload["findings"]):
         field = f"findings[{index}]"
@@ -286,12 +332,39 @@ def validate_payload_against_intake(
         if number in seen:
             raise ValidationError(f"duplicate triage result for alert {number}")
         seen.add(number)
+        if finding.get("input_id") != f"github-codeql-alert-{number}":
+            raise ValidationError(f"{field}.input_id does not match alert {number}")
         references = finding["normalized_input"]["references"]
+        repository = intake.get("repository") if intake is not None else None
+        if repository:
+            canonical_alert_url = (
+                f"https://github.com/{repository}/security/code-scanning/{number}"
+            )
+            if canonical_alert_url not in references:
+                raise ValidationError(
+                    f"{field} does not preserve the canonical GitHub alert URL"
+                )
         if f"ref:{intake_ref}" not in references:
             raise ValidationError(f"{field} does not preserve current branch ref")
         intake_commits = commits_by_alert[number]
         if not any(f"commit:{commit}" in references for commit in intake_commits):
             raise ValidationError(f"{field} does not preserve a matching instance commit")
+        if intake is not None:
+            expected_severity = security_severity_by_alert[number]
+            severity_references = [
+                reference.removeprefix(SECURITY_SEVERITY_REFERENCE_PREFIX)
+                for reference in references
+                if isinstance(reference, str)
+                and reference.startswith(SECURITY_SEVERITY_REFERENCE_PREFIX)
+            ]
+            expected_references = (
+                [expected_severity] if expected_severity is not None else []
+            )
+            if severity_references != expected_references:
+                raise ValidationError(
+                    f"{field} CodeQL security severity reference does not match "
+                    "branch intake"
+                )
     if seen != set(commits_by_alert):
         missing = sorted(set(commits_by_alert) - seen)
         raise ValidationError(f"triage results are missing intake alerts: {missing}")
@@ -381,7 +454,9 @@ def main() -> int:
                 "expected-count does not match branch intake expected_count"
             )
         counts = validate_payload(payload, expected_count)
-        validate_payload_against_intake(payload, intake_ref, commits_by_alert)
+        validate_payload_against_intake(
+            payload, intake_ref, commits_by_alert, intake
+        )
         validate_current_checkout(intake)
         slug = branch_slug(args.branch)
         repository = payload["repository"]

@@ -218,6 +218,7 @@ token itself.
 - [generate-release-notes skill](./.ai/skills/generate-release-notes/SKILL.md): Instructions for generating release notes.
 - [triage-codeql-and-store skill](./.agents/skills/triage-codeql-and-store/SKILL.md): Instructions for triaging GitHub CodeQL alerts, persisting validated results, and applying approval-gated status updates to existing GitHub alerts
 - [clean-reset-codesql skill](./.agents/skills/clean-reset-codesql/SKILL.md): Instructions for approval-gated reopening, final-analysis deletion, CodeQL rerun verification, and fresh triage
+- [fix-finding-and-open-pr skill](./.agents/skills/fix-finding-and-open-pr/SKILL.md): Instructions for fixing a security finding, proving regression coverage, running focused tests, and requesting approval before opening a pull request
 - [verify-challenge skill](./.ai/skills/verify-challenge/SKILL.md): Instructions for verifying new challenges fulfill all project requirements and metadata
 - [verify-rsn-fix skill](./.ai/skills/verify-rsn-fix/SKILL.md): Instructions for identifying and fixing broken RSN caused by code changes
 

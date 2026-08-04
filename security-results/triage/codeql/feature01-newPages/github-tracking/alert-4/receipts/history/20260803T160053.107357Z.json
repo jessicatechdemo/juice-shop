@@ -1,0 +1,37 @@
+{
+  "branch": "feature01-newPages",
+  "complete": true,
+  "completed_at": "20260803T160056.645303Z",
+  "github": {
+    "host": "github.com",
+    "login": "jessicatechdemo",
+    "repository": "jessicatechdemo/juice-shop",
+    "repository_url": "https://github.com/jessicatechdemo/juice-shop",
+    "viewer_permission": "ADMIN",
+    "visibility": "PUBLIC"
+  },
+  "manual_link_required": true,
+  "plan_sha256": "628697b8cda39c5af799f75462ba2d6b1d7d744ac979d8f412ff35552c66c385",
+  "report_path": "security-results/triage/codeql/feature01-newPages/report.html",
+  "report_sha256": "a6e8c090df3d8c63937169ec344cc43e0d32e1294e64f0c8ba74d94655087298",
+  "repository": "jessicatechdemo/juice-shop",
+  "results": [
+    {
+      "action": "create",
+      "alert_number": 4,
+      "alert_url": "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/4",
+      "comment_url": "https://github.com/jessicatechdemo/juice-shop/issues/5#issuecomment-5168752995",
+      "finding_id": "github-codeql-alert-4",
+      "issue_number": 5,
+      "issue_url": "https://github.com/jessicatechdemo/juice-shop/issues/5",
+      "manual_link_required": true,
+      "outcome": "issue_created_and_commented",
+      "verdict": "not_actionable"
+    }
+  ],
+  "schema_version": "codeql-triage-issue-comments-receipt/v1",
+  "started_at": "20260803T160053.108053Z",
+  "triage_revision": "840220e9a18d8bc51b034d7858c85072c45d0629",
+  "triage_sha256": "5b35487d90590840a86963c0d3da56fd185108ec139371d8444ea36b57fe00e1",
+  "write_mode": "github_issue_comment"
+}

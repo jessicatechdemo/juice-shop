@@ -46,8 +46,8 @@
   <main>
     <p class="eyebrow">OWASP Juice Shop · CodeQL backlog</p>
     <h1>Triage report</h1>
-    <p class="intro">Branch <code>feature01-newPages</code> · Revision <code>1dc7ba33a037005030a3b374975acc062d5e02d9</code><br>
-      Repository <code>/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop</code> · Generated 2026-08-03T14:19:25.966889+00:00</p>
+    <p class="intro">Branch <code>feature01-newPages</code> · Revision <code>a01265c821d0ac5c8ff5c3401871a7798309fe1d</code><br>
+      Repository <code>/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop</code> · Generated 2026-08-04T07:30:30.991285+00:00</p>
     <div class="summary" role="group" aria-label="Filter findings by verdict">
       <button type="button" data-filter="all" aria-pressed="true"><strong>58</strong>All findings</button>
       <button type="button" data-filter="confirmed" aria-pressed="false"><strong>6</strong>Confirmed</button>
@@ -56,14 +56,55 @@
     </div>
     <div class="controls">
       <label for="search"><strong>Search</strong></label>
-      <input id="search" type="search" placeholder="Alert number, rule, path, title, or evidence">
+      <input id="search" type="search" placeholder="Finding ID, alert number, rule, path, title, or evidence">
       <span id="visible-count" aria-live="polite">58 shown</span>
     </div>
     <div id="findings">
-      <article class="finding" data-verdict="not_actionable" data-search="js/remote-property-injection in routes/vulncodefixes.ts github-codeql-alert-58 triage-001 routes/vulncodefixes.ts routes/vulncodefixes.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/58 rule:js/remote-property-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the cache key can influence only the key of codefixes; the assigned value is a locally constructed {fixes, correct} object built from enumerated files, so the attacker cannot supply an arbitrary property value or reach object.prototype with controlled content. no attacker-controlled value is written and file reads use names returned by fs.readdirsync, not a path supplied directly by the request. the public snippets/fixes route can supply key, but unsupported keys produce no fixes and return 404.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/functionality-from-untrusted-source in security-results/explanations/codeql-triage-writeback.html github-codeql-alert-59 triage-001 security-results/explanations/codeql-triage-writeback.html security-results/explanations/codeql-triage-writeback.html https://github.com/jessicatechdemo/juice-shop/security/code-scanning/59 rule:js/functionality-from-untrusted-source tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium security-results/explanations/codeql-triage-writeback.html:481 loads the monaco loader from cdnjs over https without an integrity attribute. the file is a generated standalone explanation under security-results/explanations and is not referenced by a juice shop application route, build entrypoint, or package manifest. opening the standalone report executes external cdn javascript without sri, so the report itself should not be treated as a trusted offline artifact.">
         <header>
           <div>
-            <p class="eyebrow">triage-001 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/58" target="_blank" rel="noopener noreferrer">Open GitHub alert #58</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-59 · <strong>Triage item ID:</strong> triage-001 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/59" target="_blank" rel="noopener noreferrer">Open GitHub alert #59</a></p>
+            <h2>js/functionality-from-untrusted-source in security-results/explanations/codeql-triage-writeback.html</h2>
+          </div>
+          <span class="badge not_actionable">Not actionable</span>
+        </header>
+        <div class="metadata">
+          <span><strong>Confidence</strong> high</span>
+          <span><strong>Queue rank</strong> —</span>
+          <span><strong>Boundary crossed</strong> No</span>
+          <span><strong>Component</strong> security-results/explanations/codeql-triage-writeback.html</span>
+        </div>
+        <section>
+          <h3>Affected locations</h3>
+          <ul><li><code>security-results/explanations/codeql-triage-writeback.html:481</code> <span class="muted">scanner location</span><div>CodeQL js/functionality-from-untrusted-source instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Script loaded from content delivery network with no integrity check.</div></li></ul>
+        </section>
+        <details open>
+          <summary>Evidence</summary>
+          <ul><li>security-results/explanations/codeql-triage-writeback.html:481 loads the Monaco loader from cdnjs over HTTPS without an integrity attribute.</li><li>The file is a generated standalone explanation under security-results/explanations and is not referenced by a Juice Shop application route, build entrypoint, or package manifest.</li></ul>
+        </details>
+        <details>
+          <summary>Counterevidence</summary>
+          <ul><li>Opening the standalone report executes external CDN JavaScript without SRI, so the report itself should not be treated as a trusted offline artifact.</li></ul>
+        </details>
+        <details>
+          <summary>Proof gaps</summary>
+          <p class="empty">None recorded</p>
+        </details>
+        <details>
+          <summary>Boundary assessment</summary>
+          <dl>
+            <dt>Surface</dt><dd>generated</dd>
+            <dt>Source trust</dt><dd>untrusted</dd>
+            <dt>Policy basis</dt><dd>SECURITY.md covers supported Juice Shop application vulnerabilities; no application route, build entrypoint, or package manifest references this generated explanation artifact.</dd>
+          </dl>
+        </details>
+        <p class="next-step"><strong>Next step:</strong> no-action</p>
+      </article>
+    
+      <article class="finding" data-verdict="not_actionable" data-search="js/remote-property-injection in routes/vulncodefixes.ts github-codeql-alert-58 triage-002 routes/vulncodefixes.ts routes/vulncodefixes.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/58 rule:js/remote-property-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the cache key can influence only the key of codefixes; the assigned value is a locally constructed {fixes, correct} object built from enumerated files, so the attacker cannot supply an arbitrary property value or reach object.prototype with controlled content. no attacker-controlled value is written and file reads use names returned by fs.readdirsync, not a path supplied directly by the request. the public snippets/fixes route can supply key, but unsupported keys produce no fixes and return 404.">
+        <header>
+          <div>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-58 · <strong>Triage item ID:</strong> triage-002 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/58" target="_blank" rel="noopener noreferrer">Open GitHub alert #58</a></p>
             <h2>js/remote-property-injection in routes/vulnCodeFixes.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -76,7 +117,9 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/vulnCodeFixes.ts:40-40</code> <span class="muted">scanner location</span><div>CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/vulnCodeFixes.ts:40</code> <span class="muted">scanner location</span><div>CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: A property name to write to depends on a user-provided value.
+A property name to write to depends on a user-provided value.
+A property name to write to depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -101,10 +144,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="needs_review" data-search="js/remote-property-injection in routes/currentuser.ts github-codeql-alert-57 triage-002 routes/currentuser.ts server.ts routes/currentuser.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/57 rule:js/remote-property-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/currentuser.ts:22-31 lets the request choose both source and destination property names. the handler deliberately permits password projection for passwordhashleakchallenge. token verification and authenticatedusers lookup constrain the record to the caller&#x27;s authenticated user. the assigned value comes from user.data, not an arbitrary request body value. static inspection does not settle javascript __proto__ assignment plus express json serialization behavior for this object shape. maintainer intent is clear for password hash exposure but not for arbitrary inherited property names.">
+      <article class="finding" data-verdict="needs_review" data-search="js/remote-property-injection in routes/currentuser.ts github-codeql-alert-57 triage-003 routes/currentuser.ts server.ts routes/currentuser.ts routes/currentuser.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/57 rule:js/remote-property-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high routes/currentuser.ts:22-31 lets the request choose both source and destination property names. the handler deliberately permits password projection for passwordhashleakchallenge. token verification and authenticatedusers lookup constrain the record to the caller&#x27;s authenticated user. the assigned value comes from user.data, not an arbitrary request body value. static inspection does not settle javascript __proto__ assignment plus express json serialization behavior for this object shape. maintainer intent is clear for password hash exposure but not for arbitrary inherited property names.">
         <header>
           <div>
-            <p class="eyebrow">triage-002 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/57" target="_blank" rel="noopener noreferrer">Open GitHub alert #57</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-57 · <strong>Triage item ID:</strong> triage-003 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/57" target="_blank" rel="noopener noreferrer">Open GitHub alert #57</a></p>
             <h2>js/remote-property-injection in routes/currentUser.ts</h2>
           </div>
           <span class="badge needs_review">Needs review</span>
@@ -117,7 +160,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>server.ts:600</code> <span class="muted">entrypoint</span><div>Public whoami route with in-handler cookie verification</div></li><li><code>routes/currentUser.ts:17-44</code> <span class="muted">source/control/sink</span><div>Verified user plus request-controlled dynamic field projection</div></li></ul>
+          <ul><li><code>server.ts:600</code> <span class="muted">entrypoint</span><div>Public whoami route with in-handler cookie verification</div></li><li><code>routes/currentUser.ts:31</code> <span class="muted">scanner location</span><div>CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: A property name to write to depends on a user-provided value.</div></li><li><code>routes/currentUser.ts:17-44</code> <span class="muted">source/control/sink</span><div>Verified user plus request-controlled dynamic field projection</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -142,10 +185,10 @@
         <p class="next-step"><strong>Next step:</strong> manual-review</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/remote-property-injection in lib/insecurity.ts github-codeql-alert-56 triage-003 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/56 rule:js/remote-property-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 authenticatedusers.tokenmap is populated with a token and decoded user object only after server signing or jwt verification; this is an authentication cache, not a generic remote object merge. the value written is a server-created or signature-verified decoded token, and later lookup unquotes the token without copying attacker properties. no path was found that lets an unauthenticated caller choose both a dangerous property name and an arbitrary value.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/remote-property-injection in lib/insecurity.ts github-codeql-alert-56 triage-004 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/56 rule:js/remote-property-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high authenticatedusers.tokenmap is populated with a token and decoded user object only after server signing or jwt verification; this is an authentication cache, not a generic remote object merge. the value written is a server-created or signature-verified decoded token, and later lookup unquotes the token without copying attacker properties. no path was found that lets an unauthenticated caller choose both a dangerous property name and an arbitrary value.">
         <header>
           <div>
-            <p class="eyebrow">triage-003 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/56" target="_blank" rel="noopener noreferrer">Open GitHub alert #56</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-56 · <strong>Triage item ID:</strong> triage-004 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/56" target="_blank" rel="noopener noreferrer">Open GitHub alert #56</a></p>
             <h2>js/remote-property-injection in lib/insecurity.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -158,7 +201,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/insecurity.ts:75-75</code> <span class="muted">scanner location</span><div>CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/insecurity.ts:75</code> <span class="muted">scanner location</span><div>CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: A property name to write to depends on a user-provided value.
+A property name to write to depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -183,10 +227,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/remote-property-injection in lib/insecurity.ts github-codeql-alert-55 triage-004 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/55 rule:js/remote-property-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 authenticatedusers.idmap is keyed by the authenticated database user id and stores the corresponding server-issued token; neither side is an arbitrary request object. user ids originate from persisted user records and tokens are issued or verified by the server. no remotely controllable __proto__ assignment with attacker-controlled object content is supported.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/remote-property-injection in lib/insecurity.ts github-codeql-alert-55 triage-005 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/55 rule:js/remote-property-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high authenticatedusers.idmap is keyed by the authenticated database user id and stores the corresponding server-issued token; neither side is an arbitrary request object. user ids originate from persisted user records and tokens are issued or verified by the server. no remotely controllable __proto__ assignment with attacker-controlled object content is supported.">
         <header>
           <div>
-            <p class="eyebrow">triage-004 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/55" target="_blank" rel="noopener noreferrer">Open GitHub alert #55</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-55 · <strong>Triage item ID:</strong> triage-005 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/55" target="_blank" rel="noopener noreferrer">Open GitHub alert #55</a></p>
             <h2>js/remote-property-injection in lib/insecurity.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -199,7 +243,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/insecurity.ts:74-74</code> <span class="muted">scanner location</span><div>CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/insecurity.ts:74</code> <span class="muted">scanner location</span><div>CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: A property name to write to depends on a user-provided value.
+A property name to write to depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -224,10 +269,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/remote-property-injection in lib/accuracy.ts github-codeql-alert-54 triage-005 lib/accuracy.ts lib/accuracy.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/54 rule:js/remote-property-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 accuracy state is reached only after a challenge key is present in the precomputed code-challenge map; unknown keys return before storeverdict. the state value and nested field names are fixed booleans/counters and valid challenge keys come from repository annotations. no supported path lets an arbitrary property key pass the map membership gate.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/remote-property-injection in lib/accuracy.ts github-codeql-alert-54 triage-006 lib/accuracy.ts lib/accuracy.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/54 rule:js/remote-property-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high accuracy state is reached only after a challenge key is present in the precomputed code-challenge map; unknown keys return before storeverdict. the state value and nested field names are fixed booleans/counters and valid challenge keys come from repository annotations. no supported path lets an arbitrary property key pass the map membership gate.">
         <header>
           <div>
-            <p class="eyebrow">triage-005 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/54" target="_blank" rel="noopener noreferrer">Open GitHub alert #54</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-54 · <strong>Triage item ID:</strong> triage-006 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/54" target="_blank" rel="noopener noreferrer">Open GitHub alert #54</a></p>
             <h2>js/remote-property-injection in lib/accuracy.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -240,7 +285,9 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/accuracy.ts:68-68</code> <span class="muted">scanner location</span><div>CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/accuracy.ts:68</code> <span class="muted">scanner location</span><div>CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: A property name to write to depends on a user-provided value.
+A property name to write to depends on a user-provided value.
+A property name to write to depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -265,10 +312,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/http-to-file-access in routes/profileimagefileupload.ts github-codeql-alert-53 triage-006 routes/profileimagefileupload.ts routes/profileimagefileupload.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/53 rule:js/http-to-file-access tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the filesystem destination is composed from an authenticated persisted user id and an extension returned by file-type inspection after an image mime check. the uploaded filename is never used; the attacker controls file bytes, not the destination path, and the extension comes from the detected image type. no untrusted path segment reaches fs.writefile.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/http-to-file-access in routes/profileimagefileupload.ts github-codeql-alert-53 triage-007 routes/profileimagefileupload.ts routes/profileimagefileupload.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/53 rule:js/http-to-file-access tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium the filesystem destination is composed from an authenticated persisted user id and an extension returned by file-type inspection after an image mime check. the uploaded filename is never used; the attacker controls file bytes, not the destination path, and the extension comes from the detected image type. no untrusted path segment reaches fs.writefile.">
         <header>
           <div>
-            <p class="eyebrow">triage-006 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/53" target="_blank" rel="noopener noreferrer">Open GitHub alert #53</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-53 · <strong>Triage item ID:</strong> triage-007 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/53" target="_blank" rel="noopener noreferrer">Open GitHub alert #53</a></p>
             <h2>js/http-to-file-access in routes/profileImageFileUpload.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -281,7 +328,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/profileImageFileUpload.ts:43-43</code> <span class="muted">scanner location</span><div>CodeQL js/http-to-file-access instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/profileImageFileUpload.ts:43</code> <span class="muted">scanner location</span><div>CodeQL js/http-to-file-access instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Write to file system depends on Untrusted data.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -306,10 +353,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/file-system-race in lib/codingchallenges.ts github-codeql-alert-52 triage-007 lib/codingchallenges.ts lib/codingchallenges.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/52 rule:js/file-system-race tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 findfileswithcodechallenges runs against the repository-owned snippet_paths and reads files discovered by local lstat/readdir traversal. a remote request does not choose or mutate these paths; exploiting the race requires local filesystem write access already outside the hosted-service boundary. no remote source-to-race path exists.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/file-system-race in lib/codingchallenges.ts github-codeql-alert-52 triage-008 lib/codingchallenges.ts lib/codingchallenges.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/52 rule:js/file-system-race tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high findfileswithcodechallenges runs against the repository-owned snippet_paths and reads files discovered by local lstat/readdir traversal. a remote request does not choose or mutate these paths; exploiting the race requires local filesystem write access already outside the hosted-service boundary. no remote source-to-race path exists.">
         <header>
           <div>
-            <p class="eyebrow">triage-007 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/52" target="_blank" rel="noopener noreferrer">Open GitHub alert #52</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-52 · <strong>Triage item ID:</strong> triage-008 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/52" target="_blank" rel="noopener noreferrer">Open GitHub alert #52</a></p>
             <h2>js/file-system-race in lib/codingChallenges.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -322,7 +369,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/codingChallenges.ts:29-29</code> <span class="muted">scanner location</span><div>CodeQL js/file-system-race instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/codingChallenges.ts:29</code> <span class="muted">scanner location</span><div>CodeQL js/file-system-race instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: The file may have changed since it was checked.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -347,10 +394,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/regex/missing-regexp-anchor in test/cypress/e2e/redirect.spec.ts github-codeql-alert-51 triage-008 test/cypress/e2e/redirect.spec.ts test/cypress/e2e/redirect.spec.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/51 rule:js/regex/missing-regexp-anchor tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 test/cypress/e2e/redirect.spec.ts is a test file and the flagged expression is used to verify expected behavior or an external resource. no production import or hosted request handler path exists from this test expression.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/regex/missing-regexp-anchor in test/cypress/e2e/redirect.spec.ts github-codeql-alert-51 triage-009 test/cypress/e2e/redirect.spec.ts test/cypress/e2e/redirect.spec.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/51 rule:js/regex/missing-regexp-anchor tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high test/cypress/e2e/redirect.spec.ts is a test file and the flagged expression is used to verify expected behavior or an external resource. no production import or hosted request handler path exists from this test expression.">
         <header>
           <div>
-            <p class="eyebrow">triage-008 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/51" target="_blank" rel="noopener noreferrer">Open GitHub alert #51</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-51 · <strong>Triage item ID:</strong> triage-009 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/51" target="_blank" rel="noopener noreferrer">Open GitHub alert #51</a></p>
             <h2>js/regex/missing-regexp-anchor in test/cypress/e2e/redirect.spec.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -363,7 +410,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>test/cypress/e2e/redirect.spec.ts:19-19</code> <span class="muted">scanner location</span><div>CodeQL js/regex/missing-regexp-anchor instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>test/cypress/e2e/redirect.spec.ts:19</code> <span class="muted">scanner location</span><div>CodeQL js/regex/missing-regexp-anchor instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: When this is used as a regular expression on a URL, it may match anywhere, and arbitrary hosts may come before or after it.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -388,10 +435,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/user-controlled-bypass in routes/verify.ts github-codeql-alert-50 triage-009 routes/verify.ts routes/verify.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/50 rule:js/user-controlled-bypass tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the condition at jwtchallenge checks only whether a token is present; signature verification is performed by jwt.verify with the repository public key before any challenge action. a user value does not decide the security result: err must be null and the verified token must match the required algorithm and email. the alert models an expected input-presence branch as the authorization decision.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/user-controlled-bypass in routes/verify.ts github-codeql-alert-50 triage-010 routes/verify.ts routes/verify.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/50 rule:js/user-controlled-bypass tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the condition at jwtchallenge checks only whether a token is present; signature verification is performed by jwt.verify with the repository public key before any challenge action. a user value does not decide the security result: err must be null and the verified token must match the required algorithm and email. the alert models an expected input-presence branch as the authorization decision.">
         <header>
           <div>
-            <p class="eyebrow">triage-009 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/50" target="_blank" rel="noopener noreferrer">Open GitHub alert #50</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-50 · <strong>Triage item ID:</strong> triage-010 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/50" target="_blank" rel="noopener noreferrer">Open GitHub alert #50</a></p>
             <h2>js/user-controlled-bypass in routes/verify.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -404,7 +451,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/verify.ts:113-113</code> <span class="muted">scanner location</span><div>CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/verify.ts:113</code> <span class="muted">scanner location</span><div>CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This condition guards a sensitive action, but a user-provided value controls it.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -429,10 +476,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/user-controlled-bypass in routes/fileserver.ts github-codeql-alert-49 triage-010 routes/fileserver.ts routes/fileserver.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/49 rule:js/user-controlled-bypass tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the flagged condition is filename validation, not an authorization decision: it requires an allowlisted suffix or one exact filename before sendfile. forward slashes are rejected earlier and the branch does not grant a user identity or privilege. windows backslash traversal remains separately represented by confirmed alert 5 at the filesystem sink.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/user-controlled-bypass in routes/fileserver.ts github-codeql-alert-49 triage-011 routes/fileserver.ts routes/fileserver.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/49 rule:js/user-controlled-bypass tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the flagged condition is filename validation, not an authorization decision: it requires an allowlisted suffix or one exact filename before sendfile. forward slashes are rejected earlier and the branch does not grant a user identity or privilege. windows backslash traversal remains separately represented by confirmed alert 5 at the filesystem sink.">
         <header>
           <div>
-            <p class="eyebrow">triage-010 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/49" target="_blank" rel="noopener noreferrer">Open GitHub alert #49</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-49 · <strong>Triage item ID:</strong> triage-011 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/49" target="_blank" rel="noopener noreferrer">Open GitHub alert #49</a></p>
             <h2>js/user-controlled-bypass in routes/fileServer.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -445,7 +492,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/fileServer.ts:27-27</code> <span class="muted">scanner location</span><div>CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/fileServer.ts:27</code> <span class="muted">scanner location</span><div>CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This condition guards a sensitive action, but a user-provided value controls it.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -470,10 +517,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/user-controlled-bypass in lib/insecurity.ts github-codeql-alert-48 triage-011 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/48 rule:js/user-controlled-bypass tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the token-presence condition only decides whether to attempt jwt.verify; decoded data is cached only when verification succeeds with the public key. a request cannot make err null merely by choosing token content. the scanner treats user control of whether verification runs as control of its result.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/user-controlled-bypass in lib/insecurity.ts github-codeql-alert-48 triage-012 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/48 rule:js/user-controlled-bypass tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the token-presence condition only decides whether to attempt jwt.verify; decoded data is cached only when verification succeeds with the public key. a request cannot make err null merely by choosing token content. the scanner treats user control of whether verification runs as control of its result.">
         <header>
           <div>
-            <p class="eyebrow">triage-011 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/48" target="_blank" rel="noopener noreferrer">Open GitHub alert #48</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-48 · <strong>Triage item ID:</strong> triage-012 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/48" target="_blank" rel="noopener noreferrer">Open GitHub alert #48</a></p>
             <h2>js/user-controlled-bypass in lib/insecurity.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -486,7 +533,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/insecurity.ts:188-188</code> <span class="muted">scanner location</span><div>CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/insecurity.ts:188</code> <span class="muted">scanner location</span><div>CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This condition guards a sensitive action, but a user-provided value controls it.
+This condition guards a sensitive action, but a user-provided value controls it.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -511,10 +559,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/user-controlled-bypass in lib/insecurity.ts github-codeql-alert-47 triage-012 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/47 rule:js/user-controlled-bypass tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 verify returns the result of jws.verify(token, publickey); attacker control of token bytes does not control the cryptographic verification outcome. the verification key is loaded from the repository public key and is not request-controlled. no bypass of jws.verify is shown.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/user-controlled-bypass in lib/insecurity.ts github-codeql-alert-47 triage-013 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/47 rule:js/user-controlled-bypass tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high verify returns the result of jws.verify(token, publickey); attacker control of token bytes does not control the cryptographic verification outcome. the verification key is loaded from the repository public key and is not request-controlled. no bypass of jws.verify is shown.">
         <header>
           <div>
-            <p class="eyebrow">triage-012 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/47" target="_blank" rel="noopener noreferrer">Open GitHub alert #47</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-47 · <strong>Triage item ID:</strong> triage-013 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/47" target="_blank" rel="noopener noreferrer">Open GitHub alert #47</a></p>
             <h2>js/user-controlled-bypass in lib/insecurity.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -527,7 +575,11 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/insecurity.ts:55-55</code> <span class="muted">scanner location</span><div>CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/insecurity.ts:55</code> <span class="muted">scanner location</span><div>CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This condition guards a sensitive action, but a user-provided value controls it.
+This condition guards a sensitive action, but a user-provided value controls it.
+This condition guards a sensitive action, but a user-provided value controls it.
+This condition guards a sensitive action, but a user-provided value controls it.
+This condition guards a sensitive action, but a user-provided value controls it.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -552,10 +604,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="confirmed" data-search="js/log-injection in lib/challengeutils.ts github-codeql-alert-46 triage-013 lib/challengeutils.ts server.ts routes/repeatnotification.ts lib/challengeutils.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/46 rule:js/log-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 server.ts:608 exposes the route without authentication middleware. routes/repeatnotification.ts:11 decodes attacker input and line 12 calls findchallengebyname. lib/challengeutils.ts:99 concatenates the unmatched value directly into logger.warn.">
+      <article class="finding" data-verdict="confirmed" data-search="js/log-injection in lib/challengeutils.ts github-codeql-alert-46 triage-014 lib/challengeutils.ts server.ts lib/challengeutils.ts lib/challengeutils.ts routes/repeatnotification.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/46 rule:js/log-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium server.ts:608 exposes the route without authentication middleware. routes/repeatnotification.ts:11 decodes attacker input and line 12 calls findchallengebyname. lib/challengeutils.ts:99 concatenates the unmatched value directly into logger.warn. the working tree contains an uncommitted cr/lf-stripping change at lib/challengeutils.ts:99, but it is not part of the triaged revision and does not change this revision-bound verdict. commit and scan the local candidate fix before reevaluating alert closure.">
         <header>
           <div>
-            <p class="eyebrow">triage-013 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/46" target="_blank" rel="noopener noreferrer">Open GitHub alert #46</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-46 · <strong>Triage item ID:</strong> triage-014 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/46" target="_blank" rel="noopener noreferrer">Open GitHub alert #46</a></p>
             <h2>js/log-injection in lib/challengeUtils.ts</h2>
           </div>
           <span class="badge confirmed">Confirmed</span>
@@ -568,7 +620,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>server.ts:608</code> <span class="muted">entrypoint</span><div>Public GET route</div></li><li><code>routes/repeatNotification.ts:10-12</code> <span class="muted">source</span><div>Query value is decoded and passed to lookup</div></li><li><code>lib/challengeUtils.ts:93-99</code> <span class="muted">sink</span><div>Missing name is concatenated into warning log</div></li></ul>
+          <ul><li><code>server.ts:608</code> <span class="muted">entrypoint</span><div>Public GET route</div></li><li><code>lib/challengeUtils.ts:99</code> <span class="muted">scanner location</span><div>CodeQL js/log-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Log entry depends on a user-provided value.</div></li><li><code>lib/challengeUtils.ts:93-99</code> <span class="muted">sink</span><div>Missing name is concatenated into warning log</div></li><li><code>routes/repeatNotification.ts:10-12</code> <span class="muted">source</span><div>Query value is decoded and passed to lookup</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -576,11 +628,11 @@
         </details>
         <details>
           <summary>Counterevidence</summary>
-          <p class="empty">None recorded</p>
+          <ul><li>The working tree contains an uncommitted CR/LF-stripping change at lib/challengeUtils.ts:99, but it is not part of the triaged revision and does not change this revision-bound verdict.</li></ul>
         </details>
         <details>
           <summary>Proof gaps</summary>
-          <p class="empty">None recorded</p>
+          <ul><li>Commit and scan the local candidate fix before reevaluating alert closure.</li></ul>
         </details>
         <details>
           <summary>Boundary assessment</summary>
@@ -593,10 +645,10 @@
         <p class="next-step"><strong>Next step:</strong> fix-finding</p>
       </article>
     
-      <article class="finding" data-verdict="confirmed" data-search="js/polynomial-redos in routes/profileimageurlupload.ts github-codeql-alert-45 triage-014 routes/profileimageurlupload.ts server.ts routes/profileimageurlupload.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/45 rule:js/polynomial-redos tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 server.ts:311 exposes the post route without authentication middleware. routes/profileimageurlupload.ts:18-20 evaluates attacker input with (.)* on both sides before line 21-22 authentication. no ssrf challenge evidence requires the regex itself to be polynomial or unbounded.">
+      <article class="finding" data-verdict="confirmed" data-search="js/polynomial-redos in routes/profileimageurlupload.ts github-codeql-alert-45 triage-015 routes/profileimageurlupload.ts server.ts routes/profileimageurlupload.ts routes/profileimageurlupload.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/45 rule:js/polynomial-redos tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high server.ts:311 exposes the post route without authentication middleware. routes/profileimageurlupload.ts:18-20 evaluates attacker input with (.)* on both sides before line 21-22 authentication. no ssrf challenge evidence requires the regex itself to be polynomial or unbounded.">
         <header>
           <div>
-            <p class="eyebrow">triage-014 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/45" target="_blank" rel="noopener noreferrer">Open GitHub alert #45</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-45 · <strong>Triage item ID:</strong> triage-015 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/45" target="_blank" rel="noopener noreferrer">Open GitHub alert #45</a></p>
             <h2>js/polynomial-redos in routes/profileImageUrlUpload.ts</h2>
           </div>
           <span class="badge confirmed">Confirmed</span>
@@ -609,7 +661,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>server.ts:311</code> <span class="muted">entrypoint</span><div>Public POST route</div></li><li><code>routes/profileImageUrlUpload.ts:18-20</code> <span class="muted">source/sink</span><div>Request body enters polynomial regex before authentication</div></li></ul>
+          <ul><li><code>server.ts:311</code> <span class="muted">entrypoint</span><div>Public POST route</div></li><li><code>routes/profileImageUrlUpload.ts:20</code> <span class="muted">scanner location</span><div>CodeQL js/polynomial-redos instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This regular expression that depends on a user-provided value may run slow on strings with many repetitions of &#x27;a&#x27;.</div></li><li><code>routes/profileImageUrlUpload.ts:18-20</code> <span class="muted">source/sink</span><div>Request body enters polynomial regex before authentication</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -634,10 +686,10 @@
         <p class="next-step"><strong>Next step:</strong> fix-finding</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/server-side-unvalidated-url-redirection in routes/redirect.ts github-codeql-alert-44 triage-015 routes/redirect.ts routes/redirect.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/44 rule:js/server-side-unvalidated-url-redirection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/redirect.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/server-side-unvalidated-url-redirection in routes/redirect.ts github-codeql-alert-44 triage-016 routes/redirect.ts routes/redirect.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/44 rule:js/server-side-unvalidated-url-redirection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium routes/redirect.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-015 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/44" target="_blank" rel="noopener noreferrer">Open GitHub alert #44</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-44 · <strong>Triage item ID:</strong> triage-016 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/44" target="_blank" rel="noopener noreferrer">Open GitHub alert #44</a></p>
             <h2>js/server-side-unvalidated-url-redirection in routes/redirect.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -650,7 +702,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/redirect.ts:19-19</code> <span class="muted">scanner location</span><div>CodeQL js/server-side-unvalidated-url-redirection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/redirect.ts:19</code> <span class="muted">scanner location</span><div>CodeQL js/server-side-unvalidated-url-redirection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Untrusted URL redirection depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -675,10 +727,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/web3wallet.ts github-codeql-alert-43 triage-016 routes/web3wallet.ts routes/web3wallet.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/43 rule:js/stack-trace-exposure tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the catch response passes utils.geterrormessage(error), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. provider/library message content may still be operationally verbose, but the claimed stack-trace sink is absent.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/web3wallet.ts github-codeql-alert-43 triage-017 routes/web3wallet.ts routes/web3wallet.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/43 rule:js/stack-trace-exposure tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium the catch response passes utils.geterrormessage(error), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. provider/library message content may still be operationally verbose, but the claimed stack-trace sink is absent.">
         <header>
           <div>
-            <p class="eyebrow">triage-016 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/43" target="_blank" rel="noopener noreferrer">Open GitHub alert #43</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-43 · <strong>Triage item ID:</strong> triage-017 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/43" target="_blank" rel="noopener noreferrer">Open GitHub alert #43</a></p>
             <h2>js/stack-trace-exposure in routes/web3Wallet.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -691,7 +743,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/web3Wallet.ts:36-36</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/web3Wallet.ts:36</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -716,10 +768,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/nftmint.ts github-codeql-alert-42 triage-017 routes/nftmint.ts routes/nftmint.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/42 rule:js/stack-trace-exposure tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the catch response passes utils.geterrormessage(error), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. the claimed stack-trace sink is absent.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/nftmint.ts github-codeql-alert-42 triage-018 routes/nftmint.ts routes/nftmint.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/42 rule:js/stack-trace-exposure tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium the catch response passes utils.geterrormessage(error), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. the claimed stack-trace sink is absent.">
         <header>
           <div>
-            <p class="eyebrow">triage-017 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/42" target="_blank" rel="noopener noreferrer">Open GitHub alert #42</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-42 · <strong>Triage item ID:</strong> triage-018 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/42" target="_blank" rel="noopener noreferrer">Open GitHub alert #42</a></p>
             <h2>js/stack-trace-exposure in routes/nftMint.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -732,7 +784,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/nftMint.ts:50-50</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/nftMint.ts:50</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -757,10 +809,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/nftmint.ts github-codeql-alert-41 triage-018 routes/nftmint.ts routes/nftmint.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/41 rule:js/stack-trace-exposure tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the catch response passes utils.geterrormessage(error), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. the claimed stack-trace sink is absent.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/nftmint.ts github-codeql-alert-41 triage-019 routes/nftmint.ts routes/nftmint.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/41 rule:js/stack-trace-exposure tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium the catch response passes utils.geterrormessage(error), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. the claimed stack-trace sink is absent.">
         <header>
           <div>
-            <p class="eyebrow">triage-018 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/41" target="_blank" rel="noopener noreferrer">Open GitHub alert #41</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-41 · <strong>Triage item ID:</strong> triage-019 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/41" target="_blank" rel="noopener noreferrer">Open GitHub alert #41</a></p>
             <h2>js/stack-trace-exposure in routes/nftMint.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -773,7 +825,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/nftMint.ts:33-33</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/nftMint.ts:33</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -798,10 +850,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="needs_review" data-search="js/stack-trace-exposure in routes/likeproductreviews.ts github-codeql-alert-40 triage-019 routes/likeproductreviews.ts server.ts routes/likeproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/40 rule:js/stack-trace-exposure tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/likeproductreviews.ts:55-56 serializes err directly, unlike nearby handlers that call geterrormessage. native error stack/message properties are often non-enumerable, and the concrete marsdb error shape is not established statically. authentication is required. need the concrete enumerable properties of errors produced by the supported marsdb update path. need to determine whether any error can contain queries, paths, or stack data.">
+      <article class="finding" data-verdict="needs_review" data-search="js/stack-trace-exposure in routes/likeproductreviews.ts github-codeql-alert-40 triage-020 routes/likeproductreviews.ts server.ts routes/likeproductreviews.ts routes/likeproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/40 rule:js/stack-trace-exposure tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium routes/likeproductreviews.ts:55-56 serializes err directly, unlike nearby handlers that call geterrormessage. native error stack/message properties are often non-enumerable, and the concrete marsdb error shape is not established statically. authentication is required. need the concrete enumerable properties of errors produced by the supported marsdb update path. need to determine whether any error can contain queries, paths, or stack data.">
         <header>
           <div>
-            <p class="eyebrow">triage-019 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/40" target="_blank" rel="noopener noreferrer">Open GitHub alert #40</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-40 · <strong>Triage item ID:</strong> triage-020 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/40" target="_blank" rel="noopener noreferrer">Open GitHub alert #40</a></p>
             <h2>js/stack-trace-exposure in routes/likeProductReviews.ts</h2>
           </div>
           <span class="badge needs_review">Needs review</span>
@@ -814,7 +866,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>server.ts:634-635</code> <span class="muted">entrypoint</span><div>JWT-protected review-like route</div></li><li><code>routes/likeProductReviews.ts:43-56</code> <span class="muted">sink</span><div>Inner database failure object is returned directly</div></li></ul>
+          <ul><li><code>server.ts:634-635</code> <span class="muted">entrypoint</span><div>JWT-protected review-like route</div></li><li><code>routes/likeProductReviews.ts:56</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.</div></li><li><code>routes/likeProductReviews.ts:43-56</code> <span class="muted">sink</span><div>Inner database failure object is returned directly</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -839,10 +891,10 @@
         <p class="next-step"><strong>Next step:</strong> manual-review</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/createproductreviews.ts github-codeql-alert-39 triage-020 routes/createproductreviews.ts routes/createproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/39 rule:js/stack-trace-exposure tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the catch response passes utils.geterrormessage(err), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. the claimed stack-trace sink is absent.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/createproductreviews.ts github-codeql-alert-39 triage-021 routes/createproductreviews.ts routes/createproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/39 rule:js/stack-trace-exposure tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium the catch response passes utils.geterrormessage(err), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. the claimed stack-trace sink is absent.">
         <header>
           <div>
-            <p class="eyebrow">triage-020 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/39" target="_blank" rel="noopener noreferrer">Open GitHub alert #39</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-39 · <strong>Triage item ID:</strong> triage-021 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/39" target="_blank" rel="noopener noreferrer">Open GitHub alert #39</a></p>
             <h2>js/stack-trace-exposure in routes/createProductReviews.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -855,7 +907,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/createProductReviews.ts:32-32</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/createProductReviews.ts:32</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -880,10 +932,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/checkkeys.ts github-codeql-alert-38 triage-021 routes/checkkeys.ts routes/checkkeys.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/38 rule:js/stack-trace-exposure tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the catch response passes utils.geterrormessage(error), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. the claimed stack-trace sink is absent.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/checkkeys.ts github-codeql-alert-38 triage-022 routes/checkkeys.ts routes/checkkeys.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/38 rule:js/stack-trace-exposure tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium the catch response passes utils.geterrormessage(error), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. the claimed stack-trace sink is absent.">
         <header>
           <div>
-            <p class="eyebrow">triage-021 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/38" target="_blank" rel="noopener noreferrer">Open GitHub alert #38</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-38 · <strong>Triage item ID:</strong> triage-022 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/38" target="_blank" rel="noopener noreferrer">Open GitHub alert #38</a></p>
             <h2>js/stack-trace-exposure in routes/checkKeys.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -896,7 +948,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/checkKeys.ts:39-39</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/checkKeys.ts:39</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -921,10 +973,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/checkkeys.ts github-codeql-alert-37 triage-022 routes/checkkeys.ts routes/checkkeys.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/37 rule:js/stack-trace-exposure tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the catch response passes utils.geterrormessage(error), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. the claimed stack-trace sink is absent.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/stack-trace-exposure in routes/checkkeys.ts github-codeql-alert-37 triage-023 routes/checkkeys.ts routes/checkkeys.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/37 rule:js/stack-trace-exposure tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium the catch response passes utils.geterrormessage(error), which returns error.message or a string, not error.stack. stack is not selected or serialized by this route. the claimed stack-trace sink is absent.">
         <header>
           <div>
-            <p class="eyebrow">triage-022 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/37" target="_blank" rel="noopener noreferrer">Open GitHub alert #37</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-37 · <strong>Triage item ID:</strong> triage-023 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/37" target="_blank" rel="noopener noreferrer">Open GitHub alert #37</a></p>
             <h2>js/stack-trace-exposure in routes/checkKeys.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -937,7 +989,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/checkKeys.ts:30-30</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/checkKeys.ts:30</code> <span class="muted">scanner location</span><div>CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -962,10 +1014,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/clear-text-logging in lib/anticheat.ts github-codeql-alert-36 triage-023 lib/anticheat.ts lib/anticheat.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/36 rule:js/clear-text-logging tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the log statement emits challenge key, timing, configuration booleans, and a computed cheat score; it does not emit password or api-key challenge values. codeql&#x27;s named sensitive sources are challenge metadata properties, while the concrete interpolated value is challenge.key. no credential value reaches the logger.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/clear-text-logging in lib/anticheat.ts github-codeql-alert-36 triage-024 lib/anticheat.ts lib/anticheat.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/36 rule:js/clear-text-logging tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the log statement emits challenge key, timing, configuration booleans, and a computed cheat score; it does not emit password or api-key challenge values. codeql&#x27;s named sensitive sources are challenge metadata properties, while the concrete interpolated value is challenge.key. no credential value reaches the logger.">
         <header>
           <div>
-            <p class="eyebrow">triage-023 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/36" target="_blank" rel="noopener noreferrer">Open GitHub alert #36</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-36 · <strong>Triage item ID:</strong> triage-024 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/36" target="_blank" rel="noopener noreferrer">Open GitHub alert #36</a></p>
             <h2>js/clear-text-logging in lib/antiCheat.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -978,7 +1030,18 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/antiCheat.ts:93-93</code> <span class="muted">scanner location</span><div>CodeQL js/clear-text-logging instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/antiCheat.ts:93</code> <span class="muted">scanner location</span><div>CodeQL js/clear-text-logging instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.
+This logs sensitive data returned by an access to weakPasswordChallenge as clear text.
+This logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.
+This logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.
+This logs sensitive data returned by an access to passwordRepeatChallenge as clear text.
+This logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1003,10 +1066,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/clear-text-logging in lib/anticheat.ts github-codeql-alert-35 triage-024 lib/anticheat.ts lib/anticheat.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/35 rule:js/clear-text-logging tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the log statement emits challenge key and a constant cheat score; it does not emit password or api-key challenge values. codeql&#x27;s named sensitive sources are challenge metadata properties, while the concrete interpolated value is challenge.key. no credential value reaches the logger.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/clear-text-logging in lib/anticheat.ts github-codeql-alert-35 triage-025 lib/anticheat.ts lib/anticheat.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/35 rule:js/clear-text-logging tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the log statement emits challenge key and a constant cheat score; it does not emit password or api-key challenge values. codeql&#x27;s named sensitive sources are challenge metadata properties, while the concrete interpolated value is challenge.key. no credential value reaches the logger.">
         <header>
           <div>
-            <p class="eyebrow">triage-024 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/35" target="_blank" rel="noopener noreferrer">Open GitHub alert #35</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-35 · <strong>Triage item ID:</strong> triage-025 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/35" target="_blank" rel="noopener noreferrer">Open GitHub alert #35</a></p>
             <h2>js/clear-text-logging in lib/antiCheat.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1019,7 +1082,18 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/antiCheat.ts:64-64</code> <span class="muted">scanner location</span><div>CodeQL js/clear-text-logging instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/antiCheat.ts:64</code> <span class="muted">scanner location</span><div>CodeQL js/clear-text-logging instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.
+This logs sensitive data returned by an access to weakPasswordChallenge as clear text.
+This logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.
+This logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.
+This logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.
+This logs sensitive data returned by an access to passwordRepeatChallenge as clear text.
+This logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1044,10 +1118,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/incomplete-sanitization in server.ts github-codeql-alert-34 triage-025 server.ts server.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/34 rule:js/incomplete-sanitization tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the replace call rewrites generated relative hyperlinks in an html directory-index response; it is not used to validate a filesystem path or other security boundary. matchedurl comes from generated anchor markup and the result is emitted as a link only. the scanner identified an incomplete replacement pattern, but no sanitizer claim or dangerous sink exists.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/incomplete-sanitization in server.ts github-codeql-alert-34 triage-026 server.ts server.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/34 rule:js/incomplete-sanitization tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the replace call rewrites generated relative hyperlinks in an html directory-index response; it is not used to validate a filesystem path or other security boundary. matchedurl comes from generated anchor markup and the result is emitted as a link only. the scanner identified an incomplete replacement pattern, but no sanitizer claim or dangerous sink exists.">
         <header>
           <div>
-            <p class="eyebrow">triage-025 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/34" target="_blank" rel="noopener noreferrer">Open GitHub alert #34</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-34 · <strong>Triage item ID:</strong> triage-026 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/34" target="_blank" rel="noopener noreferrer">Open GitHub alert #34</a></p>
             <h2>js/incomplete-sanitization in server.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1060,7 +1134,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>server.ts:256-256</code> <span class="muted">scanner location</span><div>CodeQL js/incomplete-sanitization instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>server.ts:256</code> <span class="muted">scanner location</span><div>CodeQL js/incomplete-sanitization instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This replaces only the first occurrence of &#x27;..&#x27;.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1085,10 +1159,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/incomplete-sanitization in lib/utils.ts github-codeql-alert-33 triage-026 lib/utils.ts lib/utils.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/33 rule:js/incomplete-sanitization tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 containsescaped transforms a comparison needle so challenge detectors can recognize quoted and escaped payloads; it is not an output encoder or security sanitizer. the returned string is used for containment comparisons, not emitted into html, sql, shell, or filesystem sinks. no security boundary relies on this helper to neutralize backslashes.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/incomplete-sanitization in lib/utils.ts github-codeql-alert-33 triage-027 lib/utils.ts lib/utils.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/33 rule:js/incomplete-sanitization tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high containsescaped transforms a comparison needle so challenge detectors can recognize quoted and escaped payloads; it is not an output encoder or security sanitizer. the returned string is used for containment comparisons, not emitted into html, sql, shell, or filesystem sinks. no security boundary relies on this helper to neutralize backslashes.">
         <header>
           <div>
-            <p class="eyebrow">triage-026 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/33" target="_blank" rel="noopener noreferrer">Open GitHub alert #33</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-33 · <strong>Triage item ID:</strong> triage-027 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/33" target="_blank" rel="noopener noreferrer">Open GitHub alert #33</a></p>
             <h2>js/incomplete-sanitization in lib/utils.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1101,7 +1175,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/utils.ts:44-44</code> <span class="muted">scanner location</span><div>CodeQL js/incomplete-sanitization instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/utils.ts:44</code> <span class="muted">scanner location</span><div>CodeQL js/incomplete-sanitization instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This does not escape backslash characters in the input.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1126,10 +1200,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/type-confusion-through-parameter-tampering in routes/search.ts github-codeql-alert-32 triage-027 routes/search.ts routes/search.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/32 rule:js/type-confusion-through-parameter-tampering tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/search.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/type-confusion-through-parameter-tampering in routes/search.ts github-codeql-alert-32 triage-028 routes/search.ts routes/search.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/32 rule:js/type-confusion-through-parameter-tampering tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:critical routes/search.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-027 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/32" target="_blank" rel="noopener noreferrer">Open GitHub alert #32</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-32 · <strong>Triage item ID:</strong> triage-028 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/32" target="_blank" rel="noopener noreferrer">Open GitHub alert #32</a></p>
             <h2>js/type-confusion-through-parameter-tampering in routes/search.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1142,7 +1216,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/search.ts:22-22</code> <span class="muted">scanner location</span><div>CodeQL js/type-confusion-through-parameter-tampering instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/search.ts:22</code> <span class="muted">scanner location</span><div>CodeQL js/type-confusion-through-parameter-tampering instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Potential type confusion as this HTTP request parameter may be either an array or a string.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1167,10 +1241,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/type-confusion-through-parameter-tampering in lib/insecurity.ts github-codeql-alert-31 triage-028 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/31 rule:js/type-confusion-through-parameter-tampering tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 isredirectallowed performs membership checks over a fixed allowlist; alternate express query types do not create a stronger sink than the separately documented intentional redirect challenge. the function returns only a boolean and does not copy properties or execute input. the actual substring allowlist weakness is separately represented by alert 44 and explicit redirectchallenge annotations.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/type-confusion-through-parameter-tampering in lib/insecurity.ts github-codeql-alert-31 triage-029 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/31 rule:js/type-confusion-through-parameter-tampering tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:critical isredirectallowed performs membership checks over a fixed allowlist; alternate express query types do not create a stronger sink than the separately documented intentional redirect challenge. the function returns only a boolean and does not copy properties or execute input. the actual substring allowlist weakness is separately represented by alert 44 and explicit redirectchallenge annotations.">
         <header>
           <div>
-            <p class="eyebrow">triage-028 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/31" target="_blank" rel="noopener noreferrer">Open GitHub alert #31</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-31 · <strong>Triage item ID:</strong> triage-029 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/31" target="_blank" rel="noopener noreferrer">Open GitHub alert #31</a></p>
             <h2>js/type-confusion-through-parameter-tampering in lib/insecurity.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1183,7 +1257,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/insecurity.ts:136-136</code> <span class="muted">scanner location</span><div>CodeQL js/type-confusion-through-parameter-tampering instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/insecurity.ts:136</code> <span class="muted">scanner location</span><div>CodeQL js/type-confusion-through-parameter-tampering instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Potential type confusion as this HTTP request parameter may be either an array or a string.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1208,10 +1282,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/insufficient-password-hash in lib/insecurity.ts github-codeql-alert-30 triage-029 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/30 rule:js/insufficient-password-hash tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 lib/insecurity.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/insufficient-password-hash in lib/insecurity.ts github-codeql-alert-30 triage-030 lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/30 rule:js/insufficient-password-hash tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high lib/insecurity.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-029 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/30" target="_blank" rel="noopener noreferrer">Open GitHub alert #30</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-30 · <strong>Triage item ID:</strong> triage-030 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/30" target="_blank" rel="noopener noreferrer">Open GitHub alert #30</a></p>
             <h2>js/insufficient-password-hash in lib/insecurity.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1224,7 +1298,16 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/insecurity.ts:41-41</code> <span class="muted">scanner location</span><div>CodeQL js/insufficient-password-hash instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/insecurity.ts:41</code> <span class="muted">scanner location</span><div>CodeQL js/insufficient-password-hash instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Password from an access to password is hashed insecurely.
+Password from an access to password is hashed insecurely.
+Password from an access to clearTextPassword is hashed insecurely.
+Password from an access to password is hashed insecurely.
+Password from an access to password is hashed insecurely.
+Password from an access to currentPassword is hashed insecurely.
+Password from an access to currentPassword is hashed insecurely.
+Password from an access to password is hashed insecurely.
+Password from an access to password is hashed insecurely.
+Password from an access to password is hashed insecurely.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1249,10 +1332,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/prototype-polluting-assignment in lib/accuracy.ts github-codeql-alert-29 triage-030 lib/accuracy.ts lib/accuracy.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/29 rule:js/prototype-polluting-assignment tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 accuracy state is reached only for repository-defined challenge keys after code-challenge map lookup; property names below the key are fixed phase values. the request cannot provide an arbitrary object value, and unknown keys return before accuracy storage. no supported arbitrary __proto__ assignment path passes the challenge-key gate.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/prototype-polluting-assignment in lib/accuracy.ts github-codeql-alert-29 triage-031 lib/accuracy.ts lib/accuracy.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/29 rule:js/prototype-polluting-assignment tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium accuracy state is reached only for repository-defined challenge keys after code-challenge map lookup; property names below the key are fixed phase values. the request cannot provide an arbitrary object value, and unknown keys return before accuracy storage. no supported arbitrary __proto__ assignment path passes the challenge-key gate.">
         <header>
           <div>
-            <p class="eyebrow">triage-030 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/29" target="_blank" rel="noopener noreferrer">Open GitHub alert #29</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-29 · <strong>Triage item ID:</strong> triage-031 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/29" target="_blank" rel="noopener noreferrer">Open GitHub alert #29</a></p>
             <h2>js/prototype-polluting-assignment in lib/accuracy.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1265,7 +1348,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/accuracy.ts:71-71</code> <span class="muted">scanner location</span><div>CodeQL js/prototype-polluting-assignment instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>lib/accuracy.ts:71</code> <span class="muted">scanner location</span><div>CodeQL js/prototype-polluting-assignment instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This assignment may alter Object.prototype if a malicious &#x27;__proto__&#x27; string is injected from user controlled input.
+This assignment may alter Object.prototype if a malicious &#x27;__proto__&#x27; string is injected from user controlled input.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1290,10 +1374,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/missing-token-validation in server.ts github-codeql-alert-28 triage-031 server.ts server.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/28 rule:js/missing-token-validation tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 cookieparser only parses cookies and is not a session or authorization middleware; protected apis use explicit jwt verification, bearer extraction, or per-handler authenticated-user checks. the scanner has modeled the presence of cookie parsing as ambient cookie authentication, but parsing itself grants no authority. the broad alert does not establish a concrete state-changing handler whose sole authorization is an automatically attached session cookie.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/missing-token-validation in server.ts github-codeql-alert-28 triage-032 server.ts server.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/28 rule:js/missing-token-validation tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high cookieparser only parses cookies and is not a session or authorization middleware; protected apis use explicit jwt verification, bearer extraction, or per-handler authenticated-user checks. the scanner has modeled the presence of cookie parsing as ambient cookie authentication, but parsing itself grants no authority. the broad alert does not establish a concrete state-changing handler whose sole authorization is an automatically attached session cookie.">
         <header>
           <div>
-            <p class="eyebrow">triage-031 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/28" target="_blank" rel="noopener noreferrer">Open GitHub alert #28</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-28 · <strong>Triage item ID:</strong> triage-032 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/28" target="_blank" rel="noopener noreferrer">Open GitHub alert #28</a></p>
             <h2>js/missing-token-validation in server.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1306,7 +1390,11 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>server.ts:289-289</code> <span class="muted">scanner location</span><div>CodeQL js/missing-token-validation instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>server.ts:289</code> <span class="muted">scanner location</span><div>CodeQL js/missing-token-validation instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This cookie middleware is serving a request handler without CSRF protection.
+This cookie middleware is serving a request handler without CSRF protection.
+This cookie middleware is serving a request handler without CSRF protection.
+This cookie middleware is serving a request handler without CSRF protection.
+This cookie middleware is serving a request handler without CSRF protection.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1331,10 +1419,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/incomplete-url-substring-sanitization in test/api/internet-resources.test.ts github-codeql-alert-27 triage-032 test/api/internet-resources.test.ts test/api/internet-resources.test.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/27 rule:js/incomplete-url-substring-sanitization tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 test/api/internet-resources.test.ts is a test file and the flagged expression is used to verify expected behavior or an external resource. no production import or hosted request handler path exists from this test expression.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/incomplete-url-substring-sanitization in test/api/internet-resources.test.ts github-codeql-alert-26 triage-033 test/api/internet-resources.test.ts test/api/internet-resources.test.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/26 rule:js/incomplete-url-substring-sanitization tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high test/api/internet-resources.test.ts is a test file and the flagged expression is used to verify expected behavior or an external resource. no production import or hosted request handler path exists from this test expression.">
         <header>
           <div>
-            <p class="eyebrow">triage-032 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/27" target="_blank" rel="noopener noreferrer">Open GitHub alert #27</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-26 · <strong>Triage item ID:</strong> triage-033 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/26" target="_blank" rel="noopener noreferrer">Open GitHub alert #26</a></p>
             <h2>js/incomplete-url-substring-sanitization in test/api/internet-resources.test.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1347,7 +1435,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>test/api/internet-resources.test.ts:81-81</code> <span class="muted">scanner location</span><div>CodeQL js/incomplete-url-substring-sanitization instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>test/api/internet-resources.test.ts:65</code> <span class="muted">scanner location</span><div>CodeQL js/incomplete-url-substring-sanitization instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: &#x27;https://pastebin.com/90dUgd7s&#x27; can be anywhere in the URL, and arbitrary hosts may come before or after it.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1372,51 +1460,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/incomplete-url-substring-sanitization in test/api/internet-resources.test.ts github-codeql-alert-26 triage-033 test/api/internet-resources.test.ts test/api/internet-resources.test.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/26 rule:js/incomplete-url-substring-sanitization tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 test/api/internet-resources.test.ts is a test file and the flagged expression is used to verify expected behavior or an external resource. no production import or hosted request handler path exists from this test expression.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/updateproductreviews.ts github-codeql-alert-25 triage-034 routes/updateproductreviews.ts routes/updateproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/25 rule:js/sql-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high routes/updateproductreviews.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-033 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/26" target="_blank" rel="noopener noreferrer">Open GitHub alert #26</a></p>
-            <h2>js/incomplete-url-substring-sanitization in test/api/internet-resources.test.ts</h2>
-          </div>
-          <span class="badge not_actionable">Not actionable</span>
-        </header>
-        <div class="metadata">
-          <span><strong>Confidence</strong> high</span>
-          <span><strong>Queue rank</strong> —</span>
-          <span><strong>Boundary crossed</strong> No</span>
-          <span><strong>Component</strong> test/api/internet-resources.test.ts</span>
-        </div>
-        <section>
-          <h3>Affected locations</h3>
-          <ul><li><code>test/api/internet-resources.test.ts:65-65</code> <span class="muted">scanner location</span><div>CodeQL js/incomplete-url-substring-sanitization instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
-        </section>
-        <details open>
-          <summary>Evidence</summary>
-          <ul><li>test/api/internet-resources.test.ts is a test file and the flagged expression is used to verify expected behavior or an external resource.</li></ul>
-        </details>
-        <details>
-          <summary>Counterevidence</summary>
-          <ul><li>No production import or hosted request handler path exists from this test expression.</li></ul>
-        </details>
-        <details>
-          <summary>Proof gaps</summary>
-          <p class="empty">None recorded</p>
-        </details>
-        <details>
-          <summary>Boundary assessment</summary>
-          <dl>
-            <dt>Surface</dt><dd>test/fixture</dd>
-            <dt>Source trust</dt><dd>trusted_developer_config</dd>
-            <dt>Policy basis</dt><dd>Repository path and test runner structure identify this as test-only code.</dd>
-          </dl>
-        </details>
-        <p class="next-step"><strong>Next step:</strong> no-action</p>
-      </article>
-    
-      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/updateproductreviews.ts github-codeql-alert-25 triage-034 routes/updateproductreviews.ts routes/updateproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/25 rule:js/sql-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/updateproductreviews.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
-        <header>
-          <div>
-            <p class="eyebrow">triage-034 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/25" target="_blank" rel="noopener noreferrer">Open GitHub alert #25</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-25 · <strong>Triage item ID:</strong> triage-034 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/25" target="_blank" rel="noopener noreferrer">Open GitHub alert #25</a></p>
             <h2>js/sql-injection in routes/updateProductReviews.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1429,7 +1476,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/updateProductReviews.ts:18-18</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/updateProductReviews.ts:18</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query object depends on a user-provided value.
+This query object depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1454,10 +1502,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/search.ts github-codeql-alert-24 triage-035 routes/search.ts routes/search.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/24 rule:js/sql-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/search.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/search.ts github-codeql-alert-24 triage-035 routes/search.ts routes/search.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/24 rule:js/sql-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high routes/search.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-035 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/24" target="_blank" rel="noopener noreferrer">Open GitHub alert #24</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-24 · <strong>Triage item ID:</strong> triage-035 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/24" target="_blank" rel="noopener noreferrer">Open GitHub alert #24</a></p>
             <h2>js/sql-injection in routes/search.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1470,7 +1518,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/search.ts:23-23</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/search.ts:23</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query string depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1495,10 +1543,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/login.ts github-codeql-alert-23 triage-036 routes/login.ts routes/login.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/23 rule:js/sql-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/login.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/login.ts github-codeql-alert-23 triage-036 routes/login.ts routes/login.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/23 rule:js/sql-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high routes/login.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-036 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/23" target="_blank" rel="noopener noreferrer">Open GitHub alert #23</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-23 · <strong>Triage item ID:</strong> triage-036 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/23" target="_blank" rel="noopener noreferrer">Open GitHub alert #23</a></p>
             <h2>js/sql-injection in routes/login.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1511,7 +1559,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/login.ts:34-34</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/login.ts:34</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query string depends on a user-provided value.
+This query string depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1536,10 +1585,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/likeproductreviews.ts github-codeql-alert-22 triage-037 routes/likeproductreviews.ts routes/likeproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/22 rule:js/sql-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the flagged call is a marsdb query-object equality lookup/update, not sql string construction; access is additionally gated by jwt middleware and authenticatedusers.from. the request id is placed as the value of the fixed _id key and query operator/property names are not constructed from it. the intended race condition is separately checked through timingattackchallenge; codeql&#x27;s sql-injection model does not match this sink.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/likeproductreviews.ts github-codeql-alert-22 triage-037 routes/likeproductreviews.ts routes/likeproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/22 rule:js/sql-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the flagged call is a marsdb query-object equality lookup/update, not sql string construction; access is additionally gated by jwt middleware and authenticatedusers.from. the request id is placed as the value of the fixed _id key and query operator/property names are not constructed from it. the intended race condition is separately checked through timingattackchallenge; codeql&#x27;s sql-injection model does not match this sink.">
         <header>
           <div>
-            <p class="eyebrow">triage-037 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/22" target="_blank" rel="noopener noreferrer">Open GitHub alert #22</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-22 · <strong>Triage item ID:</strong> triage-037 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/22" target="_blank" rel="noopener noreferrer">Open GitHub alert #22</a></p>
             <h2>js/sql-injection in routes/likeProductReviews.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1552,7 +1601,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/likeProductReviews.ts:51-51</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/likeProductReviews.ts:51</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query object depends on a user-provided value.
+This query object depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1577,10 +1627,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/likeproductreviews.ts github-codeql-alert-21 triage-038 routes/likeproductreviews.ts routes/likeproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/21 rule:js/sql-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the flagged call is a marsdb query-object equality lookup/update, not sql string construction; access is gated by jwt middleware and an authenticated user. the request id is the value of a fixed _id key rather than executable sql text. codeql&#x27;s sql-injection sink model does not match this database api.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/likeproductreviews.ts github-codeql-alert-21 triage-038 routes/likeproductreviews.ts routes/likeproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/21 rule:js/sql-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the flagged call is a marsdb query-object equality lookup/update, not sql string construction; access is gated by jwt middleware and an authenticated user. the request id is the value of a fixed _id key rather than executable sql text. codeql&#x27;s sql-injection sink model does not match this database api.">
         <header>
           <div>
-            <p class="eyebrow">triage-038 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/21" target="_blank" rel="noopener noreferrer">Open GitHub alert #21</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-21 · <strong>Triage item ID:</strong> triage-038 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/21" target="_blank" rel="noopener noreferrer">Open GitHub alert #21</a></p>
             <h2>js/sql-injection in routes/likeProductReviews.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1593,7 +1643,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/likeProductReviews.ts:43-43</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/likeProductReviews.ts:43</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query object depends on a user-provided value.
+This query object depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1618,10 +1669,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/likeproductreviews.ts github-codeql-alert-20 triage-039 routes/likeproductreviews.ts routes/likeproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/20 rule:js/sql-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the flagged call is a marsdb query-object equality lookup/update, not sql string construction; access is gated by jwt middleware and an authenticated user. the request id is the value of a fixed _id key rather than executable sql text. codeql&#x27;s sql-injection sink model does not match this database api.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/likeproductreviews.ts github-codeql-alert-20 triage-039 routes/likeproductreviews.ts routes/likeproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/20 rule:js/sql-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the flagged call is a marsdb query-object equality lookup/update, not sql string construction; access is gated by jwt middleware and an authenticated user. the request id is the value of a fixed _id key rather than executable sql text. codeql&#x27;s sql-injection sink model does not match this database api.">
         <header>
           <div>
-            <p class="eyebrow">triage-039 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/20" target="_blank" rel="noopener noreferrer">Open GitHub alert #20</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-20 · <strong>Triage item ID:</strong> triage-039 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/20" target="_blank" rel="noopener noreferrer">Open GitHub alert #20</a></p>
             <h2>js/sql-injection in routes/likeProductReviews.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1634,7 +1685,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/likeProductReviews.ts:36-36</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/likeProductReviews.ts:36</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query object depends on a user-provided value.
+This query object depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1659,10 +1711,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/likeproductreviews.ts github-codeql-alert-19 triage-040 routes/likeproductreviews.ts routes/likeproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/19 rule:js/sql-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the flagged call is a marsdb query-object equality lookup/update, not sql string construction; access is gated by jwt middleware and an authenticated user. the request id is the value of a fixed _id key rather than executable sql text. codeql&#x27;s sql-injection sink model does not match this database api.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/sql-injection in routes/likeproductreviews.ts github-codeql-alert-19 triage-040 routes/likeproductreviews.ts routes/likeproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/19 rule:js/sql-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the flagged call is a marsdb query-object equality lookup/update, not sql string construction; access is gated by jwt middleware and an authenticated user. the request id is the value of a fixed _id key rather than executable sql text. codeql&#x27;s sql-injection sink model does not match this database api.">
         <header>
           <div>
-            <p class="eyebrow">triage-040 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/19" target="_blank" rel="noopener noreferrer">Open GitHub alert #19</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-19 · <strong>Triage item ID:</strong> triage-040 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/19" target="_blank" rel="noopener noreferrer">Open GitHub alert #19</a></p>
             <h2>js/sql-injection in routes/likeProductReviews.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1675,7 +1727,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/likeProductReviews.ts:25-25</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/likeProductReviews.ts:25</code> <span class="muted">scanner location</span><div>CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query object depends on a user-provided value.
+This query object depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1700,10 +1753,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/template-object-injection in routes/dataerasure.ts github-codeql-alert-18 triage-041 routes/dataerasure.ts routes/dataerasure.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/18 rule:js/template-object-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/dataerasure.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/template-object-injection in routes/dataerasure.ts github-codeql-alert-18 triage-041 routes/dataerasure.ts routes/dataerasure.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/18 rule:js/template-object-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:critical routes/dataerasure.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-041 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/18" target="_blank" rel="noopener noreferrer">Open GitHub alert #18</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-18 · <strong>Triage item ID:</strong> triage-041 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/18" target="_blank" rel="noopener noreferrer">Open GitHub alert #18</a></p>
             <h2>js/template-object-injection in routes/dataErasure.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1716,7 +1769,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/dataErasure.ts:123-126</code> <span class="muted">scanner location</span><div>CodeQL js/template-object-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/dataErasure.ts:123-126</code> <span class="muted">scanner location</span><div>CodeQL js/template-object-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Template object depends on a user-provided value.
+Template object depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1741,10 +1795,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/template-object-injection in routes/dataerasure.ts github-codeql-alert-17 triage-042 routes/dataerasure.ts routes/dataerasure.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/17 rule:js/template-object-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/dataerasure.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/template-object-injection in routes/dataerasure.ts github-codeql-alert-17 triage-042 routes/dataerasure.ts routes/dataerasure.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/17 rule:js/template-object-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:critical routes/dataerasure.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-042 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/17" target="_blank" rel="noopener noreferrer">Open GitHub alert #17</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-17 · <strong>Triage item ID:</strong> triage-042 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/17" target="_blank" rel="noopener noreferrer">Open GitHub alert #17</a></p>
             <h2>js/template-object-injection in routes/dataErasure.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1757,7 +1811,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/dataErasure.ts:107-110</code> <span class="muted">scanner location</span><div>CodeQL js/template-object-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/dataErasure.ts:107-110</code> <span class="muted">scanner location</span><div>CodeQL js/template-object-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Template object depends on a user-provided value.
+Template object depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1782,10 +1837,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/sensitive-get-query in routes/changepassword.ts github-codeql-alert-16 triage-043 routes/changepassword.ts routes/changepassword.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/16 rule:js/sensitive-get-query tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/changepassword.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/sensitive-get-query in routes/changepassword.ts github-codeql-alert-16 triage-043 routes/changepassword.ts routes/changepassword.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/16 rule:js/sensitive-get-query tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium routes/changepassword.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-043 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/16" target="_blank" rel="noopener noreferrer">Open GitHub alert #16</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-16 · <strong>Triage item ID:</strong> triage-043 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/16" target="_blank" rel="noopener noreferrer">Open GitHub alert #16</a></p>
             <h2>js/sensitive-get-query in routes/changePassword.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1798,7 +1853,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/changePassword.ts:17-17</code> <span class="muted">scanner location</span><div>CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/changePassword.ts:17</code> <span class="muted">scanner location</span><div>CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Route handler for GET requests uses query parameter as sensitive data.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1823,10 +1878,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/sensitive-get-query in routes/changepassword.ts github-codeql-alert-15 triage-044 routes/changepassword.ts routes/changepassword.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/15 rule:js/sensitive-get-query tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/changepassword.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/sensitive-get-query in routes/changepassword.ts github-codeql-alert-15 triage-044 routes/changepassword.ts routes/changepassword.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/15 rule:js/sensitive-get-query tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium routes/changepassword.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-044 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/15" target="_blank" rel="noopener noreferrer">Open GitHub alert #15</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-15 · <strong>Triage item ID:</strong> triage-044 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/15" target="_blank" rel="noopener noreferrer">Open GitHub alert #15</a></p>
             <h2>js/sensitive-get-query in routes/changePassword.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1839,7 +1894,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/changePassword.ts:15-15</code> <span class="muted">scanner location</span><div>CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/changePassword.ts:15</code> <span class="muted">scanner location</span><div>CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Route handler for GET requests uses query parameter as sensitive data.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1864,10 +1919,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/sensitive-get-query in routes/changepassword.ts github-codeql-alert-14 triage-045 routes/changepassword.ts routes/changepassword.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/14 rule:js/sensitive-get-query tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/changepassword.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/sensitive-get-query in routes/changepassword.ts github-codeql-alert-14 triage-045 routes/changepassword.ts routes/changepassword.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/14 rule:js/sensitive-get-query tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:medium routes/changepassword.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-045 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/14" target="_blank" rel="noopener noreferrer">Open GitHub alert #14</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-14 · <strong>Triage item ID:</strong> triage-045 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/14" target="_blank" rel="noopener noreferrer">Open GitHub alert #14</a></p>
             <h2>js/sensitive-get-query in routes/changePassword.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1880,7 +1935,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/changePassword.ts:14-14</code> <span class="muted">scanner location</span><div>CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/changePassword.ts:14</code> <span class="muted">scanner location</span><div>CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Route handler for GET requests uses query parameter as sensitive data.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1905,10 +1960,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/path-injection in routes/vulncodesnippet.ts github-codeql-alert-13 triage-046 routes/vulncodesnippet.ts routes/vulncodesnippet.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/13 rule:js/path-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the key must exist in the precomputed code-challenge map before the handler proceeds to the metadata read; unknown or traversal-shaped keys return 404 first. the metadata suffix is used only after retrievecodesnippet confirms a repository-defined key. no attacker-chosen path bypassing the map membership check is supported.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/path-injection in routes/vulncodesnippet.ts github-codeql-alert-13 triage-046 routes/vulncodesnippet.ts routes/vulncodesnippet.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/13 rule:js/path-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the key must exist in the precomputed code-challenge map before the handler proceeds to the metadata read; unknown or traversal-shaped keys return 404 first. the metadata suffix is used only after retrievecodesnippet confirms a repository-defined key. no attacker-chosen path bypassing the map membership check is supported.">
         <header>
           <div>
-            <p class="eyebrow">triage-046 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/13" target="_blank" rel="noopener noreferrer">Open GitHub alert #13</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-13 · <strong>Triage item ID:</strong> triage-046 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/13" target="_blank" rel="noopener noreferrer">Open GitHub alert #13</a></p>
             <h2>js/path-injection in routes/vulnCodeSnippet.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1921,7 +1976,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/vulnCodeSnippet.ts:90-90</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/vulnCodeSnippet.ts:90</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1946,10 +2001,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/path-injection in routes/vulncodesnippet.ts github-codeql-alert-12 triage-047 routes/vulncodesnippet.ts routes/vulncodesnippet.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/12 rule:js/path-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the key must exist in the precomputed code-challenge map before the handler proceeds to the metadata read; unknown or traversal-shaped keys return 404 first. the metadata suffix is used only after retrievecodesnippet confirms a repository-defined key. no attacker-chosen path bypassing the map membership check is supported.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/path-injection in routes/vulncodesnippet.ts github-codeql-alert-12 triage-047 routes/vulncodesnippet.ts routes/vulncodesnippet.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/12 rule:js/path-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the key must exist in the precomputed code-challenge map before the handler proceeds to the metadata read; unknown or traversal-shaped keys return 404 first. the metadata suffix is used only after retrievecodesnippet confirms a repository-defined key. no attacker-chosen path bypassing the map membership check is supported.">
         <header>
           <div>
-            <p class="eyebrow">triage-047 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/12" target="_blank" rel="noopener noreferrer">Open GitHub alert #12</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-12 · <strong>Triage item ID:</strong> triage-047 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/12" target="_blank" rel="noopener noreferrer">Open GitHub alert #12</a></p>
             <h2>js/path-injection in routes/vulnCodeSnippet.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -1962,7 +2017,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/vulnCodeSnippet.ts:89-89</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/vulnCodeSnippet.ts:89</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -1987,10 +2042,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/path-injection in routes/vulncodefixes.ts github-codeql-alert-11 triage-048 routes/vulncodefixes.ts routes/vulncodefixes.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/11 rule:js/path-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 readfixes enumerates files in a fixed directory and reads only an enumerated filename whose prefix matches the key; the request key is never concatenated into that read path. the later metadata read is reached only when enumerated fixes exist for a repository-defined key. a traversal-shaped key cannot make an enumerated basename contain directory separators.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/path-injection in routes/vulncodefixes.ts github-codeql-alert-11 triage-048 routes/vulncodefixes.ts routes/vulncodefixes.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/11 rule:js/path-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high readfixes enumerates files in a fixed directory and reads only an enumerated filename whose prefix matches the key; the request key is never concatenated into that read path. the later metadata read is reached only when enumerated fixes exist for a repository-defined key. a traversal-shaped key cannot make an enumerated basename contain directory separators.">
         <header>
           <div>
-            <p class="eyebrow">triage-048 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/11" target="_blank" rel="noopener noreferrer">Open GitHub alert #11</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-11 · <strong>Triage item ID:</strong> triage-048 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/11" target="_blank" rel="noopener noreferrer">Open GitHub alert #11</a></p>
             <h2>js/path-injection in routes/vulnCodeFixes.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -2003,7 +2058,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/vulnCodeFixes.ts:81-81</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/vulnCodeFixes.ts:81</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -2028,10 +2083,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/path-injection in routes/vulncodefixes.ts github-codeql-alert-10 triage-049 routes/vulncodefixes.ts routes/vulncodefixes.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/10 rule:js/path-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 readfixes enumerates files in a fixed directory and reads only an enumerated filename whose prefix matches the key; the request key is never concatenated into that read path. the later metadata read is reached only when enumerated fixes exist for a repository-defined key. a traversal-shaped key cannot make an enumerated basename contain directory separators.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/path-injection in routes/vulncodefixes.ts github-codeql-alert-10 triage-049 routes/vulncodefixes.ts routes/vulncodefixes.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/10 rule:js/path-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high readfixes enumerates files in a fixed directory and reads only an enumerated filename whose prefix matches the key; the request key is never concatenated into that read path. the later metadata read is reached only when enumerated fixes exist for a repository-defined key. a traversal-shaped key cannot make an enumerated basename contain directory separators.">
         <header>
           <div>
-            <p class="eyebrow">triage-049 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/10" target="_blank" rel="noopener noreferrer">Open GitHub alert #10</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-10 · <strong>Triage item ID:</strong> triage-049 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/10" target="_blank" rel="noopener noreferrer">Open GitHub alert #10</a></p>
             <h2>js/path-injection in routes/vulnCodeFixes.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -2044,7 +2099,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/vulnCodeFixes.ts:80-80</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/vulnCodeFixes.ts:80</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -2069,10 +2124,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/path-injection in routes/profileimageurlupload.ts github-codeql-alert-9 triage-050 routes/profileimageurlupload.ts routes/profileimageurlupload.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/9 rule:js/path-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 the destination filename uses an authenticated persisted user id plus an extension selected from a fixed image-extension allowlist. the url is not used as a filesystem path; unknown suffixes fall back to jpg. no attacker-controlled directory component reaches createwritestream.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/path-injection in routes/profileimageurlupload.ts github-codeql-alert-9 triage-050 routes/profileimageurlupload.ts routes/profileimageurlupload.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/9 rule:js/path-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high the destination filename uses an authenticated persisted user id plus an extension selected from a fixed image-extension allowlist. the url is not used as a filesystem path; unknown suffixes fall back to jpg. no attacker-controlled directory component reaches createwritestream.">
         <header>
           <div>
-            <p class="eyebrow">triage-050 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/9" target="_blank" rel="noopener noreferrer">Open GitHub alert #9</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-9 · <strong>Triage item ID:</strong> triage-050 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/9" target="_blank" rel="noopener noreferrer">Open GitHub alert #9</a></p>
             <h2>js/path-injection in routes/profileImageUrlUpload.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -2085,7 +2140,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/profileImageUrlUpload.ts:29-29</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/profileImageUrlUpload.ts:29</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -2110,10 +2165,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="confirmed" data-search="js/path-injection in routes/quarantineserver.ts github-codeql-alert-8 triage-051 routes/quarantineserver.ts server.ts routes/quarantineserver.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/8 rule:js/path-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 readme.md documents windows as a supported runtime. server.ts:271 exposes the route without authentication. the test covers encoded forward slashes only; it does not defeat windows backslash traversal. forward-slash traversal is rejected.">
+      <article class="finding" data-verdict="confirmed" data-search="js/path-injection in routes/quarantineserver.ts github-codeql-alert-8 triage-051 routes/quarantineserver.ts routes/quarantineserver.ts server.ts routes/quarantineserver.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/8 rule:js/path-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high readme.md documents windows as a supported runtime. server.ts:271 exposes the route without authentication. the test covers encoded forward slashes only; it does not defeat windows backslash traversal. forward-slash traversal is rejected.">
         <header>
           <div>
-            <p class="eyebrow">triage-051 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/8" target="_blank" rel="noopener noreferrer">Open GitHub alert #8</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-8 · <strong>Triage item ID:</strong> triage-051 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/8" target="_blank" rel="noopener noreferrer">Open GitHub alert #8</a></p>
             <h2>js/path-injection in routes/quarantineServer.ts</h2>
           </div>
           <span class="badge confirmed">Confirmed</span>
@@ -2126,7 +2181,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>server.ts:270-271</code> <span class="muted">entrypoint</span><div>Public quarantine-file route</div></li><li><code>routes/quarantineServer.ts:9-17</code> <span class="muted">control/sink</span><div>Forward-slash-only check precedes path.resolve/sendFile</div></li></ul>
+          <ul><li><code>routes/quarantineServer.ts:9-17</code> <span class="muted">control/sink</span><div>Forward-slash-only check precedes path.resolve/sendFile</div></li><li><code>server.ts:270-271</code> <span class="muted">entrypoint</span><div>Public quarantine-file route</div></li><li><code>routes/quarantineServer.ts:14</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -2151,10 +2206,10 @@
         <p class="next-step"><strong>Next step:</strong> fix-finding</p>
       </article>
     
-      <article class="finding" data-verdict="confirmed" data-search="js/path-injection in routes/logfileserver.ts github-codeql-alert-7 triage-052 routes/logfileserver.ts server.ts routes/logfileserver.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/7 rule:js/path-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 readme.md documents windows as a supported runtime. server.ts:283 exposes the parameterized log-file route; the preceding challenge middleware does not authorize access. routes/logfileserver.ts checks only forward slash. forward-slash traversal is rejected.">
+      <article class="finding" data-verdict="confirmed" data-search="js/path-injection in routes/logfileserver.ts github-codeql-alert-7 triage-052 routes/logfileserver.ts routes/logfileserver.ts server.ts routes/logfileserver.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/7 rule:js/path-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high readme.md documents windows as a supported runtime. server.ts:283 exposes the parameterized log-file route; the preceding challenge middleware does not authorize access. routes/logfileserver.ts checks only forward slash. forward-slash traversal is rejected.">
         <header>
           <div>
-            <p class="eyebrow">triage-052 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/7" target="_blank" rel="noopener noreferrer">Open GitHub alert #7</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-7 · <strong>Triage item ID:</strong> triage-052 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/7" target="_blank" rel="noopener noreferrer">Open GitHub alert #7</a></p>
             <h2>js/path-injection in routes/logfileServer.ts</h2>
           </div>
           <span class="badge confirmed">Confirmed</span>
@@ -2167,7 +2222,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>server.ts:280-283</code> <span class="muted">entrypoint</span><div>Public log-file route</div></li><li><code>routes/logfileServer.ts:9-17</code> <span class="muted">control/sink</span><div>Forward-slash-only check precedes path.resolve/sendFile</div></li></ul>
+          <ul><li><code>routes/logfileServer.ts:9-17</code> <span class="muted">control/sink</span><div>Forward-slash-only check precedes path.resolve/sendFile</div></li><li><code>server.ts:280-283</code> <span class="muted">entrypoint</span><div>Public log-file route</div></li><li><code>routes/logfileServer.ts:14</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -2192,10 +2247,10 @@
         <p class="next-step"><strong>Next step:</strong> fix-finding</p>
       </article>
     
-      <article class="finding" data-verdict="confirmed" data-search="js/path-injection in routes/keyserver.ts github-codeql-alert-6 triage-053 routes/keyserver.ts server.ts routes/keyserver.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/6 rule:js/path-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 readme.md documents windows as a supported runtime and package.json includes win32. server.ts:278 exposes the file route without authentication. routes/keyserver.ts:13 checks only &#x27;/&#x27; while node:path on windows treats &#x27;\\&#x27; as a separator. forward-slash traversal is rejected.">
+      <article class="finding" data-verdict="confirmed" data-search="js/path-injection in routes/keyserver.ts github-codeql-alert-6 triage-053 routes/keyserver.ts routes/keyserver.ts server.ts routes/keyserver.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/6 rule:js/path-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high readme.md documents windows as a supported runtime and package.json includes win32. server.ts:278 exposes the file route without authentication. routes/keyserver.ts:13 checks only &#x27;/&#x27; while node:path on windows treats &#x27;\\&#x27; as a separator. forward-slash traversal is rejected.">
         <header>
           <div>
-            <p class="eyebrow">triage-053 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/6" target="_blank" rel="noopener noreferrer">Open GitHub alert #6</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-6 · <strong>Triage item ID:</strong> triage-053 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/6" target="_blank" rel="noopener noreferrer">Open GitHub alert #6</a></p>
             <h2>js/path-injection in routes/keyServer.ts</h2>
           </div>
           <span class="badge confirmed">Confirmed</span>
@@ -2208,7 +2263,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>server.ts:276-278</code> <span class="muted">entrypoint</span><div>Public key-file route</div></li><li><code>routes/keyServer.ts:9-17</code> <span class="muted">control/sink</span><div>Forward-slash-only check precedes path.resolve/sendFile</div></li></ul>
+          <ul><li><code>routes/keyServer.ts:9-17</code> <span class="muted">control/sink</span><div>Forward-slash-only check precedes path.resolve/sendFile</div></li><li><code>server.ts:276-278</code> <span class="muted">entrypoint</span><div>Public key-file route</div></li><li><code>routes/keyServer.ts:14</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -2233,10 +2288,10 @@
         <p class="next-step"><strong>Next step:</strong> fix-finding</p>
       </article>
     
-      <article class="finding" data-verdict="confirmed" data-search="js/path-injection in routes/fileserver.ts github-codeql-alert-5 triage-054 routes/fileserver.ts server.ts routes/fileserver.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/5 rule:js/path-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 readme.md documents windows as a supported runtime. routes/fileserver.ts:18 rejects only &#x27;/&#x27;, and line 33 sends a resolved attacker-influenced path. the existing directory-listing/null-byte challenges do not document arbitrary parent-directory reads through windows separators. the suffix allowlist narrows readable targets and forward-slash traversal is rejected.">
+      <article class="finding" data-verdict="confirmed" data-search="js/path-injection in routes/fileserver.ts github-codeql-alert-5 triage-054 routes/fileserver.ts routes/fileserver.ts server.ts routes/fileserver.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/5 rule:js/path-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high readme.md documents windows as a supported runtime. routes/fileserver.ts:18 rejects only &#x27;/&#x27;, and line 33 sends a resolved attacker-influenced path. the existing directory-listing/null-byte challenges do not document arbitrary parent-directory reads through windows separators. the suffix allowlist narrows readable targets and forward-slash traversal is rejected.">
         <header>
           <div>
-            <p class="eyebrow">triage-054 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/5" target="_blank" rel="noopener noreferrer">Open GitHub alert #5</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-5 · <strong>Triage item ID:</strong> triage-054 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/5" target="_blank" rel="noopener noreferrer">Open GitHub alert #5</a></p>
             <h2>js/path-injection in routes/fileServer.ts</h2>
           </div>
           <span class="badge confirmed">Confirmed</span>
@@ -2249,7 +2304,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>server.ts:267-270</code> <span class="muted">entrypoint</span><div>Public FTP file route</div></li><li><code>routes/fileServer.ts:14-36</code> <span class="muted">control/sink</span><div>Suffix and forward-slash checks precede path.resolve/sendFile</div></li></ul>
+          <ul><li><code>routes/fileServer.ts:14-36</code> <span class="muted">control/sink</span><div>Suffix and forward-slash checks precede path.resolve/sendFile</div></li><li><code>server.ts:267-270</code> <span class="muted">entrypoint</span><div>Public FTP file route</div></li><li><code>routes/fileServer.ts:33</code> <span class="muted">scanner location</span><div>CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -2274,10 +2329,10 @@
         <p class="next-step"><strong>Next step:</strong> fix-finding</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/code-injection in routes/trackorder.ts github-codeql-alert-4 triage-055 routes/trackorder.ts routes/trackorder.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/4 rule:js/code-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/trackorder.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/code-injection in routes/trackorder.ts github-codeql-alert-4 triage-055 routes/trackorder.ts routes/trackorder.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/4 rule:js/code-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:critical routes/trackorder.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-055 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/4" target="_blank" rel="noopener noreferrer">Open GitHub alert #4</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-4 · <strong>Triage item ID:</strong> triage-055 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/4" target="_blank" rel="noopener noreferrer">Open GitHub alert #4</a></p>
             <h2>js/code-injection in routes/trackOrder.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -2290,7 +2345,8 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/trackOrder.ts:18-18</code> <span class="muted">scanner location</span><div>CodeQL js/code-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/trackOrder.ts:18</code> <span class="muted">scanner location</span><div>CodeQL js/code-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This code execution depends on a user-provided value.
+This code execution depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -2315,10 +2371,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/code-injection in routes/showproductreviews.ts github-codeql-alert-3 triage-056 routes/showproductreviews.ts routes/showproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/3 rule:js/code-injection tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/showproductreviews.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/code-injection in routes/showproductreviews.ts github-codeql-alert-3 triage-056 routes/showproductreviews.ts routes/showproductreviews.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/3 rule:js/code-injection tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:critical routes/showproductreviews.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-056 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/3" target="_blank" rel="noopener noreferrer">Open GitHub alert #3</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-3 · <strong>Triage item ID:</strong> triage-056 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/3" target="_blank" rel="noopener noreferrer">Open GitHub alert #3</a></p>
             <h2>js/code-injection in routes/showProductReviews.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -2331,7 +2387,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/showProductReviews.ts:36-36</code> <span class="muted">scanner location</span><div>CodeQL js/code-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/showProductReviews.ts:36</code> <span class="muted">scanner location</span><div>CodeQL js/code-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This code execution depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -2356,10 +2412,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="not_actionable" data-search="js/request-forgery in routes/profileimageurlupload.ts github-codeql-alert-2 triage-057 routes/profileimageurlupload.ts routes/profileimageurlupload.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/2 rule:js/request-forgery tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 routes/profileimageurlupload.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
+      <article class="finding" data-verdict="not_actionable" data-search="js/request-forgery in routes/profileimageurlupload.ts github-codeql-alert-2 triage-057 routes/profileimageurlupload.ts routes/profileimageurlupload.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/2 rule:js/request-forgery tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:error commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:critical routes/profileimageurlupload.ts contains explicit vuln-code-snippet or challengeutils linkage for the reported weakness. data/static/challenges.yml documents the corresponding attack and mitigation context. the security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability.">
         <header>
           <div>
-            <p class="eyebrow">triage-057 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/2" target="_blank" rel="noopener noreferrer">Open GitHub alert #2</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-2 · <strong>Triage item ID:</strong> triage-057 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/2" target="_blank" rel="noopener noreferrer">Open GitHub alert #2</a></p>
             <h2>js/request-forgery in routes/profileImageUrlUpload.ts</h2>
           </div>
           <span class="badge not_actionable">Not actionable</span>
@@ -2372,7 +2428,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>routes/profileImageUrlUpload.ts:24-24</code> <span class="muted">scanner location</span><div>CodeQL js/request-forgery instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9</div></li></ul>
+          <ul><li><code>routes/profileImageUrlUpload.ts:24</code> <span class="muted">scanner location</span><div>CodeQL js/request-forgery instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: The URL of this request depends on a user-provided value.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>
@@ -2397,10 +2453,10 @@
         <p class="next-step"><strong>Next step:</strong> no-action</p>
       </article>
     
-      <article class="finding" data-verdict="needs_review" data-search="js/insecure-randomness in lib/insecurity.ts github-codeql-alert-1 triage-058 lib/insecurity.ts lib/insecurity.ts server.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/1 rule:js/insecure-randomness tool:codeql ref:refs/heads/feature01-newpages commit:1dc7ba33a037005030a3b374975acc062d5e02d9 lib/insecurity.ts:53 directly uses math.random in a jwt-verification secret. server.ts applies denyall to multiple methods intended to be inaccessible. the secret is not returned or logged, and denyall is intended to reject all requests rather than issue tokens. a remote guessing path is not established. exact math.random entropy, middleware initialization lifetime, accepted jwt algorithm, and practical offline verification oracle are unresolved.">
+      <article class="finding" data-verdict="needs_review" data-search="js/insecure-randomness in lib/insecurity.ts github-codeql-alert-1 triage-058 lib/insecurity.ts server.ts lib/insecurity.ts lib/insecurity.ts https://github.com/jessicatechdemo/juice-shop/security/code-scanning/1 rule:js/insecure-randomness tool:codeql tool-version:2.26.2 ref:refs/heads/feature01-newpages codeql-severity:warning commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d codeql-security-severity:high lib/insecurity.ts:53 directly uses math.random in a jwt-verification secret. server.ts applies denyall to multiple methods intended to be inaccessible. the secret is not returned or logged, and denyall is intended to reject all requests rather than issue tokens. a remote guessing path is not established. exact math.random entropy, middleware initialization lifetime, accepted jwt algorithm, and practical offline verification oracle are unresolved.">
         <header>
           <div>
-            <p class="eyebrow">triage-058 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/1" target="_blank" rel="noopener noreferrer">Open GitHub alert #1</a></p>
+            <p class="eyebrow"><strong>Finding ID:</strong> github-codeql-alert-1 · <strong>Triage item ID:</strong> triage-058 · <a href="https://github.com/jessicatechdemo/juice-shop/security/code-scanning/1" target="_blank" rel="noopener noreferrer">Open GitHub alert #1</a></p>
             <h2>js/insecure-randomness in lib/insecurity.ts</h2>
           </div>
           <span class="badge needs_review">Needs review</span>
@@ -2413,7 +2469,7 @@
         </div>
         <section>
           <h3>Affected locations</h3>
-          <ul><li><code>lib/insecurity.ts:52-54</code> <span class="muted">control</span><div>denyAll uses Math.random as JWT secret</div></li><li><code>server.ts:366-446</code> <span class="muted">consumers</span><div>Middleware protects multiple API methods</div></li></ul>
+          <ul><li><code>server.ts:366-446</code> <span class="muted">consumers</span><div>Middleware protects multiple API methods</div></li><li><code>lib/insecurity.ts:52-54</code> <span class="muted">control</span><div>denyAll uses Math.random as JWT secret</div></li><li><code>lib/insecurity.ts:53</code> <span class="muted">scanner location</span><div>CodeQL js/insecure-randomness instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This uses a cryptographically insecure random number generated at Math.random() in a security context.</div></li></ul>
         </section>
         <details open>
           <summary>Evidence</summary>

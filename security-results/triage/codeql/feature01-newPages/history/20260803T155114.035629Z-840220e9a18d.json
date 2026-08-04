@@ -3,9 +3,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/functionality-from-untrusted-source instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Script loaded from content delivery network with no integrity check.",
+          "detail": "CodeQL js/functionality-from-untrusted-source instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "481",
+          "lines": "481-481",
           "path": "security-results/explanations/codeql-triage-writeback.html"
         }
       ],
@@ -32,7 +32,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-59",
       "normalized_input": {
-        "affected_version_or_path": "security-results/explanations/codeql-triage-writeback.html on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "security-results/explanations/codeql-triage-writeback.html",
         "claimed_control": "missing subresource integrity validation",
         "claimed_sink": "script execution in a generated standalone HTML explanation",
         "claimed_source": "JavaScript loaded from public content delivery networks",
@@ -44,11 +44,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/59",
           "rule:js/functionality-from-untrusted-source",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "security-results/explanations/codeql-triage-writeback.html"
       },
@@ -66,9 +63,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "40",
+          "lines": "40-40",
           "path": "routes/vulnCodeFixes.ts"
         }
       ],
@@ -94,7 +91,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-58",
       "normalized_input": {
-        "affected_version_or_path": "routes/vulnCodeFixes.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/vulnCodeFixes.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
         "claimed_sink": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -106,11 +103,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/58",
           "rule:js/remote-property-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/vulnCodeFixes.ts"
       },
@@ -135,12 +129,6 @@
           "label": "entrypoint",
           "lines": "600",
           "path": "server.ts"
-        },
-        {
-          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: A property name to write to depends on a user-provided value.",
-          "label": "scanner location",
-          "lines": "31",
-          "path": "routes/currentUser.ts"
         },
         {
           "detail": "Verified user plus request-controlled dynamic field projection",
@@ -178,7 +166,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-57",
       "normalized_input": {
-        "affected_version_or_path": "routes/currentUser.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/currentUser.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "Requested property names are copied into a plain response object without an allowlist",
         "claimed_sink": "baseUser[field] = user.data[field]",
         "claimed_source": "Authenticated query parameter fields",
@@ -191,11 +179,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/57",
           "rule:js/remote-property-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/currentUser.ts"
       },
@@ -217,9 +202,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "75",
+          "lines": "75-75",
           "path": "lib/insecurity.ts"
         }
       ],
@@ -245,7 +230,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-56",
       "normalized_input": {
-        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
         "claimed_sink": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -257,11 +242,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/56",
           "rule:js/remote-property-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/insecurity.ts"
       },
@@ -282,9 +264,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "74",
+          "lines": "74-74",
           "path": "lib/insecurity.ts"
         }
       ],
@@ -310,7 +292,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-55",
       "normalized_input": {
-        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
         "claimed_sink": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -322,11 +304,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/55",
           "rule:js/remote-property-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/insecurity.ts"
       },
@@ -347,9 +326,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "68",
+          "lines": "68-68",
           "path": "lib/accuracy.ts"
         }
       ],
@@ -375,7 +354,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-54",
       "normalized_input": {
-        "affected_version_or_path": "lib/accuracy.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/accuracy.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
         "claimed_sink": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -387,11 +366,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/54",
           "rule:js/remote-property-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/accuracy.ts"
       },
@@ -412,9 +388,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/http-to-file-access instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Write to file system depends on Untrusted data.",
+          "detail": "CodeQL js/http-to-file-access instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "43",
+          "lines": "43-43",
           "path": "routes/profileImageFileUpload.ts"
         }
       ],
@@ -440,7 +416,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-53",
       "normalized_input": {
-        "affected_version_or_path": "routes/profileImageFileUpload.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/profileImageFileUpload.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "Write to file system depends on Untrusted data.",
         "claimed_sink": "Write to file system depends on Untrusted data.",
         "claimed_source": "HTTP request-controlled data",
@@ -452,11 +428,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/53",
           "rule:js/http-to-file-access",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/profileImageFileUpload.ts"
       },
@@ -477,9 +450,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/file-system-race instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: The file may have changed since it was checked.",
+          "detail": "CodeQL js/file-system-race instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "29",
+          "lines": "29-29",
           "path": "lib/codingChallenges.ts"
         }
       ],
@@ -505,7 +478,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-52",
       "normalized_input": {
-        "affected_version_or_path": "lib/codingChallenges.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/codingChallenges.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The file may have changed since it was checked.",
         "claimed_sink": "The file may have changed since it was checked.",
         "claimed_source": "HTTP request-controlled data",
@@ -517,11 +490,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/52",
           "rule:js/file-system-race",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/codingChallenges.ts"
       },
@@ -542,9 +512,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/regex/missing-regexp-anchor instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: When this is used as a regular expression on a URL, it may match anywhere, and arbitrary hosts may come before or after it.",
+          "detail": "CodeQL js/regex/missing-regexp-anchor instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "19",
+          "lines": "19-19",
           "path": "test/cypress/e2e/redirect.spec.ts"
         }
       ],
@@ -570,7 +540,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-51",
       "normalized_input": {
-        "affected_version_or_path": "test/cypress/e2e/redirect.spec.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "test/cypress/e2e/redirect.spec.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "test code only",
         "claimed_sink": "js/regex/missing-regexp-anchor",
         "claimed_source": "test-authored URL or assertion",
@@ -582,11 +552,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/51",
           "rule:js/regex/missing-regexp-anchor",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "test/cypress/e2e/redirect.spec.ts"
       },
@@ -605,9 +572,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This condition guards a sensitive action, but a user-provided value controls it.",
+          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "113",
+          "lines": "113-113",
           "path": "routes/verify.ts"
         }
       ],
@@ -633,7 +600,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-50",
       "normalized_input": {
-        "affected_version_or_path": "routes/verify.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/verify.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This condition guards a sensitive action, but a user-provided value controls it.",
         "claimed_sink": "This condition guards a sensitive action, but a user-provided value controls it.",
         "claimed_source": "HTTP request-controlled data",
@@ -645,11 +612,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/50",
           "rule:js/user-controlled-bypass",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/verify.ts"
       },
@@ -670,9 +634,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This condition guards a sensitive action, but a user-provided value controls it.",
+          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "27",
+          "lines": "27-27",
           "path": "routes/fileServer.ts"
         }
       ],
@@ -698,7 +662,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-49",
       "normalized_input": {
-        "affected_version_or_path": "routes/fileServer.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/fileServer.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This condition guards a sensitive action, but a user-provided value controls it.",
         "claimed_sink": "This condition guards a sensitive action, but a user-provided value controls it.",
         "claimed_source": "HTTP request-controlled data",
@@ -710,11 +674,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/49",
           "rule:js/user-controlled-bypass",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/fileServer.ts"
       },
@@ -735,9 +696,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.",
+          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "188",
+          "lines": "188-188",
           "path": "lib/insecurity.ts"
         }
       ],
@@ -763,7 +724,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-48",
       "normalized_input": {
-        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.",
         "claimed_sink": "This condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.",
         "claimed_source": "HTTP request-controlled data",
@@ -775,11 +736,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/48",
           "rule:js/user-controlled-bypass",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/insecurity.ts"
       },
@@ -800,9 +758,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.",
+          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "55",
+          "lines": "55-55",
           "path": "lib/insecurity.ts"
         }
       ],
@@ -828,7 +786,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-47",
       "normalized_input": {
-        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.",
         "claimed_sink": "This condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.",
         "claimed_source": "HTTP request-controlled data",
@@ -840,11 +798,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/47",
           "rule:js/user-controlled-bypass",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/insecurity.ts"
       },
@@ -871,22 +826,16 @@
           "path": "server.ts"
         },
         {
-          "detail": "CodeQL js/log-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Log entry depends on a user-provided value.",
-          "label": "scanner location",
-          "lines": "99",
-          "path": "lib/challengeUtils.ts"
+          "detail": "Query value is decoded and passed to lookup",
+          "label": "source",
+          "lines": "10-12",
+          "path": "routes/repeatNotification.ts"
         },
         {
           "detail": "Missing name is concatenated into warning log",
           "label": "sink",
           "lines": "93-99",
           "path": "lib/challengeUtils.ts"
-        },
-        {
-          "detail": "Query value is decoded and passed to lookup",
-          "label": "source",
-          "lines": "10-12",
-          "path": "routes/repeatNotification.ts"
         }
       ],
       "boundary_assessment": {
@@ -919,7 +868,7 @@
       "fix_finding_handoff": "Fix CodeQL alert #46 (js/log-injection) at lib/challengeUtils.ts. GET /rest/repeat-notification reads query.challenge -> decodeURIComponent preserves log-control characters -> findChallengeByName logs unmatched value by string concatenation. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
       "input_id": "github-codeql-alert-46",
       "normalized_input": {
-        "affected_version_or_path": "lib/challengeUtils.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/challengeUtils.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "decodeURIComponent output is passed to a logger without CR/LF neutralization when no challenge matches",
         "claimed_sink": "logger.warn('Missing challenge with name: ' + challengeName)",
         "claimed_source": "Unauthenticated query parameter challenge",
@@ -931,11 +880,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/46",
           "rule:js/log-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/challengeUtils.ts"
       },
@@ -960,12 +906,6 @@
           "label": "entrypoint",
           "lines": "311",
           "path": "server.ts"
-        },
-        {
-          "detail": "CodeQL js/polynomial-redos instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This regular expression that depends on a user-provided value may run slow on strings with many repetitions of 'a'.",
-          "label": "scanner location",
-          "lines": "20",
-          "path": "routes/profileImageUrlUpload.ts"
         },
         {
           "detail": "Request body enters polynomial regex before authentication",
@@ -1002,7 +942,7 @@
       "fix_finding_handoff": "Fix CodeQL alert #45 (js/polynomial-redos) at routes/profileImageUrlUpload.ts. POST /profile/image/url accepts req.body.imageUrl -> line 20 evaluates an unbounded polynomial regex -> event-loop work grows superlinearly before loggedInUser is checked. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
       "input_id": "github-codeql-alert-45",
       "normalized_input": {
-        "affected_version_or_path": "routes/profileImageUrlUpload.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/profileImageUrlUpload.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "No input-length bound before a polynomial regular expression; authentication is checked only afterward",
         "claimed_sink": "url.match(/(.)*solve\\/challenges\\/server-side(.)*/)",
         "claimed_source": "Unauthenticated HTTP body field imageUrl",
@@ -1014,11 +954,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/45",
           "rule:js/polynomial-redos",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/profileImageUrlUpload.ts"
       },
@@ -1037,9 +974,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/server-side-unvalidated-url-redirection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Untrusted URL redirection depends on a user-provided value.",
+          "detail": "CodeQL js/server-side-unvalidated-url-redirection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "19",
+          "lines": "19-19",
           "path": "routes/redirect.ts"
         }
       ],
@@ -1066,7 +1003,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-44",
       "normalized_input": {
-        "affected_version_or_path": "routes/redirect.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/redirect.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/server-side-unvalidated-url-redirection",
         "claimed_source": "Untrusted application input",
@@ -1078,11 +1015,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/44",
           "rule:js/server-side-unvalidated-url-redirection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/redirect.ts"
       },
@@ -1101,9 +1035,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.",
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "36",
+          "lines": "36-36",
           "path": "routes/web3Wallet.ts"
         }
       ],
@@ -1129,7 +1063,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-43",
       "normalized_input": {
-        "affected_version_or_path": "routes/web3Wallet.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/web3Wallet.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This information exposed to the user depends on stack trace information.",
         "claimed_sink": "This information exposed to the user depends on stack trace information.",
         "claimed_source": "HTTP request-controlled data",
@@ -1141,11 +1075,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/43",
           "rule:js/stack-trace-exposure",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/web3Wallet.ts"
       },
@@ -1166,9 +1097,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.",
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "50",
+          "lines": "50-50",
           "path": "routes/nftMint.ts"
         }
       ],
@@ -1194,7 +1125,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-42",
       "normalized_input": {
-        "affected_version_or_path": "routes/nftMint.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/nftMint.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This information exposed to the user depends on stack trace information.",
         "claimed_sink": "This information exposed to the user depends on stack trace information.",
         "claimed_source": "HTTP request-controlled data",
@@ -1206,11 +1137,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/42",
           "rule:js/stack-trace-exposure",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/nftMint.ts"
       },
@@ -1231,9 +1159,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.",
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "33",
+          "lines": "33-33",
           "path": "routes/nftMint.ts"
         }
       ],
@@ -1259,7 +1187,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-41",
       "normalized_input": {
-        "affected_version_or_path": "routes/nftMint.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/nftMint.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This information exposed to the user depends on stack trace information.",
         "claimed_sink": "This information exposed to the user depends on stack trace information.",
         "claimed_source": "HTTP request-controlled data",
@@ -1271,11 +1199,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/41",
           "rule:js/stack-trace-exposure",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/nftMint.ts"
       },
@@ -1300,12 +1225,6 @@
           "label": "entrypoint",
           "lines": "634-635",
           "path": "server.ts"
-        },
-        {
-          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.",
-          "label": "scanner location",
-          "lines": "56",
-          "path": "routes/likeProductReviews.ts"
         },
         {
           "detail": "Inner database failure object is returned directly",
@@ -1342,7 +1261,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-40",
       "normalized_input": {
-        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "Inner catch serializes err directly rather than reducing it with getErrorMessage",
         "claimed_sink": "res.status(500).json(err)",
         "claimed_source": "Authenticated review id and database behavior",
@@ -1355,11 +1274,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/40",
           "rule:js/stack-trace-exposure",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/likeProductReviews.ts"
       },
@@ -1381,9 +1297,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.",
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "32",
+          "lines": "32-32",
           "path": "routes/createProductReviews.ts"
         }
       ],
@@ -1409,7 +1325,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-39",
       "normalized_input": {
-        "affected_version_or_path": "routes/createProductReviews.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/createProductReviews.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This information exposed to the user depends on stack trace information.",
         "claimed_sink": "This information exposed to the user depends on stack trace information.",
         "claimed_source": "HTTP request-controlled data",
@@ -1421,11 +1337,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/39",
           "rule:js/stack-trace-exposure",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/createProductReviews.ts"
       },
@@ -1446,9 +1359,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.",
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "39",
+          "lines": "39-39",
           "path": "routes/checkKeys.ts"
         }
       ],
@@ -1474,7 +1387,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-38",
       "normalized_input": {
-        "affected_version_or_path": "routes/checkKeys.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/checkKeys.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This information exposed to the user depends on stack trace information.",
         "claimed_sink": "This information exposed to the user depends on stack trace information.",
         "claimed_source": "HTTP request-controlled data",
@@ -1486,11 +1399,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/38",
           "rule:js/stack-trace-exposure",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/checkKeys.ts"
       },
@@ -1511,9 +1421,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This information exposed to the user depends on stack trace information.",
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "30",
+          "lines": "30-30",
           "path": "routes/checkKeys.ts"
         }
       ],
@@ -1539,7 +1449,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-37",
       "normalized_input": {
-        "affected_version_or_path": "routes/checkKeys.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/checkKeys.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This information exposed to the user depends on stack trace information.",
         "claimed_sink": "This information exposed to the user depends on stack trace information.",
         "claimed_source": "HTTP request-controlled data",
@@ -1551,11 +1461,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/37",
           "rule:js/stack-trace-exposure",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/checkKeys.ts"
       },
@@ -1576,9 +1483,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/clear-text-logging instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to weakPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.\nThis logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.\nThis logs sensitive data returned by an access to passwordRepeatChallenge as clear text.\nThis logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.",
+          "detail": "CodeQL js/clear-text-logging instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "93",
+          "lines": "93-93",
           "path": "lib/antiCheat.ts"
         }
       ],
@@ -1604,7 +1511,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-36",
       "normalized_input": {
-        "affected_version_or_path": "lib/antiCheat.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/antiCheat.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to weakPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.\nThis logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.\nThis logs sensitive data returned by an access to passwordRepeatChallenge as clear text.\nThis logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.",
         "claimed_sink": "This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to weakPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.\nThis logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.\nThis logs sensitive data returned by an access to passwordRepeatChallenge as clear text.\nThis logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.",
         "claimed_source": "HTTP request-controlled data",
@@ -1616,11 +1523,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/36",
           "rule:js/clear-text-logging",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/antiCheat.ts"
       },
@@ -1641,9 +1545,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/clear-text-logging instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to weakPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.\nThis logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.\nThis logs sensitive data returned by an access to passwordRepeatChallenge as clear text.\nThis logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.",
+          "detail": "CodeQL js/clear-text-logging instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "64",
+          "lines": "64-64",
           "path": "lib/antiCheat.ts"
         }
       ],
@@ -1669,7 +1573,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-35",
       "normalized_input": {
-        "affected_version_or_path": "lib/antiCheat.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/antiCheat.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to weakPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.\nThis logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.\nThis logs sensitive data returned by an access to passwordRepeatChallenge as clear text.\nThis logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.",
         "claimed_sink": "This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to weakPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.\nThis logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.\nThis logs sensitive data returned by an access to passwordRepeatChallenge as clear text.\nThis logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.",
         "claimed_source": "HTTP request-controlled data",
@@ -1681,11 +1585,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/35",
           "rule:js/clear-text-logging",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/antiCheat.ts"
       },
@@ -1706,9 +1607,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/incomplete-sanitization instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This replaces only the first occurrence of '..'.",
+          "detail": "CodeQL js/incomplete-sanitization instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "256",
+          "lines": "256-256",
           "path": "server.ts"
         }
       ],
@@ -1734,7 +1635,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-34",
       "normalized_input": {
-        "affected_version_or_path": "server.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "server.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This replaces only the first occurrence of '..'.",
         "claimed_sink": "This replaces only the first occurrence of '..'.",
         "claimed_source": "HTTP request-controlled data",
@@ -1746,11 +1647,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/34",
           "rule:js/incomplete-sanitization",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "server.ts"
       },
@@ -1771,9 +1669,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/incomplete-sanitization instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This does not escape backslash characters in the input.",
+          "detail": "CodeQL js/incomplete-sanitization instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "44",
+          "lines": "44-44",
           "path": "lib/utils.ts"
         }
       ],
@@ -1799,7 +1697,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-33",
       "normalized_input": {
-        "affected_version_or_path": "lib/utils.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/utils.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This does not escape backslash characters in the input.",
         "claimed_sink": "This does not escape backslash characters in the input.",
         "claimed_source": "HTTP request-controlled data",
@@ -1811,11 +1709,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/33",
           "rule:js/incomplete-sanitization",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/utils.ts"
       },
@@ -1836,9 +1731,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/type-confusion-through-parameter-tampering instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Potential type confusion as this HTTP request parameter may be either an array or a string.",
+          "detail": "CodeQL js/type-confusion-through-parameter-tampering instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "22",
+          "lines": "22-22",
           "path": "routes/search.ts"
         }
       ],
@@ -1865,7 +1760,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-32",
       "normalized_input": {
-        "affected_version_or_path": "routes/search.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/search.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/type-confusion-through-parameter-tampering",
         "claimed_source": "Untrusted application input",
@@ -1877,11 +1772,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/32",
           "rule:js/type-confusion-through-parameter-tampering",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:critical"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/search.ts"
       },
@@ -1900,9 +1792,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/type-confusion-through-parameter-tampering instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Potential type confusion as this HTTP request parameter may be either an array or a string.",
+          "detail": "CodeQL js/type-confusion-through-parameter-tampering instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "136",
+          "lines": "136-136",
           "path": "lib/insecurity.ts"
         }
       ],
@@ -1928,7 +1820,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-31",
       "normalized_input": {
-        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "Potential type confusion as this HTTP request parameter may be either an array or a string.",
         "claimed_sink": "Potential type confusion as this HTTP request parameter may be either an array or a string.",
         "claimed_source": "HTTP request-controlled data",
@@ -1940,11 +1832,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/31",
           "rule:js/type-confusion-through-parameter-tampering",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:critical"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/insecurity.ts"
       },
@@ -1965,9 +1854,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/insufficient-password-hash instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Password from an access to password is hashed insecurely.\nPassword from an access to password is hashed insecurely.\nPassword from an access to clearTextPassword is hashed insecurely.\nPassword from an access to password is hashed insecurely.\nPassword from an access to password is hashed insecurely.\nPassword from an access to currentPassword is hashed insecurely.\nPassword from an access to currentPassword is hashed insecurely.\nPassword from an access to password is hashed insecurely.\nPassword from an access to password is hashed insecurely.\nPassword from an access to password is hashed insecurely.",
+          "detail": "CodeQL js/insufficient-password-hash instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "41",
+          "lines": "41-41",
           "path": "lib/insecurity.ts"
         }
       ],
@@ -1994,7 +1883,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-30",
       "normalized_input": {
-        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/insufficient-password-hash",
         "claimed_source": "Untrusted application input",
@@ -2006,11 +1895,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/30",
           "rule:js/insufficient-password-hash",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/insecurity.ts"
       },
@@ -2029,9 +1915,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/prototype-polluting-assignment instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This assignment may alter Object.prototype if a malicious '__proto__' string is injected from user controlled input.\nThis assignment may alter Object.prototype if a malicious '__proto__' string is injected from user controlled input.",
+          "detail": "CodeQL js/prototype-polluting-assignment instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "71",
+          "lines": "71-71",
           "path": "lib/accuracy.ts"
         }
       ],
@@ -2057,7 +1943,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-29",
       "normalized_input": {
-        "affected_version_or_path": "lib/accuracy.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/accuracy.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This assignment may alter Object.prototype if a malicious '__proto__' string is injected from user controlled input.\nThis assignment may alter Object.prototype if a malicious '__proto__' string is injected from user controlled input.",
         "claimed_sink": "This assignment may alter Object.prototype if a malicious '__proto__' string is injected from user controlled input.\nThis assignment may alter Object.prototype if a malicious '__proto__' string is injected from user controlled input.",
         "claimed_source": "HTTP request-controlled data",
@@ -2069,11 +1955,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/29",
           "rule:js/prototype-polluting-assignment",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/accuracy.ts"
       },
@@ -2094,9 +1977,9 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/missing-token-validation instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.",
+          "detail": "CodeQL js/missing-token-validation instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "289",
+          "lines": "289-289",
           "path": "server.ts"
         }
       ],
@@ -2122,7 +2005,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-28",
       "normalized_input": {
-        "affected_version_or_path": "server.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "server.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.",
         "claimed_sink": "This cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.",
         "claimed_source": "HTTP request-controlled data",
@@ -2134,11 +2017,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/28",
           "rule:js/missing-token-validation",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "server.ts"
       },
@@ -2159,9 +2039,69 @@
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/incomplete-url-substring-sanitization instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: 'https://pastebin.com/90dUgd7s' can be anywhere in the URL, and arbitrary hosts may come before or after it.",
+          "detail": "CodeQL js/incomplete-url-substring-sanitization instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "65",
+          "lines": "81-81",
+          "path": "test/api/internet-resources.test.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Repository path and test runner structure identify this as test-only code.",
+        "product_surface": "test/fixture",
+        "source_trust": "trusted_developer_config"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "No production import or hosted request handler path exists from this test expression."
+      ],
+      "evidence": [
+        "test/api/internet-resources.test.ts is a test file and the flagged expression is used to verify expected behavior or an external resource."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-27",
+      "normalized_input": {
+        "affected_version_or_path": "test/api/internet-resources.test.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
+        "claimed_control": "test code only",
+        "claimed_sink": "js/incomplete-url-substring-sanitization",
+        "claimed_source": "test-authored URL or assertion",
+        "impact": "URL validation bypass",
+        "preconditions": [
+          "The file is executed only by the repository test suite"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/27",
+          "rule:js/incomplete-url-substring-sanitization",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
+        ],
+        "vulnerable_component": "test/api/internet-resources.test.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "test/api/internet-resources.test.ts is under test/",
+        "the flagged expression is an assertion or external-resource test",
+        "it is not shipped as an application request handler"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/incomplete-url-substring-sanitization in test/api/internet-resources.test.ts",
+      "triage_item_id": "triage-033",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/incomplete-url-substring-sanitization instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
+          "label": "scanner location",
+          "lines": "65-65",
           "path": "test/api/internet-resources.test.ts"
         }
       ],
@@ -2187,7 +2127,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-26",
       "normalized_input": {
-        "affected_version_or_path": "test/api/internet-resources.test.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "test/api/internet-resources.test.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "test code only",
         "claimed_sink": "js/incomplete-url-substring-sanitization",
         "claimed_source": "test-authored URL or assertion",
@@ -2199,11 +2139,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/26",
           "rule:js/incomplete-url-substring-sanitization",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "test/api/internet-resources.test.ts"
       },
@@ -2216,15 +2153,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/incomplete-url-substring-sanitization in test/api/internet-resources.test.ts",
-      "triage_item_id": "triage-033",
+      "triage_item_id": "triage-034",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "18",
+          "lines": "18-18",
           "path": "routes/updateProductReviews.ts"
         }
       ],
@@ -2251,7 +2188,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-25",
       "normalized_input": {
-        "affected_version_or_path": "routes/updateProductReviews.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/updateProductReviews.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/sql-injection",
         "claimed_source": "Untrusted application input",
@@ -2263,11 +2200,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/25",
           "rule:js/sql-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/updateProductReviews.ts"
       },
@@ -2280,15 +2214,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/sql-injection in routes/updateProductReviews.ts",
-      "triage_item_id": "triage-034",
+      "triage_item_id": "triage-035",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query string depends on a user-provided value.",
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "23",
+          "lines": "23-23",
           "path": "routes/search.ts"
         }
       ],
@@ -2315,7 +2249,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-24",
       "normalized_input": {
-        "affected_version_or_path": "routes/search.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/search.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/sql-injection",
         "claimed_source": "Untrusted application input",
@@ -2327,11 +2261,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/24",
           "rule:js/sql-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/search.ts"
       },
@@ -2344,15 +2275,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/sql-injection in routes/search.ts",
-      "triage_item_id": "triage-035",
+      "triage_item_id": "triage-036",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query string depends on a user-provided value.\nThis query string depends on a user-provided value.",
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "34",
+          "lines": "34-34",
           "path": "routes/login.ts"
         }
       ],
@@ -2379,7 +2310,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-23",
       "normalized_input": {
-        "affected_version_or_path": "routes/login.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/login.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/sql-injection",
         "claimed_source": "Untrusted application input",
@@ -2391,11 +2322,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/23",
           "rule:js/sql-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/login.ts"
       },
@@ -2408,15 +2336,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/sql-injection in routes/login.ts",
-      "triage_item_id": "triage-036",
+      "triage_item_id": "triage-037",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "51",
+          "lines": "51-51",
           "path": "routes/likeProductReviews.ts"
         }
       ],
@@ -2442,7 +2370,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-22",
       "normalized_input": {
-        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
         "claimed_sink": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -2454,11 +2382,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/22",
           "rule:js/sql-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/likeProductReviews.ts"
       },
@@ -2473,15 +2398,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/sql-injection in routes/likeProductReviews.ts",
-      "triage_item_id": "triage-037",
+      "triage_item_id": "triage-038",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "43",
+          "lines": "43-43",
           "path": "routes/likeProductReviews.ts"
         }
       ],
@@ -2507,7 +2432,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-21",
       "normalized_input": {
-        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
         "claimed_sink": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -2519,11 +2444,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/21",
           "rule:js/sql-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/likeProductReviews.ts"
       },
@@ -2538,15 +2460,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/sql-injection in routes/likeProductReviews.ts",
-      "triage_item_id": "triage-038",
+      "triage_item_id": "triage-039",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "36",
+          "lines": "36-36",
           "path": "routes/likeProductReviews.ts"
         }
       ],
@@ -2572,7 +2494,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-20",
       "normalized_input": {
-        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
         "claimed_sink": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -2584,11 +2506,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/20",
           "rule:js/sql-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/likeProductReviews.ts"
       },
@@ -2603,15 +2522,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/sql-injection in routes/likeProductReviews.ts",
-      "triage_item_id": "triage-039",
+      "triage_item_id": "triage-040",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "25",
+          "lines": "25-25",
           "path": "routes/likeProductReviews.ts"
         }
       ],
@@ -2637,7 +2556,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-19",
       "normalized_input": {
-        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
         "claimed_sink": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -2649,11 +2568,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/19",
           "rule:js/sql-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/likeProductReviews.ts"
       },
@@ -2668,13 +2584,13 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/sql-injection in routes/likeProductReviews.ts",
-      "triage_item_id": "triage-040",
+      "triage_item_id": "triage-041",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/template-object-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Template object depends on a user-provided value.\nTemplate object depends on a user-provided value.",
+          "detail": "CodeQL js/template-object-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
           "lines": "123-126",
           "path": "routes/dataErasure.ts"
@@ -2703,7 +2619,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-18",
       "normalized_input": {
-        "affected_version_or_path": "routes/dataErasure.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/dataErasure.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/template-object-injection",
         "claimed_source": "Untrusted application input",
@@ -2715,11 +2631,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/18",
           "rule:js/template-object-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:critical"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/dataErasure.ts"
       },
@@ -2732,13 +2645,13 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/template-object-injection in routes/dataErasure.ts",
-      "triage_item_id": "triage-041",
+      "triage_item_id": "triage-042",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/template-object-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Template object depends on a user-provided value.\nTemplate object depends on a user-provided value.",
+          "detail": "CodeQL js/template-object-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
           "lines": "107-110",
           "path": "routes/dataErasure.ts"
@@ -2767,7 +2680,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-17",
       "normalized_input": {
-        "affected_version_or_path": "routes/dataErasure.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/dataErasure.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/template-object-injection",
         "claimed_source": "Untrusted application input",
@@ -2779,11 +2692,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/17",
           "rule:js/template-object-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:critical"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/dataErasure.ts"
       },
@@ -2796,15 +2706,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/template-object-injection in routes/dataErasure.ts",
-      "triage_item_id": "triage-042",
+      "triage_item_id": "triage-043",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Route handler for GET requests uses query parameter as sensitive data.",
+          "detail": "CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "17",
+          "lines": "17-17",
           "path": "routes/changePassword.ts"
         }
       ],
@@ -2831,7 +2741,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-16",
       "normalized_input": {
-        "affected_version_or_path": "routes/changePassword.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/changePassword.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/sensitive-get-query",
         "claimed_source": "Untrusted application input",
@@ -2843,11 +2753,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/16",
           "rule:js/sensitive-get-query",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/changePassword.ts"
       },
@@ -2860,15 +2767,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/sensitive-get-query in routes/changePassword.ts",
-      "triage_item_id": "triage-043",
+      "triage_item_id": "triage-044",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Route handler for GET requests uses query parameter as sensitive data.",
+          "detail": "CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "15",
+          "lines": "15-15",
           "path": "routes/changePassword.ts"
         }
       ],
@@ -2895,7 +2802,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-15",
       "normalized_input": {
-        "affected_version_or_path": "routes/changePassword.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/changePassword.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/sensitive-get-query",
         "claimed_source": "Untrusted application input",
@@ -2907,11 +2814,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/15",
           "rule:js/sensitive-get-query",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/changePassword.ts"
       },
@@ -2924,15 +2828,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/sensitive-get-query in routes/changePassword.ts",
-      "triage_item_id": "triage-044",
+      "triage_item_id": "triage-045",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: Route handler for GET requests uses query parameter as sensitive data.",
+          "detail": "CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "14",
+          "lines": "14-14",
           "path": "routes/changePassword.ts"
         }
       ],
@@ -2959,7 +2863,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-14",
       "normalized_input": {
-        "affected_version_or_path": "routes/changePassword.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/changePassword.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/sensitive-get-query",
         "claimed_source": "Untrusted application input",
@@ -2971,11 +2875,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/14",
           "rule:js/sensitive-get-query",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:medium"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/changePassword.ts"
       },
@@ -2988,15 +2889,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/sensitive-get-query in routes/changePassword.ts",
-      "triage_item_id": "triage-045",
+      "triage_item_id": "triage-046",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.",
+          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "90",
+          "lines": "90-90",
           "path": "routes/vulnCodeSnippet.ts"
         }
       ],
@@ -3022,7 +2923,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-13",
       "normalized_input": {
-        "affected_version_or_path": "routes/vulnCodeSnippet.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/vulnCodeSnippet.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This path depends on a user-provided value.",
         "claimed_sink": "This path depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -3034,11 +2935,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/13",
           "rule:js/path-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/vulnCodeSnippet.ts"
       },
@@ -3053,15 +2951,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/path-injection in routes/vulnCodeSnippet.ts",
-      "triage_item_id": "triage-046",
+      "triage_item_id": "triage-047",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.",
+          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "89",
+          "lines": "89-89",
           "path": "routes/vulnCodeSnippet.ts"
         }
       ],
@@ -3087,7 +2985,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-12",
       "normalized_input": {
-        "affected_version_or_path": "routes/vulnCodeSnippet.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/vulnCodeSnippet.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This path depends on a user-provided value.",
         "claimed_sink": "This path depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -3099,11 +2997,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/12",
           "rule:js/path-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/vulnCodeSnippet.ts"
       },
@@ -3118,15 +3013,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/path-injection in routes/vulnCodeSnippet.ts",
-      "triage_item_id": "triage-047",
+      "triage_item_id": "triage-048",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.",
+          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "81",
+          "lines": "81-81",
           "path": "routes/vulnCodeFixes.ts"
         }
       ],
@@ -3152,7 +3047,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-11",
       "normalized_input": {
-        "affected_version_or_path": "routes/vulnCodeFixes.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/vulnCodeFixes.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This path depends on a user-provided value.",
         "claimed_sink": "This path depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -3164,11 +3059,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/11",
           "rule:js/path-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/vulnCodeFixes.ts"
       },
@@ -3183,15 +3075,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/path-injection in routes/vulnCodeFixes.ts",
-      "triage_item_id": "triage-048",
+      "triage_item_id": "triage-049",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.",
+          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "80",
+          "lines": "80-80",
           "path": "routes/vulnCodeFixes.ts"
         }
       ],
@@ -3217,7 +3109,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-10",
       "normalized_input": {
-        "affected_version_or_path": "routes/vulnCodeFixes.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/vulnCodeFixes.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This path depends on a user-provided value.",
         "claimed_sink": "This path depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -3229,11 +3121,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/10",
           "rule:js/path-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/vulnCodeFixes.ts"
       },
@@ -3248,15 +3137,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/path-injection in routes/vulnCodeFixes.ts",
-      "triage_item_id": "triage-049",
+      "triage_item_id": "triage-050",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.",
+          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "29",
+          "lines": "29-29",
           "path": "routes/profileImageUrlUpload.ts"
         }
       ],
@@ -3282,7 +3171,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-9",
       "normalized_input": {
-        "affected_version_or_path": "routes/profileImageUrlUpload.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/profileImageUrlUpload.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "This path depends on a user-provided value.",
         "claimed_sink": "This path depends on a user-provided value.",
         "claimed_source": "HTTP request-controlled data",
@@ -3294,11 +3183,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/9",
           "rule:js/path-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/profileImageUrlUpload.ts"
       },
@@ -3313,17 +3199,11 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/path-injection in routes/profileImageUrlUpload.ts",
-      "triage_item_id": "triage-050",
+      "triage_item_id": "triage-051",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
-        {
-          "detail": "Forward-slash-only check precedes path.resolve/sendFile",
-          "label": "control/sink",
-          "lines": "9-17",
-          "path": "routes/quarantineServer.ts"
-        },
         {
           "detail": "Public quarantine-file route",
           "label": "entrypoint",
@@ -3331,9 +3211,9 @@
           "path": "server.ts"
         },
         {
-          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.",
-          "label": "scanner location",
-          "lines": "14",
+          "detail": "Forward-slash-only check precedes path.resolve/sendFile",
+          "label": "control/sink",
+          "lines": "9-17",
           "path": "routes/quarantineServer.ts"
         }
       ],
@@ -3367,7 +3247,7 @@
       "fix_finding_handoff": "Fix CodeQL alert #8 (js/path-injection) at routes/quarantineServer.ts. GET /ftp/quarantine/:file supplies a decoded filename -> file.includes('/') accepts backslash traversal on Windows -> path.resolve escapes the quarantine directory and sendFile returns the resolved file. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
       "input_id": "github-codeql-alert-8",
       "normalized_input": {
-        "affected_version_or_path": "routes/quarantineServer.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/quarantineServer.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "Guard rejects only forward slash, not Windows separators or resolved-path escape",
         "claimed_sink": "res.sendFile(path.resolve('ftp/quarantine/', file))",
         "claimed_source": "Unauthenticated route parameter file",
@@ -3380,11 +3260,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/8",
           "rule:js/path-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/quarantineServer.ts"
       },
@@ -3397,17 +3274,11 @@
       "recommended_next_step": "fix-finding",
       "source_type": "sarif",
       "title": "js/path-injection in routes/quarantineServer.ts",
-      "triage_item_id": "triage-051",
+      "triage_item_id": "triage-052",
       "verdict": "confirmed"
     },
     {
       "affected_locations": [
-        {
-          "detail": "Forward-slash-only check precedes path.resolve/sendFile",
-          "label": "control/sink",
-          "lines": "9-17",
-          "path": "routes/logfileServer.ts"
-        },
         {
           "detail": "Public log-file route",
           "label": "entrypoint",
@@ -3415,9 +3286,9 @@
           "path": "server.ts"
         },
         {
-          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.",
-          "label": "scanner location",
-          "lines": "14",
+          "detail": "Forward-slash-only check precedes path.resolve/sendFile",
+          "label": "control/sink",
+          "lines": "9-17",
           "path": "routes/logfileServer.ts"
         }
       ],
@@ -3451,7 +3322,7 @@
       "fix_finding_handoff": "Fix CodeQL alert #7 (js/path-injection) at routes/logfileServer.ts. GET /support/logs/:file supplies a decoded filename -> file.includes('/') accepts backslash traversal on Windows -> path.resolve escapes logs and sendFile returns the resolved file. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
       "input_id": "github-codeql-alert-7",
       "normalized_input": {
-        "affected_version_or_path": "routes/logfileServer.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/logfileServer.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "Guard rejects only forward slash, not Windows separators or resolved-path escape",
         "claimed_sink": "res.sendFile(path.resolve('logs/', file))",
         "claimed_source": "Unauthenticated route parameter file",
@@ -3464,11 +3335,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/7",
           "rule:js/path-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/logfileServer.ts"
       },
@@ -3481,17 +3349,11 @@
       "recommended_next_step": "fix-finding",
       "source_type": "sarif",
       "title": "js/path-injection in routes/logfileServer.ts",
-      "triage_item_id": "triage-052",
+      "triage_item_id": "triage-053",
       "verdict": "confirmed"
     },
     {
       "affected_locations": [
-        {
-          "detail": "Forward-slash-only check precedes path.resolve/sendFile",
-          "label": "control/sink",
-          "lines": "9-17",
-          "path": "routes/keyServer.ts"
-        },
         {
           "detail": "Public key-file route",
           "label": "entrypoint",
@@ -3499,9 +3361,9 @@
           "path": "server.ts"
         },
         {
-          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.",
-          "label": "scanner location",
-          "lines": "14",
+          "detail": "Forward-slash-only check precedes path.resolve/sendFile",
+          "label": "control/sink",
+          "lines": "9-17",
           "path": "routes/keyServer.ts"
         }
       ],
@@ -3535,7 +3397,7 @@
       "fix_finding_handoff": "Fix CodeQL alert #6 (js/path-injection) at routes/keyServer.ts. GET /encryptionkeys/:file supplies a decoded filename -> file.includes('/') accepts backslash traversal on Windows -> path.resolve escapes encryptionkeys and sendFile returns the resolved file. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
       "input_id": "github-codeql-alert-6",
       "normalized_input": {
-        "affected_version_or_path": "routes/keyServer.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/keyServer.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "Guard rejects only forward slash, not Windows separators or resolved-path escape",
         "claimed_sink": "res.sendFile(path.resolve('encryptionkeys/', file))",
         "claimed_source": "Unauthenticated route parameter file",
@@ -3548,11 +3410,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/6",
           "rule:js/path-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/keyServer.ts"
       },
@@ -3565,17 +3424,11 @@
       "recommended_next_step": "fix-finding",
       "source_type": "sarif",
       "title": "js/path-injection in routes/keyServer.ts",
-      "triage_item_id": "triage-053",
+      "triage_item_id": "triage-054",
       "verdict": "confirmed"
     },
     {
       "affected_locations": [
-        {
-          "detail": "Suffix and forward-slash checks precede path.resolve/sendFile",
-          "label": "control/sink",
-          "lines": "14-36",
-          "path": "routes/fileServer.ts"
-        },
         {
           "detail": "Public FTP file route",
           "label": "entrypoint",
@@ -3583,9 +3436,9 @@
           "path": "server.ts"
         },
         {
-          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This path depends on a user-provided value.",
-          "label": "scanner location",
-          "lines": "33",
+          "detail": "Suffix and forward-slash checks precede path.resolve/sendFile",
+          "label": "control/sink",
+          "lines": "14-36",
           "path": "routes/fileServer.ts"
         }
       ],
@@ -3619,7 +3472,7 @@
       "fix_finding_handoff": "Fix CodeQL alert #5 (js/path-injection) at routes/fileServer.ts. GET /ftp/:file supplies a decoded filename -> backslash traversal passes the forward-slash test and can retain an allowed suffix -> path.resolve escapes ftp and sendFile returns the resolved file. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
       "input_id": "github-codeql-alert-5",
       "normalized_input": {
-        "affected_version_or_path": "routes/fileServer.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/fileServer.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "Guard rejects only forward slash and checks a suffix, but does not contain the resolved path on Windows",
         "claimed_sink": "res.sendFile(path.resolve('ftp/', file))",
         "claimed_source": "Unauthenticated route parameter file",
@@ -3632,11 +3485,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/5",
           "rule:js/path-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/fileServer.ts"
       },
@@ -3649,15 +3499,15 @@
       "recommended_next_step": "fix-finding",
       "source_type": "sarif",
       "title": "js/path-injection in routes/fileServer.ts",
-      "triage_item_id": "triage-054",
+      "triage_item_id": "triage-055",
       "verdict": "confirmed"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/code-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This code execution depends on a user-provided value.\nThis code execution depends on a user-provided value.",
+          "detail": "CodeQL js/code-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "18",
+          "lines": "18-18",
           "path": "routes/trackOrder.ts"
         }
       ],
@@ -3684,7 +3534,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-4",
       "normalized_input": {
-        "affected_version_or_path": "routes/trackOrder.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/trackOrder.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/code-injection",
         "claimed_source": "Untrusted application input",
@@ -3696,11 +3546,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/4",
           "rule:js/code-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:critical"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/trackOrder.ts"
       },
@@ -3713,15 +3560,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/code-injection in routes/trackOrder.ts",
-      "triage_item_id": "triage-055",
+      "triage_item_id": "triage-056",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/code-injection instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This code execution depends on a user-provided value.",
+          "detail": "CodeQL js/code-injection instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "36",
+          "lines": "36-36",
           "path": "routes/showProductReviews.ts"
         }
       ],
@@ -3748,7 +3595,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-3",
       "normalized_input": {
-        "affected_version_or_path": "routes/showProductReviews.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/showProductReviews.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/code-injection",
         "claimed_source": "Untrusted application input",
@@ -3760,11 +3607,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/3",
           "rule:js/code-injection",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:critical"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/showProductReviews.ts"
       },
@@ -3777,15 +3621,15 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/code-injection in routes/showProductReviews.ts",
-      "triage_item_id": "triage-056",
+      "triage_item_id": "triage-057",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
         {
-          "detail": "CodeQL js/request-forgery instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: The URL of this request depends on a user-provided value.",
+          "detail": "CodeQL js/request-forgery instance on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
           "label": "scanner location",
-          "lines": "24",
+          "lines": "24-24",
           "path": "routes/profileImageUrlUpload.ts"
         }
       ],
@@ -3812,7 +3656,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-2",
       "normalized_input": {
-        "affected_version_or_path": "routes/profileImageUrlUpload.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "routes/profileImageUrlUpload.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
         "claimed_sink": "js/request-forgery",
         "claimed_source": "Untrusted application input",
@@ -3824,11 +3668,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/2",
           "rule:js/request-forgery",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:error",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:critical"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "routes/profileImageUrlUpload.ts"
       },
@@ -3841,17 +3682,11 @@
       "recommended_next_step": "no-action",
       "source_type": "sarif",
       "title": "js/request-forgery in routes/profileImageUrlUpload.ts",
-      "triage_item_id": "triage-057",
+      "triage_item_id": "triage-058",
       "verdict": "not_actionable"
     },
     {
       "affected_locations": [
-        {
-          "detail": "Middleware protects multiple API methods",
-          "label": "consumers",
-          "lines": "366-446",
-          "path": "server.ts"
-        },
         {
           "detail": "denyAll uses Math.random as JWT secret",
           "label": "control",
@@ -3859,10 +3694,10 @@
           "path": "lib/insecurity.ts"
         },
         {
-          "detail": "CodeQL js/insecure-randomness instance on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d: This uses a cryptographically insecure random number generated at Math.random() in a security context.",
-          "label": "scanner location",
-          "lines": "53",
-          "path": "lib/insecurity.ts"
+          "detail": "Middleware protects multiple API methods",
+          "label": "consumers",
+          "lines": "366-446",
+          "path": "server.ts"
         }
       ],
       "boundary_assessment": {
@@ -3894,7 +3729,7 @@
       "fix_finding_handoff": null,
       "input_id": "github-codeql-alert-1",
       "normalized_input": {
-        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at a01265c821d0ac5c8ff5c3401871a7798309fe1d",
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 840220e9a18d8bc51b034d7858c85072c45d0629",
         "claimed_control": "denyAll creates an express-jwt secret from Math.random()",
         "claimed_sink": "JWT verification for routes intended to reject every caller",
         "claimed_source": "Repeated attacker attempts to protected API routes",
@@ -3907,11 +3742,8 @@
           "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/1",
           "rule:js/insecure-randomness",
           "tool:CodeQL",
-          "tool-version:2.26.2",
           "ref:refs/heads/feature01-newPages",
-          "codeql-severity:warning",
-          "commit:a01265c821d0ac5c8ff5c3401871a7798309fe1d",
-          "codeql-security-severity:high"
+          "commit:840220e9a18d8bc51b034d7858c85072c45d0629"
         ],
         "vulnerable_component": "lib/insecurity.ts"
       },
@@ -3926,13 +3758,13 @@
       "recommended_next_step": "manual-review",
       "source_type": "sarif",
       "title": "js/insecure-randomness in lib/insecurity.ts",
-      "triage_item_id": "triage-058",
+      "triage_item_id": "triage-059",
       "verdict": "needs_review"
     }
   ],
   "repository": {
     "path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop",
-    "revision": "a01265c821d0ac5c8ff5c3401871a7798309fe1d"
+    "revision": "840220e9a18d8bc51b034d7858c85072c45d0629"
   },
   "schema_version": "triage-finding/v0"
 }

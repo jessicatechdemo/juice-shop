@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plan and apply approval-gated GitHub issue comments for CodeQL triage."""
+"""Plan and apply approval-gated GitHub issue tracking for CodeQL triage."""
 
 from __future__ import annotations
 
@@ -20,9 +20,12 @@ from urllib.parse import quote_plus
 
 PLAN_SCHEMA = "codeql-triage-issue-comments/v1"
 RECEIPT_SCHEMA = "codeql-triage-issue-comments-receipt/v1"
+BATCH_MANIFEST_SCHEMA = "codeql-triage-issue-batches/v1"
 TRIAGE_SCHEMA = "triage-finding/v0"
 VERDICTS = {"confirmed", "needs_review", "not_actionable"}
 WRITE_MODE = "github_issue_comment"
+COMMENT_DESTINATION = "github_tracking_issue"
+DIRECT_ALERT_COMMENTS_SUPPORTED = False
 GITHUB_HOST = "github.com"
 GITHUB_API_VERSION = "2026-03-10"
 MAX_BATCH_SIZE = 25
@@ -237,7 +240,11 @@ def build_comment(
     confidence = clean_line(finding.get("confidence", "unknown"))
     next_step = clean_line(finding.get("recommended_next_step", "unspecified"))
     handoff = finding.get("fix_finding_handoff")
-    handoff_text = clean_line(handoff) if isinstance(handoff, str) else "not applicable"
+    handoff_text = (
+        handoff.strip()
+        if isinstance(handoff, str) and handoff.strip()
+        else "not applicable"
+    )
     evidence = list_lines(finding.get("evidence"), "No affirmative evidence recorded.")
     counterevidence = list_lines(
         finding.get("counterevidence"), "No counterevidence recorded."
@@ -248,6 +255,7 @@ def build_comment(
         f"<!-- codex-codeql-triage:v1 finding-id={finding_id} -->",
         "## Codex Security CodeQL triage",
         "",
+        "Comment destination: `GitHub tracking issue` (not the Code Scanning alert)",
         f"Status: `{verdict}`",
         f"Finding ID: `{finding_id}`",
         f"Triage item ID: `{triage_item_id}`",
@@ -281,22 +289,78 @@ def build_comment(
 
 
 def build_issue_body(
-    finding_id: str,
-    fingerprint: str,
-    alert_url: str,
+    finding: dict[str, Any],
+    repository: str,
+    branch: str,
+    revision: str,
     report_path: str,
+    alert_number: int,
+    alert_url: str,
+    fingerprint: str,
 ) -> str:
-    return (
-        "This issue tracks one GitHub Code Scanning finding without changing the "
-        "alert state.\n\n"
-        f"Finding ID: `{finding_id}`\n"
-        f"Finding fingerprint: `{fingerprint}`\n"
-        f"Code scanning alert: {alert_url}\n"
-        f"Report path: `{report_path}`\n\n"
-        "After creation, link this issue from the alert's **Tracking** section in "
-        "the GitHub UI. GitHub does not currently expose that relationship through "
-        "its public REST or GraphQL APIs.\n"
+    finding_id = require_string(finding.get("input_id"), "finding.input_id")
+    triage_item_id = require_string(
+        finding.get("triage_item_id"), "finding.triage_item_id"
     )
+    verdict = require_string(finding.get("verdict"), "finding.verdict")
+    confidence = clean_line(finding.get("confidence", "unknown"))
+    next_step = clean_line(finding.get("recommended_next_step", "unspecified"))
+    handoff = finding.get("fix_finding_handoff")
+    handoff_text = handoff.strip() if isinstance(handoff, str) and handoff.strip() else "Not applicable."
+    evidence = list_lines(finding.get("evidence"), "No affirmative evidence recorded.")
+    counterevidence = list_lines(
+        finding.get("counterevidence"), "No counterevidence recorded."
+    )
+    proof_gaps = list_lines(finding.get("proof_gaps"), "None recorded.")
+
+    parts = [
+        f"<!-- codex-codeql-finding:v1 finding-id={finding_id} -->",
+        "## CodeQL finding",
+        "",
+        f"Status: `{verdict}`",
+        f"Finding ID: `{finding_id}`",
+        f"Triage item ID: `{triage_item_id}`",
+        f"Finding fingerprint: `{fingerprint}`",
+        f"Report path: `{report_path}`",
+        f"Code scanning alert: {alert_url}",
+        "",
+        f"Repository: `{repository}`",
+        f"Branch: `{branch}`",
+        f"Revision: `{revision}`",
+        f"Confidence: `{confidence}`",
+        "",
+        "### Affected locations",
+        *location_lines(finding),
+        "",
+        "### Evidence",
+        *[f"- {value}" for value in evidence],
+        "",
+        "### Counterevidence",
+        *[f"- {value}" for value in counterevidence],
+        "",
+        "### Proof gaps",
+        *[f"- {value}" for value in proof_gaps],
+        "",
+        "### Recommended next step",
+        "",
+        f"`{next_step}`",
+        "",
+        "### Fix-finding handoff",
+        "",
+        handoff_text,
+        "",
+        "### Tracking information",
+        "",
+        f"This issue tracks Code Scanning alert #{alert_number} without changing or dismissing the alert.",
+        "",
+        "Manually link this issue from:",
+        "",
+        "Code Scanning alert -> Tracking -> Add existing GitHub issue",
+    ]
+    body = "\n".join(parts).strip() + "\n"
+    if len(body) > MAX_GITHUB_BODY:
+        raise WritebackError(f"finding {finding_id}: issue body exceeds GitHub body limit")
+    return body
 
 
 def gh_command(arguments: list[str]) -> str:
@@ -421,7 +485,12 @@ def paged_issue_comments(repository: str, issue_number: int) -> list[dict[str, A
 
 
 def find_tracking_issue(
-    repository: str, finding_id: str, fingerprint: str, comment: str
+    repository: str,
+    finding_id: str,
+    fingerprint: str,
+    issue_title: str,
+    issue_body: str,
+    comment: str,
 ) -> dict[str, Any]:
     query = f'repo:{repository} is:issue "Finding ID: `{finding_id}`" in:body'
     response = gh_api("GET", f"search/issues?q={quote_plus(query)}&per_page=100")
@@ -449,11 +518,150 @@ def find_tracking_issue(
     number = issue["number"]
     comments = paged_issue_comments(repository, number)
     exact_comment = any(value.get("body") == comment for value in comments)
+    exact_issue = issue.get("title") == issue_title and issue.get("body") == issue_body
+    if exact_issue and exact_comment:
+        outcome = "reuse"
+    elif exact_issue:
+        outcome = "comment"
+    elif exact_comment:
+        outcome = "update"
+    else:
+        outcome = "update_comment"
     return {
-        "outcome": "reuse" if exact_comment else "comment",
+        "outcome": outcome,
         "issue": issue,
         "comment_exists": exact_comment,
     }
+
+
+def ordered_alert_findings(
+    findings: list[dict[str, Any]],
+) -> list[tuple[int, dict[str, Any]]]:
+    by_number: dict[int, dict[str, Any]] = {}
+    for finding in findings:
+        number = extract_alert_number(finding)
+        if number in by_number:
+            raise WritebackError(f"duplicate alert number in triage: {number}")
+        by_number[number] = finding
+    return sorted(by_number.items())
+
+
+def build_batch_manifest(args: argparse.Namespace) -> int:
+    repo_root = canonical_repo_root()
+    triage_path = Path(args.triage).resolve()
+    triage, triage_raw = read_json(triage_path)
+    revision, findings = validate_triage(triage)
+    branch = require_string(args.branch, "branch")
+    if git_value(repo_root, "rev-parse", "--abbrev-ref", "HEAD") != branch:
+        raise WritebackError("requested branch is not the current checkout")
+    if git_value(repo_root, "rev-parse", "HEAD") != revision:
+        raise WritebackError("triage revision is not the current checkout revision")
+
+    report = Path(args.report)
+    report_path = relative_report_path(report, repo_root)
+    report_raw = report.resolve().read_bytes()
+    repository = validate_repository(args.repository)
+    ordered = ordered_alert_findings(findings)
+    batches = []
+    for offset in range(0, len(ordered), MAX_BATCH_SIZE):
+        entries = ordered[offset : offset + MAX_BATCH_SIZE]
+        batches.append(
+            {
+                "batch_id": f"batch-{len(batches) + 1:03d}",
+                "alerts": [number for number, _ in entries],
+                "finding_ids": [finding["input_id"] for _, finding in entries],
+                "verdict_counts": {
+                    verdict: sum(finding["verdict"] == verdict for _, finding in entries)
+                    for verdict in ("confirmed", "needs_review", "not_actionable")
+                },
+            }
+        )
+
+    manifest = {
+        "schema_version": BATCH_MANIFEST_SCHEMA,
+        "repository": repository,
+        "branch": branch,
+        "triage_revision": revision,
+        "triage_path": triage_path.relative_to(repo_root).as_posix(),
+        "triage_sha256": sha256(triage_raw),
+        "report_path": report_path,
+        "report_sha256": sha256(report_raw),
+        "max_batch_size": MAX_BATCH_SIZE,
+        "finding_count": len(ordered),
+        "batch_count": len(batches),
+        "batches": batches,
+    }
+    output_path = Path(args.output)
+    atomic_write(output_path, json_bytes(manifest))
+    print(json.dumps({**manifest, "manifest_path": str(output_path)}, indent=2, sort_keys=True))
+    return 0
+
+
+def audit_batch_coverage(args: argparse.Namespace) -> int:
+    manifest, _ = read_json(Path(args.manifest))
+    if manifest.get("schema_version") != BATCH_MANIFEST_SCHEMA:
+        raise WritebackError(f'manifest schema_version must be "{BATCH_MANIFEST_SCHEMA}"')
+    batches = manifest.get("batches")
+    if not isinstance(batches, list):
+        raise WritebackError("manifest.batches must be an array")
+    expected = {
+        finding_id
+        for batch in batches
+        if isinstance(batch, dict)
+        for finding_id in batch.get("finding_ids", [])
+        if isinstance(finding_id, str)
+    }
+    if len(expected) != manifest.get("finding_count"):
+        raise WritebackError("manifest finding coverage is incomplete or duplicated")
+
+    completed: dict[str, dict[str, Any]] = {}
+    for receipt_name in args.receipt:
+        receipt, _ = read_json(Path(receipt_name))
+        if receipt.get("schema_version") != RECEIPT_SCHEMA or receipt.get("complete") is not True:
+            raise WritebackError(f"receipt is incomplete or invalid: {receipt_name}")
+        for field in ("repository", "branch", "triage_revision", "triage_sha256", "report_path", "report_sha256"):
+            if receipt.get(field) != manifest.get(field):
+                raise WritebackError(f"receipt {receipt_name} does not match manifest {field}")
+        results = receipt.get("results")
+        if not isinstance(results, list):
+            raise WritebackError(f"receipt has invalid results: {receipt_name}")
+        for result in results:
+            if not isinstance(result, dict):
+                raise WritebackError(f"receipt has invalid result: {receipt_name}")
+            finding_id = require_string(result.get("finding_id"), "receipt finding_id")
+            if finding_id in completed:
+                raise WritebackError(f"finding appears in multiple receipts: {finding_id}")
+            if result.get("outcome") not in {
+                "issue_created_and_commented",
+                "comment_added",
+                "issue_updated",
+                "issue_updated_and_commented",
+                "already_commented",
+            }:
+                raise WritebackError(f"finding {finding_id} does not have a verified issue outcome")
+            require_string(result.get("issue_url"), f"finding {finding_id} issue_url")
+            completed[finding_id] = result
+
+    missing = sorted(expected - set(completed))
+    unexpected = sorted(set(completed) - expected)
+    if missing or unexpected:
+        raise WritebackError(
+            f"issue coverage mismatch; missing={missing}, unexpected={unexpected}"
+        )
+    summary = {
+        "schema_version": BATCH_MANIFEST_SCHEMA,
+        "complete": True,
+        "finding_count": len(expected),
+        "verified_issue_count": len(completed),
+        "manual_link_count": sum(
+            result.get("manual_link_required") is True for result in completed.values()
+        ),
+        "finding_issue_urls": {
+            finding_id: completed[finding_id]["issue_url"] for finding_id in sorted(completed)
+        },
+    }
+    print(json.dumps(summary, indent=2, sort_keys=True))
+    return 0
 
 
 def build_plan(args: argparse.Namespace) -> int:
@@ -479,12 +687,7 @@ def build_plan(args: argparse.Namespace) -> int:
     repository = validate_repository(args.repository)
     context = github_context(repository)
 
-    by_number: dict[int, dict[str, Any]] = {}
-    for finding in findings:
-        number = extract_alert_number(finding)
-        if number in by_number:
-            raise WritebackError(f"duplicate alert number in triage: {number}")
-        by_number[number] = finding
+    by_number = dict(ordered_alert_findings(findings))
     missing = sorted(set(requested) - set(by_number))
     if missing:
         raise WritebackError(f"alert numbers not found in triage: {missing}")
@@ -495,6 +698,19 @@ def build_plan(args: argparse.Namespace) -> int:
         finding_id = require_string(finding.get("input_id"), "finding.input_id")
         alert_url = extract_alert_url(finding, repository, number)
         fingerprint = finding_fingerprint(repository, number, finding_id)
+        verdict = finding["verdict"]
+        title = clean_line(finding.get("title", "CodeQL alert"))
+        issue_title = f"[CodeQL][{verdict}][#{number}] {title}"[:256]
+        issue_body = build_issue_body(
+            finding,
+            repository,
+            branch,
+            revision,
+            report_path,
+            number,
+            alert_url,
+            fingerprint,
+        )
         comment = build_comment(
             finding,
             repository,
@@ -505,13 +721,17 @@ def build_plan(args: argparse.Namespace) -> int:
             alert_url,
             fingerprint,
         )
-        duplicate = find_tracking_issue(repository, finding_id, fingerprint, comment)
+        duplicate = find_tracking_issue(
+            repository,
+            finding_id,
+            fingerprint,
+            issue_title,
+            issue_body,
+            comment,
+        )
         issue = duplicate["issue"]
         issue_number = issue.get("number") if isinstance(issue, dict) else None
         issue_url = issue.get("html_url") if isinstance(issue, dict) else None
-        verdict = finding["verdict"]
-        title = clean_line(finding.get("title", "CodeQL alert"))
-        issue_title = f"[CodeQL][{verdict}][#{number}] {title}"[:256]
         items.append(
             {
                 "alert_number": number,
@@ -525,9 +745,7 @@ def build_plan(args: argparse.Namespace) -> int:
                 "issue_number": issue_number,
                 "issue_url": issue_url,
                 "issue_title": issue_title,
-                "issue_body": build_issue_body(
-                    finding_id, fingerprint, alert_url, report_path
-                ),
+                "issue_body": issue_body,
                 "comment": comment,
                 "manual_link_required": True,
             }
@@ -595,7 +813,31 @@ def validate_plan(plan: dict[str, Any]) -> list[dict[str, Any]]:
         if item.get("verdict") not in VERDICTS:
             raise WritebackError(f"{field}.verdict is invalid")
         finding_id = require_string(item.get("finding_id"), f"{field}.finding_id")
+        triage_item_id = require_string(
+            item.get("triage_item_id"), f"{field}.triage_item_id"
+        )
+        fingerprint = require_string(
+            item.get("finding_fingerprint"), f"{field}.finding_fingerprint"
+        )
         report_binding = f"Report path: `{plan['report_path']}`"
+        issue_body = require_string(item.get("issue_body"), f"{field}.issue_body")
+        for binding in (
+            f"Status: `{item['verdict']}`",
+            f"Finding ID: `{finding_id}`",
+            report_binding,
+            f"Triage item ID: `{triage_item_id}`",
+            f"Finding fingerprint: `{fingerprint}`",
+            "### Evidence",
+            "### Counterevidence",
+            "### Proof gaps",
+            "### Recommended next step",
+            "### Fix-finding handoff",
+            "### Tracking information",
+        ):
+            if binding not in issue_body:
+                raise WritebackError(f"{field}.issue_body is missing {binding!r}")
+        if len(issue_body) > MAX_GITHUB_BODY:
+            raise WritebackError(f"{field}.issue_body exceeds GitHub body limit")
         comment = require_string(item.get("comment"), f"{field}.comment")
         if f"Finding ID: `{finding_id}`" not in comment:
             raise WritebackError(f"{field}.comment is missing finding-id")
@@ -603,12 +845,14 @@ def validate_plan(plan: dict[str, Any]) -> list[dict[str, Any]]:
             raise WritebackError(f"{field}.comment is missing report-path")
         if f"Status: `{item['verdict']}`" not in comment:
             raise WritebackError(f"{field}.comment is missing verdict status")
+        if "Comment destination: `GitHub tracking issue`" not in comment:
+            raise WritebackError(f"{field}.comment has an invalid destination")
         if len(comment) > MAX_GITHUB_BODY:
             raise WritebackError(f"{field}.comment exceeds GitHub body limit")
         action = item.get("action")
-        if action not in {"create", "comment", "reuse"}:
+        if action not in {"create", "comment", "update", "update_comment", "reuse"}:
             raise WritebackError(f"{field}.action is invalid")
-        if action in {"comment", "reuse"}:
+        if action in {"comment", "update", "update_comment", "reuse"}:
             if not isinstance(item.get("issue_number"), int):
                 raise WritebackError(f"{field}.issue_number is required")
             require_string(item.get("issue_url"), f"{field}.issue_url")
@@ -620,7 +864,7 @@ def validate_plan(plan: dict[str, Any]) -> list[dict[str, Any]]:
 def action_counts(plan: dict[str, Any]) -> dict[str, int]:
     return {
         action: sum(item["action"] == action for item in plan["items"])
-        for action in ("create", "comment", "reuse")
+        for action in ("create", "comment", "update", "update_comment", "reuse")
     }
 
 
@@ -645,6 +889,8 @@ def plan_summary(plan: dict[str, Any], path: Path) -> dict[str, Any]:
         "github_login": plan["github"]["login"],
         "github_visibility": plan["github"].get("visibility"),
         "write_mode": plan["write_mode"],
+        "comment_destination": COMMENT_DESTINATION,
+        "direct_alert_comments_supported": DIRECT_ALERT_COMMENTS_SUPPORTED,
         "finding_count": len(plan["items"]),
         "verdict_alerts": verdict_alerts(plan),
         "action_counts": action_counts(plan),
@@ -680,6 +926,28 @@ def preview_requests(plan: dict[str, Any]) -> list[dict[str, Any]]:
             issue_selector: str | int = "<created_issue_number>"
         else:
             issue_selector = item["issue_number"]
+        if item["action"] in {"update", "update_comment"}:
+            requests.append(
+                {
+                    "finding_id": item["finding_id"],
+                    "transport": "gh",
+                    "command": [
+                        "gh",
+                        "issue",
+                        "edit",
+                        str(issue_selector),
+                        "--repo",
+                        plan["repository"],
+                        "--title",
+                        item["issue_title"],
+                        "--body-file",
+                        "<mode-0600-temporary-file>",
+                    ],
+                    "body_file_content": item["issue_body"],
+                }
+            )
+        if item["action"] == "update":
+            continue
         requests.append(
             {
                 "finding_id": item["finding_id"],
@@ -712,6 +980,8 @@ def preview_plan(args: argparse.Namespace) -> int:
         "report_path": plan["report_path"],
         "github": plan["github"],
         "write_mode": plan["write_mode"],
+        "comment_destination": COMMENT_DESTINATION,
+        "direct_alert_comments_supported": DIRECT_ALERT_COMMENTS_SUPPORTED,
         "approval_token": sha256(raw),
         "verdict_alerts": verdict_alerts(plan),
         "action_counts": action_counts(plan),
@@ -746,6 +1016,8 @@ def revalidate_plan(plan: dict[str, Any], repo_root: Path) -> None:
             plan["repository"],
             item["finding_id"],
             item["finding_fingerprint"],
+            item["issue_title"],
+            item["issue_body"],
             item["comment"],
         )
         issue = duplicate["issue"]
@@ -840,6 +1112,34 @@ def apply_plan(args: argparse.Namespace) -> int:
                         )
                     result["issue_number"] = issue["number"]
                     result["issue_url"] = issue.get("url")
+                elif item["action"] in {"update", "update_comment"}:
+                    gh_with_body(
+                        [
+                            "issue",
+                            "edit",
+                            str(result["issue_number"]),
+                            "--repo",
+                            plan["repository"],
+                            "--title",
+                            item["issue_title"],
+                        ],
+                        item["issue_body"],
+                    )
+                    issue = gh_issue_view(
+                        plan["repository"], result["issue_number"]
+                    )
+                    if (
+                        issue.get("title") != item["issue_title"]
+                        or issue.get("body") != item["issue_body"]
+                    ):
+                        raise WritebackError(
+                            f"finding {item['finding_id']}: issue update readback failed"
+                        )
+                    result["issue_url"] = issue.get("url")
+                if item["action"] == "update":
+                    result["outcome"] = "issue_updated"
+                    receipt["results"].append(result)
+                    continue
                 issue_number = result["issue_number"]
                 gh_with_body(
                     [
@@ -863,11 +1163,12 @@ def apply_plan(args: argparse.Namespace) -> int:
                         f"finding {item['finding_id']}: comment readback failed"
                     )
                 result["comment_url"] = matching_comments[-1].get("url")
-                result["outcome"] = (
-                    "issue_created_and_commented"
-                    if item["action"] == "create"
-                    else "comment_added"
-                )
+                if item["action"] == "create":
+                    result["outcome"] = "issue_created_and_commented"
+                elif item["action"] == "update_comment":
+                    result["outcome"] = "issue_updated_and_commented"
+                else:
+                    result["outcome"] = "comment_added"
         except (WritebackError, OSError) as error:
             result["outcome"] = "uncertain"
             result["error"] = str(error)
@@ -905,9 +1206,19 @@ def apply_plan(args: argparse.Namespace) -> int:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Plan and apply approval-gated GitHub issue comments for CodeQL triage."
+        description="Plan and apply approval-gated GitHub issue tracking for CodeQL triage."
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    batches_parser = subparsers.add_parser(
+        "batches", help="Partition every triaged finding into complete issue batches."
+    )
+    batches_parser.add_argument("--triage", required=True)
+    batches_parser.add_argument("--report", required=True)
+    batches_parser.add_argument("--repository", required=True)
+    batches_parser.add_argument("--branch", required=True)
+    batches_parser.add_argument("--output", required=True)
+    batches_parser.set_defaults(handler=build_batch_manifest)
 
     plan_parser = subparsers.add_parser("plan", help="Build a live duplicate-checked plan.")
     plan_parser.add_argument("--triage", required=True)
@@ -931,6 +1242,13 @@ def parse_args() -> argparse.Namespace:
     apply_parser.add_argument("--approval-token", required=True)
     apply_parser.add_argument("--receipt-root")
     apply_parser.set_defaults(handler=apply_plan)
+
+    audit_parser = subparsers.add_parser(
+        "audit", help="Verify that every manifest finding has a completed issue receipt."
+    )
+    audit_parser.add_argument("--manifest", required=True)
+    audit_parser.add_argument("--receipt", action="append", required=True)
+    audit_parser.set_defaults(handler=audit_batch_coverage)
     return parser.parse_args()
 
 

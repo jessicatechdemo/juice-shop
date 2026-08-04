@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { describe, it, before } from 'node:test'
+import { describe, it, before, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import request from 'supertest'
 import type { Express } from 'express'
 import { createTestApp } from './helpers/setup'
 import * as challengeUtils from '../../lib/challengeUtils'
 import { challenges } from '../../data/datacache'
+import logger from '../../lib/logger'
 
 let app: Express
 
@@ -31,6 +32,22 @@ void describe('/rest/repeat-notification', () => {
       .get('/rest/repeat-notification?challenge=Retrieve%20Blueprint')
 
     assert.equal(res.status, 200)
+  })
+
+  void it('GET does not allow line breaks in logged missing challenge names', async () => {
+    const originalLoggerWarn = logger.warn
+    const loggerWarn = mock.fn()
+    logger.warn = loggerWarn as unknown as typeof logger.warn
+
+    try {
+      const res = await request(app)
+        .get('/rest/repeat-notification?challenge=missing%0D%0Aforged%20log%20entry')
+
+      assert.equal(res.status, 200)
+      assert.doesNotMatch(loggerWarn.mock.calls[0].arguments[0], /[\r\n]/)
+    } finally {
+      logger.warn = originalLoggerWarn
+    }
   })
 
   void it('GET triggers repeating notification passing a solved challenge', async () => {

@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Explanation Viewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0a0f1e;
+      --panel: #10192d;
+      --panel-alt: #0d1424;
+      --panel-muted: #15203a;
+      --border: rgba(160, 174, 208, 0.18);
+      --text: #ecf2ff;
+      --muted: #9fb0d8;
+      --accent: #7cc7ff;
+      --accent-strong: #44a7ff;
+      --warning: #ffcf70;
+      --success: #7cd9a3;
+      --danger: #ff9b9b;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(68, 167, 255, 0.15), transparent 28%),
+        radial-gradient(circle at top right, rgba(124, 217, 163, 0.12), transparent 22%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(380px, 44%) minmax(480px, 56%);
+      height: 100vh;
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .left-pane,
+    .right-pane {
+      min-height: 0;
+      background: var(--panel-alt);
+    }
+
+    .left-pane {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+    }
+
+    .hero {
+      padding: 28px 28px 18px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(124, 199, 255, 0.06), transparent);
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .section-tabs {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(12, 20, 36, 0.86);
+      backdrop-filter: blur(8px);
+    }
+
+    .section-tab {
+      border: 1px solid var(--border);
+      background: var(--panel-muted);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .section-tab.active {
+      color: var(--text);
+      border-color: rgba(124, 199, 255, 0.55);
+      background: rgba(68, 167, 255, 0.14);
+      box-shadow: inset 0 0 0 1px rgba(124, 199, 255, 0.22);
+    }
+
+    .explanation-scroll {
+      overflow: auto;
+      padding: 24px 24px 40px;
+    }
+
+    .section-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.03));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-card h1,
+    .section-card h2,
+    .section-card h3 {
+      margin: 0;
+      scroll-margin-top: 24px;
+    }
+
+    .section-card h1 {
+      font-size: 28px;
+      line-height: 1.2;
+      margin-bottom: 18px;
+    }
+
+    .section-card h2 {
+      font-size: 22px;
+      margin-top: 30px;
+      margin-bottom: 14px;
+    }
+
+    .section-card h3 {
+      font-size: 18px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    .section-card p,
+    .section-card li,
+    .section-card td,
+    .section-card th,
+    .section-card blockquote {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .section-card strong {
+      color: var(--text);
+    }
+
+    .section-card p,
+    .section-card ul,
+    .section-card ol,
+    .section-card table,
+    .section-card blockquote,
+    .section-card pre {
+      margin: 0 0 16px;
+    }
+
+    .section-card li + li {
+      margin-top: 10px;
+    }
+
+    .section-card a {
+      color: var(--accent);
+    }
+
+    .section-card hr {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 22px 0;
+    }
+
+    .section-card blockquote {
+      margin-left: 0;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+    }
+
+    .section-card code {
+      font-family: 'IBM Plex Mono', monospace;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 1px 6px;
+      color: #d7eeff;
+      font-size: 12px;
+    }
+
+    .section-card pre {
+      overflow: auto;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(6, 11, 22, 0.9);
+    }
+
+    .section-card pre code {
+      display: block;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .section-card table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .section-card th,
+    .section-card td {
+      border-bottom: 1px solid var(--border);
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .section-card th {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .section-card tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .ref-chip {
+      border: 1px solid rgba(124, 199, 255, 0.28);
+      background: rgba(68, 167, 255, 0.12);
+      color: #d7eeff;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .ref-chip {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 2px;
+      transition: background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .ref-chip.active {
+      background: rgba(68, 167, 255, 0.3);
+      border-color: rgba(124, 199, 255, 0.75);
+    }
+
+    .mermaid-wrap {
+      position: relative;
+      margin: 0 0 16px;
+      padding: 48px 16px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      overflow: auto;
+    }
+
+    .mermaid-diagram {
+      min-width: fit-content;
+    }
+
+    .mermaid-expand {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      border: 1px solid rgba(124, 199, 255, 0.28);
+      background: rgba(68, 167, 255, 0.12);
+      color: #d7eeff;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'IBM Plex Mono', monospace;
+      cursor: pointer;
+    }
+
+    .mermaid-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      background: rgba(4, 8, 18, 0.82);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+    }
+
+    .mermaid-modal.open {
+      display: flex;
+    }
+
+    .mermaid-modal-card {
+      position: relative;
+      width: min(1200px, 100%);
+      height: min(80vh, 900px);
+      padding: 56px 20px 20px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--panel-alt);
+      box-shadow: var(--shadow);
+      overflow: auto;
+    }
+
+    .mermaid-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      border: 1px solid rgba(160, 174, 208, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'IBM Plex Mono', monospace;
+      cursor: pointer;
+    }
+
+    .mermaid-modal-content {
+      min-width: fit-content;
+      min-height: 100%;
+    }
+
+    .mermaid-error {
+      border-left: 4px solid var(--danger);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .section-empty {
+      display: grid;
+      place-items: center;
+      padding: 48px 24px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .right-pane {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .code-header {
+      padding: 22px 22px 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(124, 199, 255, 0.05), transparent);
+    }
+
+    .code-title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .file-path {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      color: #d7eeff;
+    }
+
+    .line-range {
+      color: var(--muted);
+      font-size: 13px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .code-meta {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #editor {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .code-footer {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      overflow: auto;
+      white-space: nowrap;
+    }
+
+    .empty-state,
+    .monaco-error {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1080px) {
+      .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 54%) minmax(0, 46%);
+      }
+
+      .section-tabs {
+        padding-top: 14px;
+        padding-bottom: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <section class="left-pane">
+      <div class="hero">
+        <div class="eyebrow">Grounded Code Explanation</div>
+        <h1 id="page-title"></h1>
+      </div>
+      <nav id="section-tabs" class="section-tabs" aria-label="Explanation headings"></nav>
+      <div class="explanation-scroll">
+        <article id="section-content" class="section-card"></article>
+      </div>
+    </section>
+
+    <section class="right-pane">
+      <div class="code-header">
+        <div class="code-title">
+          <span class="file-path" id="code-file-path">Select a code reference</span>
+          <span class="line-range" id="code-line-range"></span>
+        </div>
+        <div class="code-meta" id="code-meta">Click any reference chip in the explanation to load the corresponding code here.</div>
+      </div>
+      <div id="editor-wrap">
+        <div id="editor"></div>
+      </div>
+      <div class="code-footer" id="code-footer">Ready</div>
+    </section>
+  </div>
+
+  <div id="mermaid-modal" class="mermaid-modal" aria-hidden="true">
+    <div class="mermaid-modal-card">
+      <button id="mermaid-modal-close" class="mermaid-modal-close" type="button">Close</button>
+      <div id="mermaid-modal-content" class="mermaid-modal-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const EXPLANATION_DATA = {"title": "Regression Test Validation Report: GitHub CodeQL Alert 46", "repoRoot": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop", "markdown": "# Regression Test Validation Report: GitHub CodeQL Alert 46\n\nThis report explains what the regression tests validate for the `js/log-injection`\npatch in `lib/challengeUtils.ts`, how each assertion detects the original defect,\nand what evidence establishes that the patch succeeds.\n\n## Executive Summary\n\n**Finding:** GitHub CodeQL alert 46 reported that an attacker-controlled challenge\nname could insert carriage-return or newline characters into a warning log entry.\n\n**Security invariant:** A missing challenge name may be logged, but the value passed\nto `logger.warn` must not contain `\\r` or `\\n`. One request must therefore remain one\nphysical log record.\n\n**Result:** The focused unit test passed **3/3** and the route-level API test passed\n**4/4**, both with exit code `0`. The regression was also exercised before the patch;\nthe malicious case failed because the captured log argument still contained CR/LF.\nThat before/after result demonstrates that the test is sensitive to the vulnerable\nbehavior and becomes green because of the patch.\n\n## Vulnerable Data Flow and Patch Boundary\n\nThe application registers an unauthenticated `GET /rest/repeat-notification`\nendpoint in [[server.ts:608-608]]. The handler decodes the attacker-controlled\n`challenge` query value and passes it to `findChallengeByName`\n[[routes/repeatNotification.ts:9-12]].\n\nWhen no challenge matches, `findChallengeByName` reaches the warning-log sink. The\npatch removes CR and LF characters only at that sink\n[[lib/challengeUtils.ts:93-100]]. The original `challengeName` is still used for the\nlookup, so the fix does not alter which challenge is found.\n\n```mermaid\nflowchart LR\n  A[HTTP challenge query] --> B[decodeURIComponent]\n  B --> C[findChallengeByName]\n  C --> D{Challenge found?}\n  D -- Yes --> E[Return original challenge]\n  D -- No --> F[Remove CR and LF for logging]\n  F --> G[logger.warn receives one-line value]\n```\n\n## What the Unit Regression Test Validates\n\nThe unit test replaces `logger.warn` with a mock, invokes `findChallengeByName`\ndirectly, and inspects the exact arguments captured by that mock. It exercises four\nattacker-input classes: LF, CR, CRLF, and repeated LF. Every lookup must still return\n`undefined`, and every captured log argument must fail to match `/[\\r\\n]/`\n[[test/server/challengeUtils.unit.test.ts:43-57]].\n\nThis establishes two properties:\n\n1. Missing challenge behavior is preserved: the function still returns `undefined`.\n2. Log-record injection is blocked: neither CR nor LF reaches the logger.\n\nA separate compatibility assertion verifies that an ordinary missing name is still\nlogged with the exact original message\n[[test/server/challengeUtils.unit.test.ts:31-41]]. An existing challenge is also\nstill returned normally [[test/server/challengeUtils.unit.test.ts:59-61]].\n\n### Why the unit assertion fails without the patch\n\nBefore the patch, the mock captured a value equivalent to:\n\n```text\nMissing challenge with name: missing\\r\\nforged log entry\n```\n\nBecause that value matches `/[\\r\\n]/`, `assert.doesNotMatch` fails. With the patch,\nthe logger receives the one-line equivalent `Missing challenge with name:\nmissingforged log entry`, so the assertion passes.\n\n## What the API Regression Test Validates\n\nThe API test sends `%0D%0A`, the URL-encoded form of CRLF, through the real endpoint\ninstead of calling the utility directly. It mocks the logger, performs the request,\nrequires HTTP status `200`, and checks that the captured log argument contains no CR\nor LF [[test/api/repeat-notification.test.ts:37-51]].\n\nThis proves the mitigation holds across the complete relevant path:\n\n1. Supertest sends the malicious query string.\n2. Express supplies it to the route.\n3. `decodeURIComponent` produces the CRLF-containing challenge name.\n4. `findChallengeByName` reaches the missing-challenge warning.\n5. The logger mock captures the final value after sanitization.\n6. The test fails unless the response remains `200` and the captured value is one line.\n\nThe surrounding API tests preserve the legitimate contract for requests without a\nchallenge, with an unsolved challenge, and with a solved challenge\n[[test/api/repeat-notification.test.ts:22-35]]\n[[test/api/repeat-notification.test.ts:53-59]].\n\n## How the Tests Determine That the Patch Succeeded\n\nThe tests do not infer success from the implementation text. They observe the value\nat the security-sensitive boundary: the argument actually passed to `logger.warn`.\n\n| Success criterion | Assertion and evidence | Failure signal |\n| --- | --- | --- |\n| CR/LF cannot reach the log sink | `assert.doesNotMatch(logArgument, /[\\r\\n]/)` | Any CR or LF causes an assertion failure |\n| Missing-name behavior remains | Result equals `undefined` | Changed lookup behavior causes an assertion failure |\n| Normal log text remains | Safe log argument equals the original expected message | Unnecessary modification causes an assertion failure |\n| Existing lookup remains | Known challenge object is returned | Lookup regression causes an assertion failure |\n| HTTP behavior remains | Response status equals `200` | Route behavior change causes an assertion failure |\n| Real route reaches the sink | API test reads the first captured mock call | Missing log call or bad argument causes the test to fail |\n\nThe key evidence is the combination of **negative proof** (no captured log value\ncontains CR/LF) and **compatibility proof** (lookup results, safe log text, and HTTP\nstatus are unchanged).\n\n## Recorded Test Results\n\nFocused unit regression run:\n\n```text\ntests 3\npass 3\nfail 0\nexit code 0\n```\n\nIsolated route-level API regression run:\n\n```text\ntests 4\npass 4\nfail 0\nexit code 0\n```\n\nThe API test was run from the isolated validation copy because the OneDrive-backed\nsandbox can exhaust its file-watcher allowance after the assertions finish. In the\nworkspace run, all four API assertions passed before that unrelated `EMFILE` watcher\nerror. The isolated run removed that environmental noise and completed cleanly with\nexit code `0`.\n\n## Coverage Limits\n\nThe regression tests prove closure of the reported CodeQL condition for CR and LF,\nincluding encoded CRLF through the real HTTP route. They do not claim that every\npossible Unicode line-separator convention is normalized; that is outside the\nspecific `js/log-injection` data flow tested here. GitHub CodeQL should still be\nrerun after the patch is pushed to confirm alert 46 is closed in the analyzed commit.\n\n## Conclusion\n\nThe regression test knows the patch succeeds because the same attacker-controlled\nvalue that previously reached `logger.warn` with embedded line breaks is now captured\nwithout CR/LF, while all checked legitimate behavior remains unchanged. The passing\nunit and API layers jointly validate both the narrow sink fix and its real endpoint\nintegration.\n", "references": [{"id": "ref-1", "literal": "[[server.ts:608-608]]", "file_id": "file-1", "file_path": "server.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/server.ts", "start_line": 608, "end_line": 608}, {"id": "ref-2", "literal": "[[routes/repeatNotification.ts:9-12]]", "file_id": "file-2", "file_path": "routes/repeatNotification.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/routes/repeatNotification.ts", "start_line": 9, "end_line": 12}, {"id": "ref-3", "literal": "[[lib/challengeUtils.ts:93-100]]", "file_id": "file-3", "file_path": "lib/challengeUtils.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/lib/challengeUtils.ts", "start_line": 93, "end_line": 100}, {"id": "ref-4", "literal": "[[test/server/challengeUtils.unit.test.ts:43-57]]", "file_id": "file-4", "file_path": "test/server/challengeUtils.unit.test.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/test/server/challengeUtils.unit.test.ts", "start_line": 43, "end_line": 57}, {"id": "ref-5", "literal": "[[test/server/challengeUtils.unit.test.ts:31-41]]", "file_id": "file-4", "file_path": "test/server/challengeUtils.unit.test.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/test/server/challengeUtils.unit.test.ts", "start_line": 31, "end_line": 41}, {"id": "ref-6", "literal": "[[test/server/challengeUtils.unit.test.ts:59-61]]", "file_id": "file-4", "file_path": "test/server/challengeUtils.unit.test.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/test/server/challengeUtils.unit.test.ts", "start_line": 59, "end_line": 61}, {"id": "ref-7", "literal": "[[test/api/repeat-notification.test.ts:37-51]]", "file_id": "file-5", "file_path": "test/api/repeat-notification.test.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/test/api/repeat-notification.test.ts", "start_line": 37, "end_line": 51}, {"id": "ref-8", "literal": "[[test/api/repeat-notification.test.ts:22-35]]", "file_id": "file-5", "file_path": "test/api/repeat-notification.test.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/test/api/repeat-notification.test.ts", "start_line": 22, "end_line": 35}, {"id": "ref-9", "literal": "[[test/api/repeat-notification.test.ts:53-59]]", "file_id": "file-5", "file_path": "test/api/repeat-notification.test.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/test/api/repeat-notification.test.ts", "start_line": 53, "end_line": 59}], "files": [{"id": "file-1", "path": "server.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/server.ts", "language": "typescript", "content": "/*\n * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.\n * SPDX-License-Identifier: MIT\n */\nimport i18n from 'i18n'\nimport cors from 'cors'\nimport fs from 'node:fs'\nimport yaml from 'js-yaml'\nimport config from 'config'\nimport morgan from 'morgan'\nimport multer from 'multer'\nimport helmet from 'helmet'\nimport http from 'node:http'\nimport path from 'node:path'\nimport express from 'express'\nimport colors from 'colors/safe'\nimport serveIndex from 'serve-index'\nimport bodyParser from 'body-parser'\n// @ts-expect-error FIXME due to non-existing type definitions for finale-rest\nimport * as finale from 'finale-rest'\nimport compression from 'compression'\n// @ts-expect-error FIXME due to non-existing type definitions for express-robots-txt\nimport robots from 'express-robots-txt'\nimport cookieParser from 'cookie-parser'\nimport * as Prometheus from 'prom-client'\nimport swaggerUi from 'swagger-ui-express'\nimport featurePolicy from 'feature-policy'\nimport { IpFilter } from 'express-ipfilter'\n// @ts-expect-error FIXME due to non-existing type definitions for express-security.txt\nimport securityTxt from 'express-security.txt'\nimport { rateLimit } from 'express-rate-limit'\nimport { getStream } from 'file-stream-rotator'\nimport type { Request, Response, NextFunction } from 'express'\n\nimport { sequelize, createSequelize, initModels, setSequelize } from './models'\nimport { UserModel } from './models/user'\nimport { CardModel } from './models/card'\nimport { HintModel } from './models/hint'\nimport { WalletModel } from './models/wallet'\nimport { ProductModel } from './models/product'\nimport { RecycleModel } from './models/recycle'\nimport { AddressModel } from './models/address'\nimport { QuantityModel } from './models/quantity'\nimport { FeedbackModel } from './models/feedback'\nimport { ComplaintModel } from './models/complaint'\nimport { ChallengeModel } from './models/challenge'\nimport { ChallengeDependencyModel } from './models/challengeDependency'\nimport { BasketItemModel } from './models/basketitem'\nimport { SecurityAnswerModel } from './models/securityAnswer'\nimport { PrivacyRequestModel } from './models/privacyRequests'\nimport { SecurityQuestionModel } from './models/securityQuestion'\n\nimport logger from './lib/logger'\nimport * as utils from './lib/utils'\nimport * as antiCheat from './lib/antiCheat'\nimport * as security from './lib/insecurity'\nimport validateConfig from './lib/startup/validateConfig'\nimport cleanupFtpFolder from './lib/startup/cleanupFtpFolder'\nimport customizeEasterEgg from './lib/startup/customizeEasterEgg' // vuln-code-snippet hide-line\nimport customizeApplication from './lib/startup/customizeApplication'\nimport validatePreconditions, { preconditionsReady } from './lib/startup/validatePreconditions'\nimport registerWebsocketEvents from './lib/startup/registerWebsocketEvents'\nimport restoreOverwrittenFilesWithOriginals from './lib/startup/restoreOverwrittenFilesWithOriginals'\n\nimport datacreator from './data/datacreator'\nimport locales from './data/static/locales.json'\n\nimport { login } from './routes/login'\nimport * as verify from './routes/verify'\nimport * as address from './routes/address'\nimport * as metrics from './routes/metrics'\nimport * as payment from './routes/payment'\nimport { placeOrder } from './routes/order'\nimport { b2bOrder } from './routes/b2bOrder'\nimport * as delivery from './routes/delivery'\nimport * as recycles from './routes/recycles'\nimport * as twoFactorAuth from './routes/2fa'\nimport { applyCoupon } from './routes/coupon'\nimport dataErasure from './routes/dataErasure'\nimport { dataExport } from './routes/dataExport'\nimport { chat } from './routes/chat'\nimport { retrieveBasket } from './routes/basket'\nimport { searchProducts } from './routes/search'\nimport { trackOrder } from './routes/trackOrder'\nimport { saveLoginIp } from './routes/saveLoginIp'\nimport { serveKeyFiles } from './routes/keyServer'\nimport * as basketItems from './routes/basketItems'\nimport { performRedirect } from './routes/redirect'\nimport { serveEasterEgg } from './routes/easterEgg'\nimport { getLanguageList } from './routes/languages'\nimport { getUserProfile } from './routes/userProfile'\nimport { serveAngularClient } from './routes/angular'\nimport { resetPassword } from './routes/resetPassword'\nimport { serveLogFiles } from './routes/logfileServer'\nimport { servePublicFiles } from './routes/fileServer'\nimport { addMemory, getMemories } from './routes/memory'\nimport { changePassword } from './routes/changePassword'\nimport { countryMapping } from './routes/countryMapping'\nimport { retrieveAppVersion } from './routes/appVersion'\nimport { captchas, verifyCaptcha } from './routes/captcha'\nimport * as restoreProgress from './routes/restoreProgress'\nimport { checkKeys, nftUnlocked } from './routes/checkKeys'\nimport { retrieveLoggedInUser } from './routes/currentUser'\nimport authenticatedUsers from './routes/authenticatedUsers'\nimport { securityQuestion } from './routes/securityQuestion'\nimport { servePremiumContent } from './routes/premiumReward'\nimport { contractExploitListener } from './routes/web3Wallet'\nimport { updateUserProfile } from './routes/updateUserProfile'\nimport { getVideo, promotionVideo } from './routes/videoHandler'\nimport { likeProductReviews } from './routes/likeProductReviews'\nimport { repeatNotification } from './routes/repeatNotification'\nimport { serveQuarantineFiles } from './routes/quarantineServer'\nimport { showProductReviews } from './routes/showProductReviews'\nimport { nftMintListener, walletNFTVerify } from './routes/nftMint'\nimport { createProductReviews } from './routes/createProductReviews'\nimport { getWalletBalance, addWalletBalance } from './routes/wallet'\nimport { retrieveAppConfiguration } from './routes/appConfiguration'\nimport { updateProductReviews } from './routes/updateProductReviews'\nimport { servePrivacyPolicyProof } from './routes/privacyPolicyProof'\nimport { profileImageUrlUpload } from './routes/profileImageUrlUpload'\nimport { profileImageFileUpload } from './routes/profileImageFileUpload'\nimport { serveCodeFixes, checkCorrectFix } from './routes/vulnCodeFixes'\nimport { imageCaptchas, verifyImageCaptcha } from './routes/imageCaptcha'\nimport { upgradeToDeluxe, deluxeMembershipStatus } from './routes/deluxe'\nimport { serveCodeSnippet, checkVulnLines } from './routes/vulnCodeSnippet'\nimport { orderHistory, allOrders, toggleDeliveryStatus } from './routes/orderHistory'\nimport { continueCode, continueCodeFindIt, continueCodeFixIt } from './routes/continueCode'\nimport { ensureFileIsPassed, handleZipFileUpload, checkUploadSize, checkFileType, handleXmlUpload, handleYamlUpload } from './routes/fileUpload'\n\nconst app = express()\nconst server = new http.Server(app)\n\n// errorhandler requires us from overwriting a string property on it's module which is a big no-no with esmodules :/\n\nconst errorhandler = require('errorhandler')\n\nconst startTime = Date.now()\n\nconst swaggerDocument = yaml.load(fs.readFileSync('./swagger.yml', 'utf8'))\n\nconst appName = config.get<string>('application.customMetricsPrefix')\nconst startupGauge = new Prometheus.Gauge({\n  name: `${appName}_startup_duration_seconds`,\n  help: `Duration ${appName} required to perform a certain task during startup`,\n  labelNames: ['task']\n})\n\n// Wraps the function and measures its (async) execution time\nconst collectDurationPromise = (name: string, func: (...args: any) => Promise<any>) => {\n  return async (...args: any) => {\n    const end = startupGauge.startTimer({ task: name })\n    try {\n      const res = await func(...args)\n      end()\n      return res\n    } catch (err) {\n      console.error('Error in timed startup function: ' + name, err)\n      throw err\n    }\n  }\n}\n\n/* Sets view engine to hbs */\napp.set('view engine', 'hbs')\n\nvoid collectDurationPromise('validatePreconditions', validatePreconditions)()\nvoid collectDurationPromise('cleanupFtpFolder', cleanupFtpFolder)()\nvoid collectDurationPromise('validateConfig', validateConfig)({})\n\nfunction configureApp (app: ReturnType<typeof express>, seq: typeof sequelize) {\n  /* Locals */\n  app.locals.captchaId = 0\n  app.locals.captchaReqId = 1\n  app.locals.captchaBypassReqTimes = []\n  app.locals.abused_ssti_bug = false\n  app.locals.abused_ssrf_bug = false\n\n  /* Compression for all requests */\n  app.use(compression())\n\n  /* Bludgeon solution for possible CORS problems: Allow everything! */\n  app.options('*', cors())\n  app.use(cors())\n\n  /* Security middleware */\n  app.use(helmet.noSniff())\n  app.use(helmet.frameguard())\n  // app.use(helmet.xssFilter()); // = no protection from persisted XSS via RESTful API\n  app.disable('x-powered-by')\n  app.use(featurePolicy({\n    features: {\n      payment: [\"'self'\"]\n    }\n  }))\n\n  /* Hiring header */\n  app.use((req: Request, res: Response, next: NextFunction) => {\n    res.append('X-Recruiting', config.get('application.securityTxt.hiring'))\n    next()\n  })\n\n  /* Remove duplicate slashes from URL which allowed bypassing subsequent filters */\n  app.use((req: Request, res: Response, next: NextFunction) => {\n    req.url = req.url.replace(/[/]+/g, '/')\n    next()\n  })\n\n  /* Increase request counter metric for every request */\n  app.use(metrics.observeRequestMetricsMiddleware())\n\n  /* Security Policy */\n  const securityTxtExpiration = new Date()\n  securityTxtExpiration.setFullYear(securityTxtExpiration.getFullYear() + 1)\n  app.get(['/.well-known/security.txt', '/security.txt'], verify.accessControlChallenges())\n  app.use(['/.well-known/security.txt', '/security.txt'], securityTxt({\n    contact: config.get('application.securityTxt.contact'),\n    encryption: config.get('application.securityTxt.encryption'),\n    acknowledgements: config.get('application.securityTxt.acknowledgements'),\n    'Preferred-Languages': [...new Set(locales.map((locale: { key: string }) => locale.key.substr(0, 2)))].join(', '),\n    hiring: config.get('application.securityTxt.hiring'),\n    csaf: config.get<string>('server.baseUrl') + config.get<string>('application.securityTxt.csaf'),\n    expires: securityTxtExpiration.toUTCString()\n  }))\n\n  /* robots.txt */\n  app.use(robots({ UserAgent: '*', Disallow: '/ftp' }))\n\n  /* Check for any URLs having been called that would be expected for challenge solving without cheating */\n  app.use(antiCheat.checkForPreSolveInteractions())\n\n  /* Checks for challenges solved by retrieving a file implicitly or explicitly */\n  app.use('/assets/public/images/padding', verify.accessControlChallenges())\n  app.use('/assets/public/images/products', verify.accessControlChallenges())\n  app.use('/assets/public/images/uploads', verify.accessControlChallenges())\n  app.use('/assets/i18n', verify.accessControlChallenges())\n\n  /* Checks for challenges solved by abusing SSTi and SSRF bugs */\n  app.use('/solve/challenges/server-side', verify.serverSideChallenges())\n\n  /* Create middleware to change paths from the serve-index plugin from absolute to relative */\n  const serveIndexMiddleware = (req: Request, res: Response, next: NextFunction) => {\n    const origEnd = res.end\n    // @ts-expect-error FIXME assignment broken due to seemingly void return value\n    res.end = function () {\n      if (arguments.length) {\n        const reqPath = req.originalUrl.replace(/\\?.*$/, '')\n\n        const currentFolder = reqPath.split('/').pop()!\n        arguments[0] = arguments[0].replace(/a href=\"([^\"]+?)\"/gi, function (matchString: string, matchedUrl: string) {\n          let relativePath = path.relative(reqPath, matchedUrl)\n          if (relativePath === '') {\n            relativePath = currentFolder\n          } else if (!relativePath.startsWith('.') && currentFolder !== '') {\n            relativePath = currentFolder + '/' + relativePath\n          } else {\n            relativePath = relativePath.replace('..', '.')\n          }\n          return 'a href=\"' + relativePath + '\"'\n        })\n      }\n      // @ts-expect-error FIXME passed argument has wrong type\n      origEnd.apply(this, arguments)\n    }\n    next()\n  }\n\n  // vuln-code-snippet start directoryListingChallenge accessLogDisclosureChallenge\n  /* /ftp directory browsing and file download */ // vuln-code-snippet neutral-line directoryListingChallenge\n  app.use('/ftp', serveIndexMiddleware, serveIndex('ftp', { icons: true })) // vuln-code-snippet vuln-line directoryListingChallenge\n  app.use('/ftp(?!/quarantine)/:file', servePublicFiles()) // vuln-code-snippet vuln-line directoryListingChallenge\n  app.use('/ftp/quarantine/:file', serveQuarantineFiles()) // vuln-code-snippet neutral-line directoryListingChallenge\n\n  app.use('/.well-known', serveIndexMiddleware, serveIndex('.well-known', { icons: true, view: 'details' }))\n  app.use('/.well-known', express.static('.well-known'))\n\n  /* /encryptionkeys directory browsing */\n  app.use('/encryptionkeys', serveIndexMiddleware, serveIndex('encryptionkeys', { icons: true, view: 'details' }))\n  app.use('/encryptionkeys/:file', serveKeyFiles())\n\n  /* /logs directory browsing */ // vuln-code-snippet neutral-line accessLogDisclosureChallenge\n  app.use('/support/logs', serveIndexMiddleware, serveIndex('logs', { icons: true, view: 'details' })) // vuln-code-snippet vuln-line accessLogDisclosureChallenge\n  app.use('/support/logs', verify.accessControlChallenges()) // vuln-code-snippet hide-line\n  app.use('/support/logs/:file', serveLogFiles()) // vuln-code-snippet vuln-line accessLogDisclosureChallenge\n\n  /* Swagger documentation for B2B v2 endpoints */\n  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))\n\n  app.use(express.static(path.resolve('frontend/dist/frontend')))\n  app.use(cookieParser('kekse'))\n  // vuln-code-snippet end directoryListingChallenge accessLogDisclosureChallenge\n\n  /* Serve vendor dependencies locally instead of from CDN */\n  app.use('/vendor/beercss', express.static(path.resolve('node_modules/beercss/dist/cdn')))\n  app.use('/vendor/material-icons', express.static(path.resolve('node_modules/material-icons/iconfont')))\n  app.use('/vendor/fontsource-roboto', express.static(path.resolve('node_modules/@fontsource/roboto')))\n\n  /* Configure and enable backend-side i18n */\n  i18n.configure({\n    locales: locales.map((locale: { key: string }) => locale.key),\n    directory: path.resolve('i18n'),\n    cookie: 'language',\n    defaultLocale: 'en',\n    autoReload: true\n  })\n  app.use(i18n.init)\n\n  app.use(bodyParser.urlencoded({ extended: true }))\n  /* File Upload */\n  app.post('/file-upload', uploadToMemory.single('file'), ensureFileIsPassed, metrics.observeFileUploadMetricsMiddleware(), checkUploadSize, checkFileType, handleZipFileUpload, handleXmlUpload, handleYamlUpload)\n  app.post('/profile/image/file', uploadToMemory.single('file'), ensureFileIsPassed, metrics.observeFileUploadMetricsMiddleware(), utils.asyncHandler(profileImageFileUpload()))\n  app.post('/profile/image/url', uploadToMemory.single('file'), utils.asyncHandler(profileImageUrlUpload()))\n  app.post('/rest/memories', uploadToDisk.single('image'), ensureFileIsPassed, security.appendUserId(), metrics.observeFileUploadMetricsMiddleware(), utils.asyncHandler(addMemory()))\n\n  app.use(bodyParser.text({ type: '*/*' }))\n  app.use(function jsonParser (req: Request, res: Response, next: NextFunction) {\n    // @ts-expect-error FIXME intentionally saving original request in this property\n    req.rawBody = req.body\n    if (req.headers['content-type']?.includes('application/json')) {\n      if (!req.body) {\n        req.body = {}\n      }\n      if (req.body !== Object(req.body)) { // Expensive workaround for 500 errors during Frisby test run (see #640)\n        req.body = JSON.parse(req.body)\n      }\n    }\n    next()\n  })\n\n  /* HTTP request logging */\n  const accessLogStream = getStream({\n    filename: path.resolve('logs/access.log.%DATE%'),\n    date_format: 'YYYY-MM-DD',\n    audit_file: 'logs/audit.json',\n    frequency: 'daily',\n    verbose: false,\n    max_logs: '2d'\n  })\n  app.use(morgan('combined', { stream: accessLogStream }))\n\n  // vuln-code-snippet start resetPasswordMortyChallenge\n  /* Rate limiting */\n  app.enable('trust proxy')\n  app.use('/rest/user/reset-password', rateLimit({\n    windowMs: 5 * 60 * 1000,\n    max: 100,\n    keyGenerator ({ headers, ip }: { headers: any, ip: any }) { return headers['X-Forwarded-For'] ?? ip } // vuln-code-snippet vuln-line resetPasswordMortyChallenge\n  }))\n  // vuln-code-snippet end resetPasswordMortyChallenge\n\n  // vuln-code-snippet start changeProductChallenge\n  /** Authorization **/\n  /* Checks on JWT in Authorization header */ // vuln-code-snippet hide-line\n  app.use(verify.jwtChallenges()) // vuln-code-snippet hide-line\n  app.use(security.updateAuthenticatedUsers()) // vuln-code-snippet hide-line\n  /* Baskets: Unauthorized users are not allowed to access baskets */\n  app.use('/rest/basket', security.isAuthorized(), security.appendUserId())\n  /* BasketItems: API only accessible for authenticated users */\n  app.use('/api/BasketItems', security.isAuthorized())\n  app.use('/api/BasketItems/:id', security.isAuthorized())\n  /* Feedbacks: GET allowed for feedback carousel, POST allowed in order to provide feedback without being logged in */\n  app.use('/api/Feedbacks/:id', security.isAuthorized())\n  /* Users: Only POST is allowed in order to register a new user */\n  app.get('/api/Users', security.isAuthorized())\n  app.route('/api/Users/:id')\n    .get(security.isAuthorized())\n    .put(security.denyAll())\n    .delete(security.denyAll())\n  /* Products: Only GET is allowed in order to view products */ // vuln-code-snippet neutral-line changeProductChallenge\n  app.post('/api/Products', security.isAuthorized()) // vuln-code-snippet neutral-line changeProductChallenge\n  // app.put('/api/Products/:id', security.isAuthorized()) // vuln-code-snippet vuln-line changeProductChallenge\n  app.delete('/api/Products/:id', security.denyAll())\n  /* Challenges: GET list of challenges allowed. Everything else forbidden entirely */\n  app.post('/api/Challenges', security.denyAll())\n  app.use('/api/Challenges/:id', security.denyAll())\n  /* Hints: GET and PUT hints allowed. Everything else forbidden */\n  app.post('/api/Hints', security.denyAll())\n  app.route('/api/Hints/:id')\n    .get(security.denyAll())\n    .delete(security.denyAll())\n  /* Complaints: POST and GET allowed when logged in only */\n  app.get('/api/Complaints', security.isAuthorized())\n  app.post('/api/Complaints', security.isAuthorized())\n  app.use('/api/Complaints/:id', security.denyAll())\n  /* Recycles: POST and GET allowed when logged in only */\n  app.get('/api/Recycles', recycles.blockRecycleItems())\n  app.post('/api/Recycles', security.isAuthorized())\n  /* Challenge evaluation before finale takes over */\n  app.get('/api/Recycles/:id', recycles.getRecycleItem())\n  app.put('/api/Recycles/:id', security.denyAll())\n  app.delete('/api/Recycles/:id', security.denyAll())\n  /* SecurityQuestions: Only GET list of questions allowed. */\n  app.post('/api/SecurityQuestions', security.denyAll())\n  app.use('/api/SecurityQuestions/:id', security.denyAll())\n  /* SecurityAnswers: Only POST of answer allowed. */\n  app.get('/api/SecurityAnswers', security.denyAll())\n  app.use('/api/SecurityAnswers/:id', security.denyAll())\n  /* REST API */\n  app.use('/rest/user/authentication-details', security.isAuthorized())\n  app.use('/rest/basket/:id', security.isAuthorized())\n  app.use('/rest/basket/:id/order', security.isAuthorized())\n  /* Challenge evaluation before finale takes over */ // vuln-code-snippet hide-start\n  app.post('/api/Feedbacks', verify.forgedFeedbackChallenge())\n  /* Captcha verification before finale takes over */\n  app.post('/api/Feedbacks', utils.asyncHandler(verifyCaptcha()))\n  /* Captcha Bypass challenge verification */\n  app.post('/api/Feedbacks', verify.captchaBypassChallenge())\n  /* User registration challenge verifications before finale takes over */\n  app.post('/api/Users', (req: Request, res: Response, next: NextFunction) => {\n    if (req.body.email !== undefined && req.body.password !== undefined && req.body.passwordRepeat !== undefined) {\n      if (req.body.email.length !== 0 && req.body.password.length !== 0) {\n        req.body.email = req.body.email.trim()\n        req.body.password = req.body.password.trim()\n        req.body.passwordRepeat = req.body.passwordRepeat.trim()\n      } else {\n        res.status(400).send(res.__('Invalid email/password cannot be empty'))\n      }\n    }\n    next()\n  })\n  app.post('/api/Users', verify.registerAdminChallenge())\n  app.post('/api/Users', verify.passwordRepeatChallenge()) // vuln-code-snippet hide-end\n  app.post('/api/Users', verify.emptyUserRegistration())\n  /* Unauthorized users are not allowed to access B2B API */\n  app.use('/b2b/v2', security.isAuthorized())\n  /* Check if the quantity is available in stock and limit per user not exceeded, then add item to basket */\n  app.put('/api/BasketItems/:id', security.appendUserId(), utils.asyncHandler(basketItems.quantityCheckBeforeBasketItemUpdate()))\n  app.post('/api/BasketItems', security.appendUserId(), utils.asyncHandler(basketItems.quantityCheckBeforeBasketItemAddition()), utils.asyncHandler(basketItems.addBasketItem()))\n  /* Accounting users are allowed to check and update quantities */\n  app.delete('/api/Quantitys/:id', security.denyAll())\n  app.post('/api/Quantitys', security.denyAll())\n  app.use('/api/Quantitys/:id', security.isAccounting(), IpFilter(['123.456.789'], { mode: 'allow' }))\n  /* Feedbacks: Do not allow changes of existing feedback */\n  app.put('/api/Feedbacks/:id', security.denyAll())\n  /* PrivacyRequests: Only allowed for authenticated users */\n  app.use('/api/PrivacyRequests', security.isAuthorized())\n  app.use('/api/PrivacyRequests/:id', security.isAuthorized())\n  /* PaymentMethodRequests: Only allowed for authenticated users */\n  app.post('/api/Cards', security.appendUserId())\n  app.get('/api/Cards', security.appendUserId(), utils.asyncHandler(payment.getPaymentMethods()))\n  app.put('/api/Cards/:id', security.denyAll())\n  app.delete('/api/Cards/:id', security.appendUserId(), utils.asyncHandler(payment.delPaymentMethodById()))\n  app.get('/api/Cards/:id', security.appendUserId(), utils.asyncHandler(payment.getPaymentMethodById()))\n  /* PrivacyRequests: Only POST allowed for authenticated users */\n  app.post('/api/PrivacyRequests', security.isAuthorized())\n  app.get('/api/PrivacyRequests', security.denyAll())\n  app.use('/api/PrivacyRequests/:id', security.denyAll())\n\n  app.post('/api/Addresss', security.appendUserId())\n  app.get('/api/Addresss', security.appendUserId(), utils.asyncHandler(address.getAddress()))\n  app.put('/api/Addresss/:id', security.appendUserId())\n  app.delete('/api/Addresss/:id', security.appendUserId(), utils.asyncHandler(address.delAddressById()))\n  app.get('/api/Addresss/:id', security.appendUserId(), utils.asyncHandler(address.getAddressById()))\n  app.get('/api/Deliverys', utils.asyncHandler(delivery.getDeliveryMethods()))\n  app.get('/api/Deliverys/:id', utils.asyncHandler(delivery.getDeliveryMethod()))\n  // vuln-code-snippet end changeProductChallenge\n\n  /* Verify the 2FA Token */\n  app.post('/rest/2fa/verify',\n    rateLimit({ windowMs: 5 * 60 * 1000, max: 100, validate: false }),\n    utils.asyncHandler(twoFactorAuth.verify)\n  )\n  /* Check 2FA Status for the current User */\n  app.get('/rest/2fa/status', security.isAuthorized(), utils.asyncHandler(twoFactorAuth.status))\n  /* Enable 2FA for the current User */\n  app.post('/rest/2fa/setup',\n    rateLimit({ windowMs: 5 * 60 * 1000, max: 100, validate: false }),\n    security.isAuthorized(),\n    utils.asyncHandler(twoFactorAuth.setup)\n  )\n  /* Disable 2FA Status for the current User */\n  app.post('/rest/2fa/disable',\n    rateLimit({ windowMs: 5 * 60 * 1000, max: 100, validate: false }),\n    security.isAuthorized(),\n    utils.asyncHandler(twoFactorAuth.disable)\n  )\n  /* Verifying DB related challenges can be postponed until the next request for challenges is coming via finale */\n  app.use(verify.databaseRelatedChallenges())\n\n  // vuln-code-snippet start registerAdminChallenge\n  /* Generated API endpoints */\n  finale.initialize({ app, sequelize: seq })\n\n  const autoModels = [\n    { name: 'User', exclude: ['password', 'totpSecret'], model: UserModel },\n    { name: 'Product', exclude: [], model: ProductModel },\n    { name: 'Feedback', exclude: [], model: FeedbackModel },\n    { name: 'BasketItem', exclude: [], model: BasketItemModel },\n    { name: 'Challenge', exclude: [], model: ChallengeModel, include: [ChallengeDependencyModel] },\n    { name: 'Complaint', exclude: [], model: ComplaintModel },\n    { name: 'Recycle', exclude: [], model: RecycleModel },\n    { name: 'SecurityQuestion', exclude: [], model: SecurityQuestionModel },\n    { name: 'SecurityAnswer', exclude: [], model: SecurityAnswerModel },\n    { name: 'Address', exclude: [], model: AddressModel },\n    { name: 'PrivacyRequest', exclude: [], model: PrivacyRequestModel },\n    { name: 'Card', exclude: [], model: CardModel },\n    { name: 'Quantity', exclude: [], model: QuantityModel },\n    { name: 'Hint', exclude: [], model: HintModel }\n  ]\n\n  for (const { name, exclude, model, include } of autoModels) {\n    const resource = finale.resource({\n      model,\n      endpoints: [`/api/${name}s`, `/api/${name}s/:id`],\n      excludeAttributes: exclude,\n      pagination: false,\n      include\n    })\n\n    // create a wallet when a new user is registered using API\n    if (name === 'User') { // vuln-code-snippet neutral-line registerAdminChallenge\n      resource.create.send.before((req: Request, res: Response, context: { instance: { id: any }, continue: any }) => { // vuln-code-snippet vuln-line registerAdminChallenge\n        WalletModel.create({ UserId: context.instance.id }).catch((err: unknown) => {\n          console.log(err)\n        })\n        return context.continue // vuln-code-snippet neutral-line registerAdminChallenge\n      }) // vuln-code-snippet neutral-line registerAdminChallenge\n    } // vuln-code-snippet neutral-line registerAdminChallenge\n    // vuln-code-snippet end registerAdminChallenge\n\n    // translate challenge descriptions on-the-fly\n    if (name === 'Challenge') {\n      resource.list.fetch.after((req: Request, res: Response, context: { instance: string | any[], continue: any }) => {\n        for (let i = 0; i < context.instance.length; i++) {\n          let description = context.instance[i].description\n          if (utils.contains(description, '<em>(This challenge is <strong>')) {\n            const warning = description.substring(description.indexOf(' <em>(This challenge is <strong>'))\n            description = description.substring(0, description.indexOf(' <em>(This challenge is <strong>'))\n            context.instance[i].description = req.__(description) + req.__(warning)\n          } else {\n            context.instance[i].description = req.__(description)\n          }\n        }\n        return context.continue\n      })\n      resource.read.send.before((req: Request, res: Response, context: { instance: { description: string, hint: string }, continue: any }) => {\n        context.instance.description = req.__(context.instance.description)\n        return context.continue\n      })\n    }\n\n    // translate security questions on-the-fly\n    if (name === 'SecurityQuestion') {\n      resource.list.fetch.after((req: Request, res: Response, context: { instance: string | any[], continue: any }) => {\n        for (let i = 0; i < context.instance.length; i++) {\n          context.instance[i].question = req.__(context.instance[i].question)\n        }\n        return context.continue\n      })\n      resource.read.send.before((req: Request, res: Response, context: { instance: { question: string }, continue: any }) => {\n        context.instance.question = req.__(context.instance.question)\n        return context.continue\n      })\n    }\n\n    // translate hints on-the-fly\n    if (name === 'Hint') {\n      resource.list.fetch.after((req: Request, res: Response, context: { instance: string | any[], continue: any }) => {\n        for (let i = 0; i < context.instance.length; i++) {\n          context.instance[i].text = req.__(context.instance[i].text)\n        }\n        return context.continue\n      })\n      resource.read.send.before((req: Request, res: Response, context: { instance: { text: string }, continue: any }) => {\n        context.instance.text = req.__(context.instance.text)\n        return context.continue\n      })\n    }\n\n    // translate product names and descriptions on-the-fly\n    if (name === 'Product') {\n      resource.list.fetch.after((req: Request, res: Response, context: { instance: any[], continue: any }) => {\n        for (let i = 0; i < context.instance.length; i++) {\n          context.instance[i].name = req.__(context.instance[i].name)\n          context.instance[i].description = req.__(context.instance[i].description)\n        }\n        return context.continue\n      })\n      resource.read.send.before((req: Request, res: Response, context: { instance: { name: string, description: string }, continue: any }) => {\n        context.instance.name = req.__(context.instance.name)\n        context.instance.description = req.__(context.instance.description)\n        return context.continue\n      })\n    }\n\n    // fix the api difference between finale (fka epilogue) and previously used sequlize-restful\n    resource.all.send.before((req: Request, res: Response, context: { instance: { status: string, data: any }, continue: any }) => {\n      context.instance = {\n        status: 'success',\n        data: context.instance\n      }\n      return context.continue\n    })\n  }\n\n  /* Custom Restful API */\n  app.post('/rest/user/login', login())\n  app.get('/rest/user/change-password', utils.asyncHandler(changePassword()))\n  app.post('/rest/user/reset-password', utils.asyncHandler(resetPassword()))\n  app.get('/rest/user/security-question', utils.asyncHandler(securityQuestion()))\n  app.get('/rest/user/whoami', utils.asyncHandler(retrieveLoggedInUser()))\n  app.get('/rest/user/authentication-details', utils.asyncHandler(authenticatedUsers()))\n  app.get('/rest/products/search', utils.asyncHandler(searchProducts()))\n  app.get('/rest/basket/:id', utils.asyncHandler(retrieveBasket()))\n  app.post('/rest/basket/:id/checkout', placeOrder())\n  app.put('/rest/basket/:id/coupon/:coupon', utils.asyncHandler(applyCoupon()))\n  app.get('/rest/admin/application-version', utils.asyncHandler(retrieveAppVersion()))\n  app.get('/rest/admin/application-configuration', utils.asyncHandler(retrieveAppConfiguration()))\n  app.get('/rest/repeat-notification', utils.asyncHandler(repeatNotification()))\n  app.get('/rest/continue-code', utils.asyncHandler(continueCode()))\n  app.get('/rest/continue-code-findIt', utils.asyncHandler(continueCodeFindIt()))\n  app.get('/rest/continue-code-fixIt', utils.asyncHandler(continueCodeFixIt()))\n  app.put('/rest/continue-code-findIt/apply/:continueCode', utils.asyncHandler(restoreProgress.restoreProgressFindIt()))\n  app.put('/rest/continue-code-fixIt/apply/:continueCode', utils.asyncHandler(restoreProgress.restoreProgressFixIt()))\n  app.put('/rest/continue-code/apply/:continueCode', utils.asyncHandler(restoreProgress.restoreProgress()))\n  app.get('/rest/captcha', utils.asyncHandler(captchas()))\n  app.get('/rest/image-captcha', utils.asyncHandler(imageCaptchas()))\n  app.get('/rest/track-order/:id', trackOrder())\n  app.get('/rest/country-mapping', utils.asyncHandler(countryMapping()))\n  app.get('/rest/saveLoginIp', utils.asyncHandler(saveLoginIp()))\n  app.post('/rest/user/data-export', security.appendUserId(), utils.asyncHandler(verifyImageCaptcha()))\n  app.post('/rest/user/data-export', security.appendUserId(), utils.asyncHandler(dataExport()))\n  app.get('/rest/languages', utils.asyncHandler(getLanguageList()))\n  app.get('/rest/order-history', utils.asyncHandler(orderHistory()))\n  app.get('/rest/order-history/orders', security.isAccounting(), utils.asyncHandler(allOrders()))\n  app.put('/rest/order-history/:id/delivery-status', security.isAccounting(), utils.asyncHandler(toggleDeliveryStatus()))\n  app.get('/rest/wallet/balance', security.appendUserId(), utils.asyncHandler(getWalletBalance()))\n  app.put('/rest/wallet/balance', security.appendUserId(), utils.asyncHandler(addWalletBalance()))\n  app.get('/rest/deluxe-membership', deluxeMembershipStatus())\n  app.post('/rest/deluxe-membership', security.appendUserId(), utils.asyncHandler(upgradeToDeluxe()))\n  app.get('/rest/memories', utils.asyncHandler(getMemories()))\n  /* NoSQL API endpoints */\n  app.get('/rest/products/:id/reviews', showProductReviews())\n  app.put('/rest/products/:id/reviews', utils.asyncHandler(createProductReviews()))\n  app.patch('/rest/products/reviews', security.isAuthorized(), updateProductReviews())\n  app.post('/rest/products/reviews', security.isAuthorized(), utils.asyncHandler(likeProductReviews()))\n\n  /* Chat API endpoint */\n  app.post('/rest/chat', utils.asyncHandler(chat()))\n\n  /* Web3 API endpoints */\n  app.post('/rest/web3/submitKey', utils.asyncHandler(checkKeys()))\n  app.get('/rest/web3/nftUnlocked', nftUnlocked())\n  app.get('/rest/web3/nftMintListen', utils.asyncHandler(nftMintListener()))\n  app.post('/rest/web3/walletNFTVerify', walletNFTVerify())\n  app.post('/rest/web3/walletExploitAddress', utils.asyncHandler(contractExploitListener()))\n\n  /* B2B Order API */\n  app.post('/b2b/v2/orders', b2bOrder())\n\n  /* File Serving */\n  app.get('/the/devs/are/so/funny/they/hid/an/easter/egg/within/the/easter/egg', serveEasterEgg())\n  app.get('/this/page/is/hidden/behind/an/incredibly/high/paywall/that/could/only/be/unlocked/by/sending/1btc/to/us', servePremiumContent())\n  app.get('/we/may/also/instruct/you/to/refuse/all/reasonably/necessary/responsibility', servePrivacyPolicyProof())\n\n  /* Route for dataerasure page */\n  app.use('/dataerasure', dataErasure)\n\n  /* Route for redirects */\n  app.get('/redirect', performRedirect())\n\n  /* Routes for promotion video page */\n  app.get('/promotion', promotionVideo())\n  app.get('/video', getVideo())\n\n  /* Routes for profile page */\n  app.get('/profile', utils.asyncHandler(getUserProfile()))\n  app.post('/profile', utils.asyncHandler(updateUserProfile()))\n\n  /* Route for vulnerable code snippets */\n  app.get('/snippets/:challenge', utils.asyncHandler(serveCodeSnippet()))\n  app.post('/snippets/verdict', utils.asyncHandler(checkVulnLines()))\n  app.get('/snippets/fixes/:key', utils.asyncHandler(serveCodeFixes()))\n  app.post('/snippets/fixes', utils.asyncHandler(checkCorrectFix()))\n\n  /* Serve metrics before the Angular catch-all so the route is reachable in all environments */\n  app.get('/metrics', utils.asyncHandler(metrics.serveMetrics()))\n\n  app.use(utils.asyncHandler(serveAngularClient()))\n\n  /* Error Handling */\n  app.use(verify.errorHandlingChallenge())\n  app.use(errorhandler())\n}\n\n// Function called first to ensure that all the i18n files are reloaded successfully before other linked operations.\nrestoreOverwrittenFilesWithOriginals().then(() => {\n  configureApp(app, sequelize)\n}).catch((err) => {\n  console.error(err)\n})\n\nconst uploadToMemory = multer({ storage: multer.memoryStorage(), limits: { fileSize: 200000 } })\nconst mimeTypeMap: any = {\n  'image/png': 'png',\n  'image/jpeg': 'jpg',\n  'image/jpg': 'jpg'\n}\nconst uploadToDisk = multer({\n  storage: multer.diskStorage({\n    destination: (req: Request, file: any, cb: any) => {\n      const isValid = mimeTypeMap[file.mimetype]\n      let error: Error | null = new Error('Invalid mime type')\n      if (isValid) {\n        error = null\n      }\n      cb(error, path.resolve('frontend/dist/frontend/assets/public/images/uploads/'))\n    },\n    filename: (req: Request, file: any, cb: any) => {\n      const name = security.sanitizeFilename(file.originalname)\n        .toLowerCase()\n        .split(' ')\n        .join('-')\n      const ext = mimeTypeMap[file.mimetype]\n      cb(null, name + '-' + Date.now() + '.' + ext)\n    }\n  })\n})\n\nconst expectedModels = ['Address', 'Basket', 'BasketItem', 'Captcha', 'Card', 'Challenge', 'ChallengeDependency', 'Complaint', 'Delivery', 'Feedback', 'ImageCaptcha', 'Memory', 'PrivacyRequestModel', 'Product', 'Quantity', 'Recycle', 'SecurityAnswer', 'SecurityQuestion', 'User', 'Wallet', 'Hint']\nwhile (!expectedModels.every(model => Object.keys(sequelize.models).includes(model))) {\n  logger.info(`Entity models ${colors.bold(Object.keys(sequelize.models).length.toString())} of ${colors.bold(expectedModels.length.toString())} are initialized (${colors.yellow('WAITING')})`)\n}\nlogger.info(`Entity models ${colors.bold(Object.keys(sequelize.models).length.toString())} of ${colors.bold(expectedModels.length.toString())} are initialized (${colors.green('SUCCESS')})`)\n\n// vuln-code-snippet start exposedMetricsChallenge\n/* Serve metrics */\nlet metricsUpdateLoop: any\nconst Metrics = metrics.observeMetrics() // vuln-code-snippet neutral-line exposedMetricsChallenge\napp.get('/metrics', utils.asyncHandler(metrics.serveMetrics())) // vuln-code-snippet vuln-line exposedMetricsChallenge\nerrorhandler.title = `${config.get<string>('application.name')} (Express ${utils.version('express')})`\n\nexport async function start (readyCallback?: () => void) {\n  const datacreatorEnd = startupGauge.startTimer({ task: 'datacreator' })\n  await sequelize.sync({ force: true })\n  await preconditionsReady\n  await datacreator()\n  datacreatorEnd()\n  const port = process.env.PORT ?? config.get('server.port')\n  process.env.BASE_PATH = process.env.BASE_PATH ?? config.get('server.basePath')\n\n  metricsUpdateLoop = Metrics.updateLoop() // vuln-code-snippet neutral-line exposedMetricsChallenge\n\n  server.listen(port, () => {\n    logger.info(colors.cyan(`Server listening on port ${colors.bold(`${port}`)}`))\n    startupGauge.set({ task: 'ready' }, (Date.now() - startTime) / 1000)\n    if (process.env.BASE_PATH !== '') {\n      logger.info(colors.cyan(`Server using proxy base path ${colors.bold(`${process.env.BASE_PATH}`)} for redirects`))\n    }\n    registerWebsocketEvents(server)\n    if (readyCallback) {\n      readyCallback()\n    }\n    if (process.env.EXIT_ON_READY === 'true') {\n      // used to benchmark startup time\n      process.exit(0)\n    }\n  })\n\n  void collectDurationPromise('customizeApplication', customizeApplication)() // vuln-code-snippet hide-line\n  void collectDurationPromise('customizeEasterEgg', customizeEasterEgg)() // vuln-code-snippet hide-line\n}\n\nexport function close (exitCode: number | undefined) {\n  if (server) {\n    clearInterval(metricsUpdateLoop)\n    server.close()\n  }\n  if (exitCode !== undefined) {\n    process.exit(exitCode)\n  }\n}\n// vuln-code-snippet end exposedMetricsChallenge\n\nexport async function createApp (options?: { inMemoryDb?: boolean }) {\n  const seq = options?.inMemoryDb ? createSequelize({ inMemory: true }) : sequelize\n  if (options?.inMemoryDb) {\n    initModels(seq)\n    setSequelize(seq)\n  }\n  Prometheus.register.clear()\n  const testApp = express()\n  testApp.set('view engine', 'hbs')\n  configureApp(testApp, seq)\n  await seq.sync({ force: true })\n  await datacreator()\n  return { app: testApp, sequelize: seq }\n}\n\n// stop server on sigint or sigterm signals\nprocess.on('SIGINT', () => { close(0) })\nprocess.on('SIGTERM', () => { close(0) })\n"}, {"id": "file-2", "path": "routes/repeatNotification.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/routes/repeatNotification.ts", "language": "typescript", "content": "/*\n * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.\n * SPDX-License-Identifier: MIT\n */\n\nimport * as challengeUtils from '../lib/challengeUtils'\nimport { type Request, type Response } from 'express'\n\nexport function repeatNotification () {\n  return ({ query }: Request, res: Response) => {\n    const challengeName: string = decodeURIComponent(query.challenge as string)\n    const challenge = challengeUtils.findChallengeByName(challengeName)\n\n    if (challenge?.solved) {\n      challengeUtils.sendNotification(challenge, true)\n    }\n\n    res.sendStatus(200)\n  }\n}\n"}, {"id": "file-3", "path": "lib/challengeUtils.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/lib/challengeUtils.ts", "language": "typescript", "content": "import config from 'config'\nimport { Op } from 'sequelize'\nimport colors from 'colors/safe'\nimport { type Server } from 'socket.io'\nimport sanitizeHtml from 'sanitize-html'\nimport { AllHtmlEntities as Entities } from 'html-entities'\n\nimport { type ChallengeKey, ChallengeModel } from '../models/challenge'\nimport { challenges, notifications } from '../data/datacache'\nimport { HintModel } from '../models/hint'\nimport * as accuracy from './accuracy'\nimport * as webhook from './webhook'\nimport * as antiCheat from './antiCheat'\nimport * as utils from './utils'\nimport logger from './logger'\n\nconst entities = new Entities()\n\nconst globalWithSocketIO = global as typeof globalThis & {\n  io: Server\n}\n\nexport const solveIf = function (challenge: any, criteria: () => any, isRestore: boolean = false, isCheating = false) {\n  if (notSolved(challenge) && criteria()) {\n    solve(challenge, isRestore, isCheating)\n  }\n}\n\nexport const solve = async function (challenge: ChallengeModel, isRestore = false, isCheating = false) {\n  challenge.solved = true\n  const solvedChallenge = await challenge.save()\n\n  logger.info(`${isRestore ? colors.grey('Restored') : colors.green('Solved')} ${solvedChallenge.difficulty}-star ${colors.cyan(solvedChallenge.key)} (${solvedChallenge.name})`)\n  sendNotification(solvedChallenge, isRestore)\n  if (!isRestore) {\n    const cheatScore = antiCheat.calculateCheatScore(challenge, isCheating)\n    const hintsAvailable = await HintModel.count({ where: { ChallengeId: solvedChallenge.id } })\n    const hintsUnlocked = await HintModel.count({ where: { ChallengeId: solvedChallenge.id, unlocked: true } })\n    if (process.env.SOLUTIONS_WEBHOOK) {\n      webhook.notify(solvedChallenge, cheatScore, hintsAvailable, hintsUnlocked).catch((error: unknown) => {\n        logger.error('Webhook notification failed: ' + colors.red(utils.getErrorMessage(error)))\n      })\n    }\n  }\n}\n\nexport const sendNotification = function (challenge: ChallengeModel, isRestore: boolean) {\n  if (notSolved(challenge)) {\n    return\n  }\n\n  const flag = utils.ctfFlag(challenge.name)\n\n  const challengeKey = challenge.key as ChallengeKey\n  const fullChallenge = challenges[challengeKey]\n\n  let hasCodingChallenge = false\n  if (fullChallenge) {\n    hasCodingChallenge = Boolean(fullChallenge.hasCodingChallenge) ?? false\n  }\n\n  const notification = {\n    key: challenge.key,\n    name: challenge.name,\n    challenge: challenge.name + ' (' + entities.decode(sanitizeHtml(challenge.description, { allowedTags: [], allowedAttributes: {} })) + ')',\n    flag,\n    hidden: !config.get('challenges.showSolvedNotifications'),\n    isRestore,\n    codingChallenge: config.get('challenges.codingChallengesEnabled') !== 'never' && hasCodingChallenge\n  }\n  const wasPreviouslyShown = notifications.some(({ key }) => key === challenge.key)\n  notifications.push(notification)\n\n  if (globalWithSocketIO.io && (isRestore || !wasPreviouslyShown)) {\n    globalWithSocketIO.io.emit('challenge solved', notification)\n  }\n}\n\nexport const sendCodingChallengeNotification = function (challenge: { key: string, codingChallengeStatus: 0 | 1 | 2 }) {\n  if (challenge.codingChallengeStatus > 0) {\n    const notification = {\n      key: challenge.key,\n      codingChallengeStatus: challenge.codingChallengeStatus\n    }\n    if (globalWithSocketIO.io) {\n      globalWithSocketIO.io.emit('code challenge solved', notification)\n    }\n  }\n}\n\nexport const notSolved = (challenge: ChallengeModel) => challenge && !challenge.solved\n\nexport const findChallengeByName = (challengeName: string) => {\n  for (const challenge of Object.values(challenges)) {\n    if (challenge.name === challengeName) {\n      return challenge\n    }\n  }\n  logger.warn('Missing challenge with name: ' + challengeName.replace(/[\\r\\n]/g, ''))\n}\n\nexport const findChallengeById = (challengeId: number) => {\n  for (const challenge of Object.values(challenges)) {\n    if (challenge.id === challengeId) {\n      return challenge\n    }\n  }\n  logger.warn('Missing challenge with id: ' + challengeId)\n}\n\nexport const solveFindIt = async function (key: ChallengeKey, isRestore: boolean = false) {\n  const solvedChallenge = challenges[key]\n  await ChallengeModel.update({ codingChallengeStatus: 1 }, { where: { key, codingChallengeStatus: { [Op.lt]: 2 } } })\n  logger.info(`${isRestore ? colors.grey('Restored') : colors.green('Solved')} 'Find It' phase of coding challenge ${colors.cyan(solvedChallenge.key)} (${solvedChallenge.name})`)\n  if (!isRestore) {\n    accuracy.storeFindItVerdict(solvedChallenge.key, true)\n    accuracy.calculateFindItAccuracy(solvedChallenge.key)\n    await antiCheat.calculateFindItCheatScore(solvedChallenge)\n    sendCodingChallengeNotification({ key, codingChallengeStatus: 1 })\n  }\n}\n\nexport const solveFixIt = async function (key: ChallengeKey, isRestore: boolean = false) {\n  const solvedChallenge = challenges[key]\n  await ChallengeModel.update({ codingChallengeStatus: 2 }, { where: { key } })\n  logger.info(`${isRestore ? colors.grey('Restored') : colors.green('Solved')} 'Fix It' phase of coding challenge ${colors.cyan(solvedChallenge.key)} (${solvedChallenge.name})`)\n  if (!isRestore) {\n    accuracy.storeFixItVerdict(solvedChallenge.key, true)\n    accuracy.calculateFixItAccuracy(solvedChallenge.key)\n    await antiCheat.calculateFixItCheatScore(solvedChallenge)\n    sendCodingChallengeNotification({ key, codingChallengeStatus: 2 })\n  }\n}\n"}, {"id": "file-4", "path": "test/server/challengeUtils.unit.test.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/test/server/challengeUtils.unit.test.ts", "language": "typescript", "content": "/*\n * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.\n * SPDX-License-Identifier: MIT\n */\n\nimport { describe, it, beforeEach, mock } from 'node:test'\nimport assert from 'node:assert/strict'\n\nconst antiCheat = require('../../lib/antiCheat')\nconst accuracy = require('../../lib/accuracy')\nconst { ChallengeModel } = require('../../models/challenge')\nconst { HintModel } = require('../../models/hint')\nconst datacache = require('../../data/datacache')\nconst config = require('config')\nconst logger = require('../../lib/logger').default\n\nconst challengeUtils = require('../../lib/challengeUtils')\n\nvoid describe('challengeUtils', () => {\n  beforeEach(() => {\n    datacache.challenges.scoreBoardChallenge = { id: 42, name: 'scoreBoardChallenge', key: 'scoreBoardChallenge', difficulty: 1 } as any\n    datacache.notifications.length = 0\n    ;(global as any).io = { emit: mock.fn() }\n    antiCheat.reset()\n    accuracy.reset()\n    HintModel.count = mock.fn(async () => 0)\n    ChallengeModel.update = mock.fn(async () => [1])\n  })\n\n  void describe('findChallengeByName', () => {\n    void it('returns undefined for non-existing challenge', () => {\n      const originalLoggerWarn = logger.warn\n      logger.warn = mock.fn()\n\n      try {\n        assert.equal(challengeUtils.findChallengeByName('blubbChallenge'), undefined)\n        assert.equal(logger.warn.mock.calls[0].arguments[0], 'Missing challenge with name: blubbChallenge')\n      } finally {\n        logger.warn = originalLoggerWarn\n      }\n    })\n\n    void it('does not allow line breaks in logged missing challenge names', () => {\n      const originalLoggerWarn = logger.warn\n      logger.warn = mock.fn()\n\n      try {\n        for (const challengeName of ['missing\\nforged', 'missing\\rforged', 'missing\\r\\nforged', 'missing\\n\\nforged']) {\n          assert.equal(challengeUtils.findChallengeByName(challengeName), undefined)\n        }\n        for (const call of logger.warn.mock.calls) {\n          assert.doesNotMatch(call.arguments[0], /[\\r\\n]/)\n        }\n      } finally {\n        logger.warn = originalLoggerWarn\n      }\n    })\n\n    void it('returns existing challenge', () => {\n      assert.equal(challengeUtils.findChallengeByName('scoreBoardChallenge'), datacache.challenges.scoreBoardChallenge)\n    })\n  })\n\n  void describe('findChallengeById', () => {\n    void it('returns undefined for non-existing challenge', () => {\n      assert.equal(challengeUtils.findChallengeById(43), undefined)\n    })\n\n    void it('returns existing challenge', () => {\n      assert.equal(challengeUtils.findChallengeById(42), datacache.challenges.scoreBoardChallenge)\n    })\n  })\n\n  void describe('notSolved', () => {\n    void it('returns true for unsolved challenge', () => {\n      assert.equal(challengeUtils.notSolved({ solved: false } as any), true)\n    })\n\n    void it('returns false for solved challenge', () => {\n      assert.equal(challengeUtils.notSolved({ solved: true } as any), false)\n    })\n\n    void it('returns falsy for null challenge', () => {\n      assert.equal(challengeUtils.notSolved(null as any), null)\n    })\n  })\n\n  void describe('solve', () => {\n    void it('should mark challenge as solved and save it', async () => {\n      const challenge = {\n        solved: false,\n        key: 'scoreBoardChallenge',\n        name: 'Score Board',\n        difficulty: 1,\n        id: 1,\n        save: mock.fn(async function (this: any) { return this })\n      } as any\n\n      const originalHintCount = HintModel.count\n      HintModel.count = mock.fn(async () => 0)\n\n      try {\n        await challengeUtils.solve(challenge)\n\n        assert.equal(challenge.solved, true)\n        assert.equal(challenge.save.mock.calls.length, 1)\n        assert.equal(datacache.notifications.length, 1)\n        assert.equal(datacache.notifications[0].key, 'scoreBoardChallenge')\n      } finally {\n        HintModel.count = originalHintCount\n      }\n    })\n\n    void it('should not calculate cheat score if it is a restore', async () => {\n      const challenge = {\n        solved: false,\n        key: 'scoreBoardChallenge',\n        name: 'Score Board',\n        difficulty: 1,\n        save: mock.fn(async function (this: any) { return this })\n      } as any\n\n      await challengeUtils.solve(challenge, true)\n\n      assert.equal(antiCheat.totalCheatScore(), 0)\n    })\n\n    void it('should log error if webhook notification fails', async () => {\n      const challenge = {\n        solved: false,\n        key: 'scoreBoardChallenge',\n        name: 'Score Board',\n        difficulty: 1,\n        id: 1,\n        save: mock.fn(async function (this: any) { return this })\n      } as any\n\n      process.env.SOLUTIONS_WEBHOOK = 'http://webhook.test'\n      const originalFetch = global.fetch\n      ;(global as any).fetch = mock.fn(async () => { throw new Error('Fetch error') })\n      const originalLoggerError = logger.error\n      logger.error = mock.fn()\n\n      try {\n        await challengeUtils.solve(challenge)\n        // Wait for unhandled promise in solve (webhook notification is not awaited)\n        await new Promise(resolve => setTimeout(resolve, 10))\n        assert.equal(logger.error.mock.calls.length, 1)\n        assert.match(logger.error.mock.calls[0].arguments[0], /Webhook notification failed/)\n      } finally {\n        delete process.env.SOLUTIONS_WEBHOOK\n        ;(global as any).fetch = originalFetch\n        logger.error = originalLoggerError\n      }\n    })\n  })\n\n  void describe('solveIf', () => {\n    void it('should solve challenge if criteria is met and not yet solved', async () => {\n      const challenge = {\n        solved: false,\n        key: 'scoreBoardChallenge',\n        name: 'Score Board',\n        difficulty: 1,\n        save: mock.fn(async function (this: any) { return this })\n      } as any\n      const criteria = () => true\n\n      await challengeUtils.solveIf(challenge, criteria)\n\n      assert.equal(challenge.solved, true)\n    })\n  })\n\n  void describe('sendCodingChallengeNotification', () => {\n    void it('should emit \"code challenge solved\" event via socket.io', () => {\n      const challenge = { key: 'test', codingChallengeStatus: 1 as const }\n      challengeUtils.sendCodingChallengeNotification(challenge)\n\n      const io = (global as any).io\n      assert.equal(io.emit.mock.calls.length, 1)\n      assert.equal(io.emit.mock.calls[0].arguments[0], 'code challenge solved')\n    })\n  })\n\n  void describe('solveFindIt', () => {\n    void it('should update status and calculate accuracy/cheat score', async () => {\n      const challengeKey = 'scoreBoardChallenge'\n      const originalUpdate = ChallengeModel.update\n      ChallengeModel.update = mock.fn(async () => [1])\n\n      try {\n        await challengeUtils.solveFindIt(challengeKey)\n\n        assert.equal(ChallengeModel.update.mock.calls.length, 1)\n        assert.equal(accuracy.getFindItAttempts(challengeKey), 1)\n\n        const io = (global as any).io\n        assert.equal(io.emit.mock.calls.length, 1)\n      } finally {\n        ChallengeModel.update = originalUpdate\n      }\n    })\n\n    void it('should not calculate accuracy/cheat score if it is a restore', async () => {\n      const challengeKey = 'scoreBoardChallenge'\n      const originalUpdate = ChallengeModel.update\n      ChallengeModel.update = mock.fn(async () => [1])\n\n      await challengeUtils.solveFindIt(challengeKey, true)\n\n      assert.equal(accuracy.getFindItAttempts(challengeKey), 0)\n      ChallengeModel.update = originalUpdate\n    })\n  })\n\n  void describe('solveFixIt', () => {\n    void it('should update status and calculate accuracy/cheat score', async () => {\n      const challengeKey = 'scoreBoardChallenge'\n      const originalUpdate = ChallengeModel.update\n      ChallengeModel.update = mock.fn(async () => [1])\n\n      try {\n        await challengeUtils.solveFixIt(challengeKey)\n\n        assert.equal(ChallengeModel.update.mock.calls.length, 1)\n\n        const io = (global as any).io\n        assert.equal(io.emit.mock.calls.length, 1)\n      } finally {\n        ChallengeModel.update = originalUpdate\n      }\n    })\n\n    void it('should not calculate accuracy/cheat score if it is a restore', async () => {\n      const challengeKey = 'scoreBoardChallenge'\n      const originalUpdate = ChallengeModel.update\n      ChallengeModel.update = mock.fn(async () => [1])\n\n      await challengeUtils.solveFixIt(challengeKey, true)\n\n      assert.equal(ChallengeModel.update.mock.calls.length, 1)\n      ChallengeModel.update = originalUpdate\n    })\n  })\n\n  void describe('sendNotification', () => {\n    void it('should push notification to datacache and emit via socket.io', (t) => {\n      const challenge = {\n        key: 'scoreBoardChallenge',\n        name: 'Score Board',\n        description: 'Find the score board',\n        solved: true\n      } as any\n\n      t.mock.method(config, 'get', (key: string) => {\n        if (key === 'challenges.showSolvedNotifications') return true\n        if (key === 'challenges.codingChallengesEnabled') return 'always'\n        return false\n      })\n\n      challengeUtils.sendNotification(challenge, false)\n\n      assert.equal(datacache.notifications.length, 1)\n      assert.equal(datacache.notifications[0].key, 'scoreBoardChallenge')\n\n      const io = (global as any).io\n      assert.equal(io.emit.mock.calls.length, 1)\n      assert.equal(io.emit.mock.calls[0].arguments[0], 'challenge solved')\n    })\n\n    void it('should handle missing fullChallenge', (t) => {\n      const challenge = {\n        key: 'nonExisting',\n        name: 'Non Existing',\n        description: 'desc',\n        solved: true\n      } as any\n\n      challengeUtils.sendNotification(challenge, false)\n\n      assert.equal(datacache.notifications.length, 1)\n      assert.equal(datacache.notifications[0].key, 'nonExisting')\n    })\n\n    void it('should respect showSolvedNotifications config', (t) => {\n      const challenge = {\n        key: 'scoreBoardChallenge',\n        name: 'Score Board',\n        description: 'desc',\n        solved: true\n      } as any\n\n      t.mock.method(config, 'get', (key: string) => {\n        if (key === 'challenges.showSolvedNotifications') return false\n        return true\n      })\n\n      challengeUtils.sendNotification(challenge, false)\n      assert.equal(datacache.notifications[0].hidden, true)\n    })\n\n    void it('should handle codingChallengesEnabled set to \"never\"', (t) => {\n      const challenge = {\n        key: 'scoreBoardChallenge',\n        name: 'Score Board',\n        description: 'desc',\n        solved: true\n      } as any\n      datacache.challenges.scoreBoardChallenge.hasCodingChallenge = true\n\n      t.mock.method(config, 'get', (key: string) => {\n        if (key === 'challenges.codingChallengesEnabled') return 'never'\n        return true\n      })\n\n      challengeUtils.sendNotification(challenge, false)\n      assert.equal(datacache.notifications[0].codingChallenge, false)\n    })\n  })\n})\n"}, {"id": "file-5", "path": "test/api/repeat-notification.test.ts", "absolute_path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop/test/api/repeat-notification.test.ts", "language": "typescript", "content": "/*\n * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.\n * SPDX-License-Identifier: MIT\n */\n\nimport { describe, it, before, mock } from 'node:test'\nimport assert from 'node:assert/strict'\nimport request from 'supertest'\nimport type { Express } from 'express'\nimport { createTestApp } from './helpers/setup'\nimport * as challengeUtils from '../../lib/challengeUtils'\nimport { challenges } from '../../data/datacache'\nimport logger from '../../lib/logger'\n\nlet app: Express\n\nbefore(async () => {\n  const result = await createTestApp()\n  app = result.app\n}, { timeout: 60000 })\n\nvoid describe('/rest/repeat-notification', () => {\n  void it('GET triggers repeating notification without passing a challenge', async () => {\n    const res = await request(app)\n      .get('/rest/repeat-notification')\n\n    assert.equal(res.status, 200)\n  })\n\n  void it('GET triggers repeating notification passing an unsolved challenge', async () => {\n    const res = await request(app)\n      .get('/rest/repeat-notification?challenge=Retrieve%20Blueprint')\n\n    assert.equal(res.status, 200)\n  })\n\n  void it('GET does not allow line breaks in logged missing challenge names', async () => {\n    const originalLoggerWarn = logger.warn\n    const loggerWarn = mock.fn()\n    logger.warn = loggerWarn as unknown as typeof logger.warn\n\n    try {\n      const res = await request(app)\n        .get('/rest/repeat-notification?challenge=missing%0D%0Aforged%20log%20entry')\n\n      assert.equal(res.status, 200)\n      assert.doesNotMatch(loggerWarn.mock.calls[0].arguments[0], /[\\r\\n]/)\n    } finally {\n      logger.warn = originalLoggerWarn\n    }\n  })\n\n  void it('GET triggers repeating notification passing a solved challenge', async () => {\n    challengeUtils.solveIf(challenges.errorHandlingChallenge, () => true)\n    const res = await request(app)\n      .get('/rest/repeat-notification?challenge=Error%20Handling')\n\n    assert.equal(res.status, 200)\n  })\n})\n"}]};
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+  <script>
+    const data = EXPLANATION_DATA;
+    const sectionTabsEl = document.getElementById('section-tabs');
+    const sectionContentEl = document.getElementById('section-content');
+    const pageTitleEl = document.getElementById('page-title');
+    const explanationScrollEl = document.querySelector('.explanation-scroll');
+    const mermaidModalEl = document.getElementById('mermaid-modal');
+    const mermaidModalContentEl = document.getElementById('mermaid-modal-content');
+    const mermaidModalCloseEl = document.getElementById('mermaid-modal-close');
+    const codeFilePathEl = document.getElementById('code-file-path');
+    const codeLineRangeEl = document.getElementById('code-line-range');
+    const codeMetaEl = document.getElementById('code-meta');
+    const codeFooterEl = document.getElementById('code-footer');
+
+    const referencePattern = /\[\[((?:[A-Za-z0-9._-]+\/)*[A-Za-z0-9._-]+(?:\.[A-Za-z0-9._-]+)?:(?:\d+)(?:-\d+)?)\]\]/g;
+    const referencesById = new Map(data.references.map(ref => [ref.id, ref]));
+    const referencesByLiteral = new Map(data.references.map(ref => [ref.literal, ref]));
+    const filesById = new Map(data.files.map(file => [file.id, file]));
+
+    let headings = [];
+    let activeHeadingId = null;
+    let activeReferenceId = null;
+    let editor = null;
+    let currentModel = null;
+    let currentDecorations = [];
+    const modelsByFileId = new Map();
+
+    pageTitleEl.textContent = data.title || 'Code Explanation';
+    document.title = data.title || 'Code Explanation Viewer';
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function slugify(value) {
+      return value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'section';
+    }
+
+    function createReferenceButton(ref) {
+      const button = document.createElement('button');
+      button.className = `ref-chip${activeReferenceId === ref.id ? ' active' : ''}`;
+      button.type = 'button';
+      button.dataset.refId = ref.id;
+      button.textContent = ref.literal;
+      return button;
+    }
+
+    function replaceReferencesInTextNode(textNode) {
+      const text = textNode.nodeValue;
+      if (!text || !referencesByLiteral.size) {
+        return;
+      }
+
+      referencePattern.lastIndex = 0;
+      let match = null;
+      let lastIndex = 0;
+      let changed = false;
+      const fragment = document.createDocumentFragment();
+
+      while ((match = referencePattern.exec(text)) !== null) {
+        const literal = match[0];
+        const ref = referencesByLiteral.get(literal);
+        if (!ref) {
+          continue;
+        }
+
+        const fullStart = match.index;
+        const literalEnd = fullStart + literal.length;
+
+        if (fullStart > lastIndex) {
+          fragment.appendChild(document.createTextNode(text.slice(lastIndex, fullStart)));
+        }
+        fragment.appendChild(createReferenceButton(ref));
+        lastIndex = literalEnd;
+        changed = true;
+      }
+
+      if (!changed) {
+        return;
+      }
+
+      if (lastIndex < text.length) {
+        fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+
+      textNode.parentNode.replaceChild(fragment, textNode);
+    }
+
+    function enhanceInlineReferences() {
+      const textNodes = [];
+      const walker = document.createTreeWalker(sectionContentEl, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          if (!node.nodeValue || !node.nodeValue.trim()) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          const parent = node.parentElement;
+          if (!parent) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          if (parent.closest('pre, code, button, a, script, style')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+
+      while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+      }
+
+      textNodes.forEach(replaceReferencesInTextNode);
+
+      sectionContentEl.querySelectorAll('code').forEach(codeEl => {
+        if (codeEl.closest('pre')) {
+          return;
+        }
+        const literal = codeEl.textContent.trim();
+        const ref = referencesByLiteral.get(literal);
+        if (!ref) {
+          return;
+        }
+        codeEl.replaceWith(createReferenceButton(ref));
+      });
+    }
+
+    function captureHeadings() {
+      const usedIds = new Set();
+      const headingNodes = Array.from(sectionContentEl.querySelectorAll('h2, h3'));
+      headings = headingNodes.map(heading => {
+        const baseId = slugify(heading.textContent || 'section');
+        let id = baseId;
+        let counter = 2;
+        while (usedIds.has(id)) {
+          id = `${baseId}-${counter}`;
+          counter += 1;
+        }
+        usedIds.add(id);
+        heading.id = id;
+        return {
+          id,
+          title: heading.textContent || 'Untitled section',
+          level: heading.tagName === 'H3' ? 3 : 2,
+          element: heading,
+        };
+      });
+
+      activeHeadingId = headings[0]?.id || null;
+    }
+
+    function closeMermaidModal() {
+      mermaidModalEl.classList.remove('open');
+      mermaidModalEl.setAttribute('aria-hidden', 'true');
+      mermaidModalContentEl.innerHTML = '';
+    }
+
+    function openMermaidModal(sourceNode) {
+      mermaidModalContentEl.innerHTML = '';
+      const clone = sourceNode.cloneNode(true);
+      const expandButton = clone.querySelector('.mermaid-expand');
+      if (expandButton) {
+        expandButton.remove();
+      }
+      mermaidModalContentEl.appendChild(clone);
+      mermaidModalEl.classList.add('open');
+      mermaidModalEl.setAttribute('aria-hidden', 'false');
+    }
+
+    function renderSectionTabs() {
+      if (!headings.length) {
+        sectionTabsEl.innerHTML = '<div class="section-empty">Add `##` headings to create section navigation.</div>';
+        return;
+      }
+
+      sectionTabsEl.innerHTML = headings.map(heading => `
+        <button
+          class="section-tab${heading.id === activeHeadingId ? ' active' : ''}"
+          data-heading-id="${escapeHtml(heading.id)}"
+          style="margin-left:${heading.level === 3 ? '12px' : '0'}"
+        >
+          ${escapeHtml(heading.title)}
+        </button>
+      `).join('');
+    }
+
+    function updateActiveHeadingFromScroll() {
+      if (!headings.length) {
+        return;
+      }
+
+      const scrollTop = explanationScrollEl.scrollTop;
+      let currentHeading = headings[0];
+      for (const heading of headings) {
+        if (heading.element.offsetTop - scrollTop <= 80) {
+          currentHeading = heading;
+        } else {
+          break;
+        }
+      }
+
+      if (currentHeading && currentHeading.id !== activeHeadingId) {
+        activeHeadingId = currentHeading.id;
+        renderSectionTabs();
+      }
+    }
+
+    function ensureEditor() {
+      return new Promise((resolve, reject) => {
+        if (window.monaco && window.monaco.editor && editor) {
+          resolve();
+          return;
+        }
+
+        if (!(window.require && window.require.config)) {
+          reject(new Error('Monaco loader did not initialize.'));
+          return;
+        }
+
+        window.require.config({
+          paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs' }
+        });
+
+        window.require(['vs/editor/editor.main'], () => {
+          if (!editor) {
+            editor = monaco.editor.create(document.getElementById('editor'), {
+              value: '',
+              language: 'plaintext',
+              theme: 'vs-dark',
+              readOnly: true,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              wordWrap: 'off',
+              renderLineHighlight: 'all',
+              fontSize: 13,
+              fontFamily: 'IBM Plex Mono, Menlo, monospace'
+            });
+
+            const style = document.createElement('style');
+            style.textContent = `
+              .highlighted-reference-line {
+                background: rgba(124, 199, 255, 0.16);
+              }
+              .highlighted-reference-gutter {
+                border-left: 3px solid rgba(124, 199, 255, 0.92);
+                margin-left: 4px;
+              }
+            `;
+            document.head.appendChild(style);
+          }
+          resolve();
+        }, error => reject(error));
+      });
+    }
+
+    function modelForFile(file) {
+      if (modelsByFileId.has(file.id)) {
+        return modelsByFileId.get(file.id);
+      }
+
+      const uri = monaco.Uri.parse(`inmemory://model/${file.path}`);
+      const model = monaco.editor.createModel(file.content, file.language || 'plaintext', uri);
+      modelsByFileId.set(file.id, model);
+      return model;
+    }
+
+    async function openReference(refId) {
+      const ref = referencesById.get(refId);
+      if (!ref) {
+        return;
+      }
+
+      activeReferenceId = refId;
+      sectionContentEl.querySelectorAll('[data-ref-id]').forEach(button => {
+        button.classList.toggle('active', button.getAttribute('data-ref-id') === refId);
+      });
+
+      try {
+        await ensureEditor();
+      } catch (error) {
+        document.getElementById('editor-wrap').innerHTML = `<div class="monaco-error">Unable to load Monaco from CDN.<br>${escapeHtml(String(error))}</div>`;
+        return;
+      }
+
+      const file = filesById.get(ref.file_id);
+      if (!file) {
+        return;
+      }
+
+      const model = modelForFile(file);
+      if (currentModel !== model) {
+        editor.setModel(model);
+        currentModel = model;
+      }
+
+      currentDecorations = editor.deltaDecorations(currentDecorations, [
+        {
+          range: new monaco.Range(ref.start_line, 1, ref.end_line, 1),
+          options: {
+            isWholeLine: true,
+            className: 'highlighted-reference-line',
+            linesDecorationsClassName: 'highlighted-reference-gutter'
+          }
+        }
+      ]);
+
+      editor.revealLineInCenter(ref.start_line);
+      editor.setPosition({ lineNumber: ref.start_line, column: 1 });
+
+      codeFilePathEl.textContent = ref.file_path;
+      codeLineRangeEl.textContent = ref.start_line === ref.end_line
+        ? `line ${ref.start_line}`
+        : `lines ${ref.start_line}-${ref.end_line}`;
+      codeMetaEl.textContent = ref.literal;
+      codeFooterEl.textContent = `${ref.file_path}:${ref.start_line}${ref.end_line !== ref.start_line ? '-' + ref.end_line : ''} | repo root ${data.repoRoot}`;
+    }
+
+    async function renderMarkdown() {
+      if (!(window.markdownit && window.markdownit)) {
+        sectionContentEl.innerHTML = '<div class="empty-state">Unable to load markdown renderer.</div>';
+        return;
+      }
+
+      const md = window.markdownit({
+        html: false,
+        linkify: true,
+        typographer: true,
+      });
+
+      sectionContentEl.innerHTML = md.render(data.markdown || '');
+
+      const firstHeading = sectionContentEl.querySelector('h1');
+      if (firstHeading) {
+        pageTitleEl.textContent = firstHeading.textContent || data.title || 'Code Explanation';
+        firstHeading.remove();
+      }
+
+      enhanceInlineReferences();
+      await renderMermaid();
+      captureHeadings();
+      renderSectionTabs();
+      updateActiveHeadingFromScroll();
+    }
+
+    async function renderMermaid() {
+      const mermaidBlocks = Array.from(sectionContentEl.querySelectorAll('pre > code.language-mermaid'));
+      if (!mermaidBlocks.length || !window.mermaid) {
+        return;
+      }
+
+      window.mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+      });
+
+      const containers = [];
+      mermaidBlocks.forEach((codeBlock, index) => {
+        const pre = codeBlock.parentElement;
+        if (!pre) {
+          return;
+        }
+        const container = document.createElement('div');
+        container.className = 'mermaid-wrap';
+        const expandButton = document.createElement('button');
+        expandButton.className = 'mermaid-expand';
+        expandButton.type = 'button';
+        expandButton.textContent = 'Expand';
+        expandButton.addEventListener('click', () => openMermaidModal(container));
+        container.appendChild(expandButton);
+        const diagram = document.createElement('div');
+        diagram.className = 'mermaid mermaid-diagram';
+        diagram.id = `mermaid-${index + 1}`;
+        diagram.textContent = codeBlock.textContent;
+        container.appendChild(diagram);
+        pre.replaceWith(container);
+        containers.push(diagram);
+      });
+
+      try {
+        await window.mermaid.run({ nodes: containers });
+      } catch (error) {
+        containers.forEach(container => {
+          container.classList.add('mermaid-error');
+          container.textContent = `Unable to render mermaid diagram.\n${String(error)}`;
+        });
+      }
+    }
+
+    async function initialize() {
+      await renderMarkdown();
+
+      if (data.references.length > 0) {
+        openReference(data.references[0].id);
+      }
+    }
+
+    sectionTabsEl.addEventListener('click', event => {
+      const button = event.target.closest('[data-heading-id]');
+      if (!button) {
+        return;
+      }
+
+      const headingId = button.getAttribute('data-heading-id');
+      const heading = headings.find(item => item.id === headingId);
+      if (!heading) {
+        return;
+      }
+
+      activeHeadingId = headingId;
+      renderSectionTabs();
+      explanationScrollEl.scrollTo({ top: Math.max(heading.element.offsetTop - 18, 0), behavior: 'smooth' });
+    });
+
+    sectionContentEl.addEventListener('click', event => {
+      const button = event.target.closest('[data-ref-id]');
+      if (!button) {
+        return;
+      }
+
+      openReference(button.getAttribute('data-ref-id'));
+    });
+
+    explanationScrollEl.addEventListener('scroll', updateActiveHeadingFromScroll);
+    mermaidModalCloseEl.addEventListener('click', closeMermaidModal);
+    mermaidModalEl.addEventListener('click', event => {
+      if (event.target === mermaidModalEl) {
+        closeMermaidModal();
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && mermaidModalEl.classList.contains('open')) {
+        closeMermaidModal();
+      }
+    });
+
+    initialize();
+  </script>
+</body>
+</html>

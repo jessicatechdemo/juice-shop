@@ -187,7 +187,7 @@ def finding_html(finding: dict[str, Any]) -> str:
       <article class="finding" data-verdict="{verdict}" data-search="{search}">
         <header>
           <div>
-            <p class="eyebrow">{html_text(finding.get('triage_item_id'))} · {alert_link}</p>
+            <p class="eyebrow"><strong>Finding ID:</strong> {html_text(finding.get('input_id'))} · <strong>Triage item ID:</strong> {html_text(finding.get('triage_item_id'))} · {alert_link}</p>
             <h2>{html_text(finding.get('title'))}</h2>
           </div>
           <span class="badge {verdict}">{VERDICT_LABELS[verdict]}</span>
@@ -294,7 +294,7 @@ def build_report(payload: dict[str, Any], branch: str) -> tuple[str, Counter[str
     </div>
     <div class="controls">
       <label for="search"><strong>Search</strong></label>
-      <input id="search" type="search" placeholder="Alert number, rule, path, title, or evidence">
+      <input id="search" type="search" placeholder="Finding ID, alert number, rule, path, title, or evidence">
       <span id="visible-count" aria-live="polite">{total} shown</span>
     </div>
     <div id="findings">{cards}</div>

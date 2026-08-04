@@ -21,12 +21,17 @@ class PersistTriageTest(unittest.TestCase):
             "revision": "a" * 40,
             "alerts_endpoint": (
                 "/repos/example/repo/code-scanning/alerts?state=open&"
-                "ref=refs%2Fheads%2Ffeature%2Fcurrent&per_page=100"
+                "ref=refs%2Fheads%2Ffeature%2Fcurrent&tool_name=CodeQL&per_page=100"
             ),
             "expected_count": 1,
             "alerts": [
                 {
-                    "alert": {"number": 7},
+                    "alert": {
+                        "number": 7,
+                        "state": "open",
+                        "tool": {"name": "CodeQL"},
+                        "rule": {"security_severity_level": "high"},
+                    },
                     "matching_instances": [
                         {
                             "ref": "refs/heads/feature/current",
@@ -53,6 +58,7 @@ class PersistTriageTest(unittest.TestCase):
                             "https://github.com/example/repo/security/code-scanning/7",
                             "ref:refs/heads/feature/current",
                             f"commit:{'a' * 40}",
+                            "codeql-security-severity:high",
                         ]
                     },
                     "evidence": [],
@@ -73,7 +79,7 @@ class PersistTriageTest(unittest.TestCase):
         self.assertEqual(count, 1)
         persist_triage.validate_payload(payload, count)
         persist_triage.validate_payload_against_intake(
-            payload, intake_ref, commits
+            payload, intake_ref, commits, self.intake()
         )
 
     def test_wrong_branch_is_rejected(self):
@@ -99,6 +105,86 @@ class PersistTriageTest(unittest.TestCase):
             persist_triage.validate_payload_against_intake(
                 payload, intake_ref, commits
             )
+
+    def test_security_severity_reference_must_match_intake(self):
+        payload = self.payload()
+        payload["findings"][0]["normalized_input"]["references"][-1] = (
+            "codeql-security-severity:medium"
+        )
+        intake = self.intake()
+        _, intake_ref, commits = persist_triage.validate_intake(
+            intake, payload, "feature/current"
+        )
+
+        with self.assertRaisesRegex(
+            persist_triage.ValidationError, "security severity reference"
+        ):
+            persist_triage.validate_payload_against_intake(
+                payload, intake_ref, commits, intake
+            )
+
+    def test_finding_id_must_match_alert_number(self):
+        payload = self.payload()
+        payload["findings"][0]["input_id"] = "github-codeql-alert-8"
+        intake = self.intake()
+        _, intake_ref, commits = persist_triage.validate_intake(
+            intake, payload, "feature/current"
+        )
+
+        with self.assertRaisesRegex(
+            persist_triage.ValidationError, "input_id does not match alert"
+        ):
+            persist_triage.validate_payload_against_intake(
+                payload, intake_ref, commits, intake
+            )
+
+    def test_missing_security_severity_requires_no_reference(self):
+        intake = self.intake()
+        intake["alerts"][0]["alert"]["rule"]["security_severity_level"] = None
+        payload = self.payload()
+        payload["findings"][0]["normalized_input"]["references"].pop()
+        _, intake_ref, commits = persist_triage.validate_intake(
+            intake, payload, "feature/current"
+        )
+
+        persist_triage.validate_payload_against_intake(
+            payload, intake_ref, commits, intake
+        )
+
+    def test_pr_intake_and_payload_align(self):
+        intake = {
+            "schema_version": "codeql-pr-intake/v1",
+            "repository": "example/repo",
+            "local_repository": "/repo",
+            "branch": "feature/current",
+            "ref": "refs/heads/feature/current",
+            "revision": "a" * 40,
+            "base_revision": "b" * 40,
+            "pull_request_number": 42,
+            "alerts_endpoint": (
+                "/repos/example/repo/code-scanning/alerts?pr=42&"
+                "tool_name=CodeQL&state=open&per_page=100"
+            ),
+            "expected_count": 1,
+            "alerts": [
+                {
+                    "number": 7,
+                    "state": "open",
+                    "tool": {"name": "CodeQL"},
+                    "rule": {"security_severity_level": "high"},
+                }
+            ],
+        }
+
+        count, intake_ref, commits = persist_triage.validate_intake(
+            intake, self.payload(), "feature/current"
+        )
+        persist_triage.validate_payload_against_intake(
+            self.payload(), intake_ref, commits, intake
+        )
+
+        self.assertEqual(count, 1)
+        self.assertEqual(commits, {7: {"a" * 40}})
 
 
 if __name__ == "__main__":

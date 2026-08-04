@@ -123,7 +123,7 @@ def collect_intake(
     encoded_ref = quote(target_ref, safe="")
     alerts_endpoint = (
         f"/repos/{repository}/code-scanning/alerts"
-        f"?state=open&ref={encoded_ref}&per_page=100"
+        f"?state=open&ref={encoded_ref}&tool_name=CodeQL&per_page=100"
     )
     alerts = request(alerts_endpoint)
     imported = []
@@ -135,6 +135,11 @@ def collect_intake(
         if number in alert_numbers:
             raise IntakeError(f"duplicate GitHub alert number: {number}")
         alert_numbers.add(number)
+        if alert.get("state") != "open":
+            raise IntakeError(f"alert {number} is not open")
+        tool = alert.get("tool")
+        if not isinstance(tool, dict) or tool.get("name") != "CodeQL":
+            raise IntakeError(f"alert {number} is not a CodeQL alert")
         instances_endpoint = (
             f"/repos/{repository}/code-scanning/alerts/{number}/instances?per_page=100"
         )
