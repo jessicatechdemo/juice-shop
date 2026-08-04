@@ -1,0 +1,3706 @@
+{
+  "findings": [
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "40-40",
+          "path": "routes/vulnCodeFixes.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "No attacker-controlled value is written and file reads use names returned by fs.readdirSync, not a path supplied directly by the request."
+      ],
+      "evidence": [
+        "The cache key can influence only the key of CodeFixes; the assigned value is a locally constructed {fixes, correct} object built from enumerated files, so the attacker cannot supply an arbitrary property value or reach Object.prototype with controlled content."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-58",
+      "normalized_input": {
+        "affected_version_or_path": "routes/vulnCodeFixes.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+        "claimed_sink": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "object/prototype property manipulation",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/58",
+          "rule:js/remote-property-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/vulnCodeFixes.ts"
+      },
+      "proof_gaps": [
+        "The public snippets/fixes route can supply key, but unsupported keys produce no fixes and return 404."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/remote-property-injection at routes/vulnCodeFixes.ts",
+        "The cache key can influence only the key of CodeFixes; the assigned value is a locally constructed {fixes, correct} object built from enumerated files, so the attacker cannot supply an arbitrary property value or reach Object.prototype with controlled content.",
+        "No attacker-controlled value is written and file reads use names returned by fs.readdirSync, not a path supplied directly by the request."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/remote-property-injection in routes/vulnCodeFixes.ts",
+      "triage_item_id": "triage-001",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "Public whoami route with in-handler cookie verification",
+          "label": "entrypoint",
+          "lines": "600",
+          "path": "server.ts"
+        },
+        {
+          "detail": "Verified user plus request-controlled dynamic field projection",
+          "label": "source/control/sink",
+          "lines": "17-44",
+          "path": "routes/currentUser.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": null,
+        "policy_basis": "SECURITY.md reports vulnerabilities not part of a hacking challenge; static evidence does not conclusively establish or defeat this boundary.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "medium",
+      "counterevidence": [
+        "Token verification and authenticatedUsers lookup constrain the record to the caller's authenticated user.",
+        "The assigned value comes from user.data, not an arbitrary request body value."
+      ],
+      "evidence": [
+        "routes/currentUser.ts:22-31 lets the request choose both source and destination property names.",
+        "The handler deliberately permits password projection for passwordHashLeakChallenge."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [
+          "attacker reachability",
+          "preconditions",
+          "source-to-sink control",
+          "unresolved runtime semantics"
+        ],
+        "rank": 1,
+        "rank_queue": "needs_review",
+        "rationale": "Needs-review queue rank 1: prioritized by potential confidentiality/control impact and closeness of the static path."
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-57",
+      "normalized_input": {
+        "affected_version_or_path": "routes/currentUser.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "Requested property names are copied into a plain response object without an allowlist",
+        "claimed_sink": "baseUser[field] = user.data[field]",
+        "claimed_source": "Authenticated query parameter fields",
+        "impact": "possible prototype mutation or unintended user-field disclosure",
+        "preconditions": [
+          "Attacker has a valid token cookie",
+          "A requested field such as __proto__ or another inherited key has meaningful serialization semantics"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/57",
+          "rule:js/remote-property-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/currentUser.ts"
+      },
+      "proof_gaps": [
+        "Static inspection does not settle JavaScript __proto__ assignment plus Express JSON serialization behavior for this object shape.",
+        "Maintainer intent is clear for password hash exposure but not for arbitrary inherited property names."
+      ],
+      "reachable_path": [
+        "GET /rest/user/whoami?fields=... verifies token cookie",
+        "comma-separated request names are iterated",
+        "matching dynamic user.data properties are assigned to baseUser and serialized"
+      ],
+      "recommended_next_step": "manual-review",
+      "source_type": "sarif",
+      "title": "js/remote-property-injection in routes/currentUser.ts",
+      "triage_item_id": "triage-002",
+      "verdict": "needs_review"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "75-75",
+          "path": "lib/insecurity.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The value written is a server-created or signature-verified decoded token, and later lookup unquotes the token without copying attacker properties."
+      ],
+      "evidence": [
+        "authenticatedUsers.tokenMap is populated with a token and decoded user object only after server signing or JWT verification; this is an authentication cache, not a generic remote object merge."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-56",
+      "normalized_input": {
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+        "claimed_sink": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "object/prototype property manipulation",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/56",
+          "rule:js/remote-property-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/insecurity.ts"
+      },
+      "proof_gaps": [
+        "No path was found that lets an unauthenticated caller choose both a dangerous property name and an arbitrary value."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/remote-property-injection at lib/insecurity.ts",
+        "authenticatedUsers.tokenMap is populated with a token and decoded user object only after server signing or JWT verification; this is an authentication cache, not a generic remote object merge.",
+        "The value written is a server-created or signature-verified decoded token, and later lookup unquotes the token without copying attacker properties."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/remote-property-injection in lib/insecurity.ts",
+      "triage_item_id": "triage-003",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "74-74",
+          "path": "lib/insecurity.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "User ids originate from persisted user records and tokens are issued or verified by the server."
+      ],
+      "evidence": [
+        "authenticatedUsers.idMap is keyed by the authenticated database user id and stores the corresponding server-issued token; neither side is an arbitrary request object."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-55",
+      "normalized_input": {
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+        "claimed_sink": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "object/prototype property manipulation",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/55",
+          "rule:js/remote-property-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/insecurity.ts"
+      },
+      "proof_gaps": [
+        "No remotely controllable __proto__ assignment with attacker-controlled object content is supported."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/remote-property-injection at lib/insecurity.ts",
+        "authenticatedUsers.idMap is keyed by the authenticated database user id and stores the corresponding server-issued token; neither side is an arbitrary request object.",
+        "User ids originate from persisted user records and tokens are issued or verified by the server."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/remote-property-injection in lib/insecurity.ts",
+      "triage_item_id": "triage-004",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/remote-property-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "68-68",
+          "path": "lib/accuracy.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The state value and nested field names are fixed booleans/counters and valid challenge keys come from repository annotations."
+      ],
+      "evidence": [
+        "Accuracy state is reached only after a challenge key is present in the precomputed code-challenge Map; unknown keys return before storeVerdict."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-54",
+      "normalized_input": {
+        "affected_version_or_path": "lib/accuracy.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+        "claimed_sink": "A property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.\nA property name to write to depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "object/prototype property manipulation",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/54",
+          "rule:js/remote-property-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/accuracy.ts"
+      },
+      "proof_gaps": [
+        "No supported path lets an arbitrary property key pass the Map membership gate."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/remote-property-injection at lib/accuracy.ts",
+        "Accuracy state is reached only after a challenge key is present in the precomputed code-challenge Map; unknown keys return before storeVerdict.",
+        "The state value and nested field names are fixed booleans/counters and valid challenge keys come from repository annotations."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/remote-property-injection in lib/accuracy.ts",
+      "triage_item_id": "triage-005",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/http-to-file-access instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "43-43",
+          "path": "routes/profileImageFileUpload.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The uploaded filename is never used; the attacker controls file bytes, not the destination path, and the extension comes from the detected image type."
+      ],
+      "evidence": [
+        "The filesystem destination is composed from an authenticated persisted user id and an extension returned by file-type inspection after an image MIME check."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-53",
+      "normalized_input": {
+        "affected_version_or_path": "routes/profileImageFileUpload.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "Write to file system depends on Untrusted data.",
+        "claimed_sink": "Write to file system depends on Untrusted data.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "untrusted filesystem write",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/53",
+          "rule:js/http-to-file-access",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/profileImageFileUpload.ts"
+      },
+      "proof_gaps": [
+        "No untrusted path segment reaches fs.writeFile."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/http-to-file-access at routes/profileImageFileUpload.ts",
+        "The filesystem destination is composed from an authenticated persisted user id and an extension returned by file-type inspection after an image MIME check.",
+        "The uploaded filename is never used; the attacker controls file bytes, not the destination path, and the extension comes from the detected image type."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/http-to-file-access in routes/profileImageFileUpload.ts",
+      "triage_item_id": "triage-006",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/file-system-race instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "29-29",
+          "path": "lib/codingChallenges.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "A remote request does not choose or mutate these paths; exploiting the race requires local filesystem write access already outside the hosted-service boundary."
+      ],
+      "evidence": [
+        "findFilesWithCodeChallenges runs against the repository-owned SNIPPET_PATHS and reads files discovered by local lstat/readdir traversal."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-52",
+      "normalized_input": {
+        "affected_version_or_path": "lib/codingChallenges.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The file may have changed since it was checked.",
+        "claimed_sink": "The file may have changed since it was checked.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "time-of-check/time-of-use filesystem race",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/52",
+          "rule:js/file-system-race",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/codingChallenges.ts"
+      },
+      "proof_gaps": [
+        "No remote source-to-race path exists."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/file-system-race at lib/codingChallenges.ts",
+        "findFilesWithCodeChallenges runs against the repository-owned SNIPPET_PATHS and reads files discovered by local lstat/readdir traversal.",
+        "A remote request does not choose or mutate these paths; exploiting the race requires local filesystem write access already outside the hosted-service boundary."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/file-system-race in lib/codingChallenges.ts",
+      "triage_item_id": "triage-007",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/regex/missing-regexp-anchor instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "19-19",
+          "path": "test/cypress/e2e/redirect.spec.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Repository path and test runner structure identify this as test-only code.",
+        "product_surface": "test/fixture",
+        "source_trust": "trusted_developer_config"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "No production import or hosted request handler path exists from this test expression."
+      ],
+      "evidence": [
+        "test/cypress/e2e/redirect.spec.ts is a test file and the flagged expression is used to verify expected behavior or an external resource."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-51",
+      "normalized_input": {
+        "affected_version_or_path": "test/cypress/e2e/redirect.spec.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "test code only",
+        "claimed_sink": "js/regex/missing-regexp-anchor",
+        "claimed_source": "test-authored URL or assertion",
+        "impact": "URL validation bypass",
+        "preconditions": [
+          "The file is executed only by the repository test suite"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/51",
+          "rule:js/regex/missing-regexp-anchor",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "test/cypress/e2e/redirect.spec.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "test/cypress/e2e/redirect.spec.ts is under test/",
+        "the flagged expression is an assertion or external-resource test",
+        "it is not shipped as an application request handler"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/regex/missing-regexp-anchor in test/cypress/e2e/redirect.spec.ts",
+      "triage_item_id": "triage-008",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "113-113",
+          "path": "routes/verify.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "A user value does not decide the security result: err must be null and the verified token must match the required algorithm and email."
+      ],
+      "evidence": [
+        "The condition at jwtChallenge checks only whether a token is present; signature verification is performed by jwt.verify with the repository public key before any challenge action."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-50",
+      "normalized_input": {
+        "affected_version_or_path": "routes/verify.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This condition guards a sensitive action, but a user-provided value controls it.",
+        "claimed_sink": "This condition guards a sensitive action, but a user-provided value controls it.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "security-control bypass",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/50",
+          "rule:js/user-controlled-bypass",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/verify.ts"
+      },
+      "proof_gaps": [
+        "The alert models an expected input-presence branch as the authorization decision."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/user-controlled-bypass at routes/verify.ts",
+        "The condition at jwtChallenge checks only whether a token is present; signature verification is performed by jwt.verify with the repository public key before any challenge action.",
+        "A user value does not decide the security result: err must be null and the verified token must match the required algorithm and email."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/user-controlled-bypass in routes/verify.ts",
+      "triage_item_id": "triage-009",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "27-27",
+          "path": "routes/fileServer.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "Forward slashes are rejected earlier and the branch does not grant a user identity or privilege."
+      ],
+      "evidence": [
+        "The flagged condition is filename validation, not an authorization decision: it requires an allowlisted suffix or one exact filename before sendFile."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-49",
+      "normalized_input": {
+        "affected_version_or_path": "routes/fileServer.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This condition guards a sensitive action, but a user-provided value controls it.",
+        "claimed_sink": "This condition guards a sensitive action, but a user-provided value controls it.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "security-control bypass",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/49",
+          "rule:js/user-controlled-bypass",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/fileServer.ts"
+      },
+      "proof_gaps": [
+        "Windows backslash traversal remains separately represented by confirmed alert 5 at the filesystem sink."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/user-controlled-bypass at routes/fileServer.ts",
+        "The flagged condition is filename validation, not an authorization decision: it requires an allowlisted suffix or one exact filename before sendFile.",
+        "Forward slashes are rejected earlier and the branch does not grant a user identity or privilege."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/user-controlled-bypass in routes/fileServer.ts",
+      "triage_item_id": "triage-010",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "188-188",
+          "path": "lib/insecurity.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "A request cannot make err null merely by choosing token content."
+      ],
+      "evidence": [
+        "The token-presence condition only decides whether to attempt jwt.verify; decoded data is cached only when verification succeeds with the public key."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-48",
+      "normalized_input": {
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.",
+        "claimed_sink": "This condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "security-control bypass",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/48",
+          "rule:js/user-controlled-bypass",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/insecurity.ts"
+      },
+      "proof_gaps": [
+        "The scanner treats user control of whether verification runs as control of its result."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/user-controlled-bypass at lib/insecurity.ts",
+        "The token-presence condition only decides whether to attempt jwt.verify; decoded data is cached only when verification succeeds with the public key.",
+        "A request cannot make err null merely by choosing token content."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/user-controlled-bypass in lib/insecurity.ts",
+      "triage_item_id": "triage-011",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/user-controlled-bypass instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "55-55",
+          "path": "lib/insecurity.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The verification key is loaded from the repository public key and is not request-controlled."
+      ],
+      "evidence": [
+        "verify returns the result of jws.verify(token, publicKey); attacker control of token bytes does not control the cryptographic verification outcome."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-47",
+      "normalized_input": {
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.",
+        "claimed_sink": "This condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.\nThis condition guards a sensitive action, but a user-provided value controls it.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "security-control bypass",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/47",
+          "rule:js/user-controlled-bypass",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/insecurity.ts"
+      },
+      "proof_gaps": [
+        "No bypass of jws.verify is shown."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/user-controlled-bypass at lib/insecurity.ts",
+        "verify returns the result of jws.verify(token, publicKey); attacker control of token bytes does not control the cryptographic verification outcome.",
+        "The verification key is loaded from the repository public key and is not request-controlled."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/user-controlled-bypass in lib/insecurity.ts",
+      "triage_item_id": "triage-012",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "Public GET route",
+          "label": "entrypoint",
+          "lines": "608",
+          "path": "server.ts"
+        },
+        {
+          "detail": "Query value is decoded and passed to lookup",
+          "label": "source",
+          "lines": "10-12",
+          "path": "routes/repeatNotification.ts"
+        },
+        {
+          "detail": "Missing name is concatenated into warning log",
+          "label": "sink",
+          "lines": "93-99",
+          "path": "lib/challengeUtils.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md treats vulnerabilities outside documented hacking challenges as reportable; route/code evidence shows this path is not required by an existing challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [],
+      "evidence": [
+        "server.ts:608 exposes the route without authentication middleware.",
+        "routes/repeatNotification.ts:11 decodes attacker input and line 12 calls findChallengeByName.",
+        "lib/challengeUtils.ts:99 concatenates the unmatched value directly into logger.warn."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [
+          "attacker reachability",
+          "privilege required",
+          "preconditions",
+          "source-to-sink control",
+          "guard strength"
+        ],
+        "rank": 6,
+        "rank_queue": "confirmed",
+        "rationale": "Confirmed queue rank 6: log record injection; ordered by unauthenticated reachability, cross-platform impact, exposed asset sensitivity, and preconditions."
+      },
+      "fix_finding_handoff": "Fix CodeQL alert #46 (js/log-injection) at lib/challengeUtils.ts. GET /rest/repeat-notification reads query.challenge -> decodeURIComponent preserves log-control characters -> findChallengeByName logs unmatched value by string concatenation. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
+      "input_id": "github-codeql-alert-46",
+      "normalized_input": {
+        "affected_version_or_path": "lib/challengeUtils.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "decodeURIComponent output is passed to a logger without CR/LF neutralization when no challenge matches",
+        "claimed_sink": "logger.warn('Missing challenge with name: ' + challengeName)",
+        "claimed_source": "Unauthenticated query parameter challenge",
+        "impact": "log record injection",
+        "preconditions": [
+          "Attacker can call GET /rest/repeat-notification with a crafted challenge query value"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/46",
+          "rule:js/log-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/challengeUtils.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "GET /rest/repeat-notification reads query.challenge",
+        "decodeURIComponent preserves log-control characters",
+        "findChallengeByName logs unmatched value by string concatenation"
+      ],
+      "recommended_next_step": "fix-finding",
+      "source_type": "sarif",
+      "title": "js/log-injection in lib/challengeUtils.ts",
+      "triage_item_id": "triage-013",
+      "verdict": "confirmed"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "Public POST route",
+          "label": "entrypoint",
+          "lines": "311",
+          "path": "server.ts"
+        },
+        {
+          "detail": "Request body enters polynomial regex before authentication",
+          "label": "source/sink",
+          "lines": "18-20",
+          "path": "routes/profileImageUrlUpload.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md treats vulnerabilities outside documented hacking challenges as reportable; route/code evidence shows this path is not required by an existing challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [],
+      "evidence": [
+        "server.ts:311 exposes the POST route without authentication middleware.",
+        "routes/profileImageUrlUpload.ts:18-20 evaluates attacker input with (.)* on both sides before line 21-22 authentication.",
+        "No SSRF challenge evidence requires the regex itself to be polynomial or unbounded."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [
+          "attacker reachability",
+          "privilege required",
+          "preconditions",
+          "source-to-sink control",
+          "guard strength"
+        ],
+        "rank": 1,
+        "rank_queue": "confirmed",
+        "rationale": "Confirmed queue rank 1: event-loop denial of service; ordered by unauthenticated reachability, cross-platform impact, exposed asset sensitivity, and preconditions."
+      },
+      "fix_finding_handoff": "Fix CodeQL alert #45 (js/polynomial-redos) at routes/profileImageUrlUpload.ts. POST /profile/image/url accepts req.body.imageUrl -> line 20 evaluates an unbounded polynomial regex -> event-loop work grows superlinearly before loggedInUser is checked. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
+      "input_id": "github-codeql-alert-45",
+      "normalized_input": {
+        "affected_version_or_path": "routes/profileImageUrlUpload.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "No input-length bound before a polynomial regular expression; authentication is checked only afterward",
+        "claimed_sink": "url.match(/(.)*solve\\/challenges\\/server-side(.)*/)",
+        "claimed_source": "Unauthenticated HTTP body field imageUrl",
+        "impact": "event-loop denial of service",
+        "preconditions": [
+          "Attacker can POST a long crafted imageUrl to /profile/image/url"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/45",
+          "rule:js/polynomial-redos",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/profileImageUrlUpload.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "POST /profile/image/url accepts req.body.imageUrl",
+        "line 20 evaluates an unbounded polynomial regex",
+        "event-loop work grows superlinearly before loggedInUser is checked"
+      ],
+      "recommended_next_step": "fix-finding",
+      "source_type": "sarif",
+      "title": "js/polynomial-redos in routes/profileImageUrlUpload.ts",
+      "triage_item_id": "triage-014",
+      "verdict": "confirmed"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/server-side-unvalidated-url-redirection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "19-19",
+          "path": "routes/redirect.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/redirect.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-44",
+      "normalized_input": {
+        "affected_version_or_path": "routes/redirect.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/server-side-unvalidated-url-redirection",
+        "claimed_source": "Untrusted application input",
+        "impact": "open redirect",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/44",
+          "rule:js/server-side-unvalidated-url-redirection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/redirect.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/redirect.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/server-side-unvalidated-url-redirection in routes/redirect.ts",
+      "triage_item_id": "triage-015",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "36-36",
+          "path": "routes/web3Wallet.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "Stack is not selected or serialized by this route."
+      ],
+      "evidence": [
+        "The catch response passes utils.getErrorMessage(error), which returns Error.message or a string, not Error.stack."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-43",
+      "normalized_input": {
+        "affected_version_or_path": "routes/web3Wallet.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This information exposed to the user depends on stack trace information.",
+        "claimed_sink": "This information exposed to the user depends on stack trace information.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "internal error information disclosure",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/43",
+          "rule:js/stack-trace-exposure",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/web3Wallet.ts"
+      },
+      "proof_gaps": [
+        "Provider/library message content may still be operationally verbose, but the claimed stack-trace sink is absent."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/stack-trace-exposure at routes/web3Wallet.ts",
+        "The catch response passes utils.getErrorMessage(error), which returns Error.message or a string, not Error.stack.",
+        "Stack is not selected or serialized by this route."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/stack-trace-exposure in routes/web3Wallet.ts",
+      "triage_item_id": "triage-016",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "50-50",
+          "path": "routes/nftMint.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "Stack is not selected or serialized by this route."
+      ],
+      "evidence": [
+        "The catch response passes utils.getErrorMessage(error), which returns Error.message or a string, not Error.stack."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-42",
+      "normalized_input": {
+        "affected_version_or_path": "routes/nftMint.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This information exposed to the user depends on stack trace information.",
+        "claimed_sink": "This information exposed to the user depends on stack trace information.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "internal error information disclosure",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/42",
+          "rule:js/stack-trace-exposure",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/nftMint.ts"
+      },
+      "proof_gaps": [
+        "The claimed stack-trace sink is absent."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/stack-trace-exposure at routes/nftMint.ts",
+        "The catch response passes utils.getErrorMessage(error), which returns Error.message or a string, not Error.stack.",
+        "Stack is not selected or serialized by this route."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/stack-trace-exposure in routes/nftMint.ts",
+      "triage_item_id": "triage-017",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "33-33",
+          "path": "routes/nftMint.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "Stack is not selected or serialized by this route."
+      ],
+      "evidence": [
+        "The catch response passes utils.getErrorMessage(error), which returns Error.message or a string, not Error.stack."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-41",
+      "normalized_input": {
+        "affected_version_or_path": "routes/nftMint.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This information exposed to the user depends on stack trace information.",
+        "claimed_sink": "This information exposed to the user depends on stack trace information.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "internal error information disclosure",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/41",
+          "rule:js/stack-trace-exposure",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/nftMint.ts"
+      },
+      "proof_gaps": [
+        "The claimed stack-trace sink is absent."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/stack-trace-exposure at routes/nftMint.ts",
+        "The catch response passes utils.getErrorMessage(error), which returns Error.message or a string, not Error.stack.",
+        "Stack is not selected or serialized by this route."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/stack-trace-exposure in routes/nftMint.ts",
+      "triage_item_id": "triage-018",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "JWT-protected review-like route",
+          "label": "entrypoint",
+          "lines": "634-635",
+          "path": "server.ts"
+        },
+        {
+          "detail": "Inner database failure object is returned directly",
+          "label": "sink",
+          "lines": "43-56",
+          "path": "routes/likeProductReviews.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": null,
+        "policy_basis": "SECURITY.md reports vulnerabilities not part of a hacking challenge; static evidence does not conclusively establish or defeat this boundary.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "medium",
+      "counterevidence": [
+        "Native Error stack/message properties are often non-enumerable, and the concrete MarsDB error shape is not established statically.",
+        "Authentication is required."
+      ],
+      "evidence": [
+        "routes/likeProductReviews.ts:55-56 serializes err directly, unlike nearby handlers that call getErrorMessage."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [
+          "attacker reachability",
+          "preconditions",
+          "source-to-sink control",
+          "unresolved runtime semantics"
+        ],
+        "rank": 2,
+        "rank_queue": "needs_review",
+        "rationale": "Needs-review queue rank 2: prioritized by potential confidentiality/control impact and closeness of the static path."
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-40",
+      "normalized_input": {
+        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "Inner catch serializes err directly rather than reducing it with getErrorMessage",
+        "claimed_sink": "res.status(500).json(err)",
+        "claimed_source": "Authenticated review id and database behavior",
+        "impact": "possible internal error or stack information disclosure",
+        "preconditions": [
+          "Attacker is authenticated",
+          "MarsDB/update path throws an error object with enumerable sensitive properties"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/40",
+          "rule:js/stack-trace-exposure",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/likeProductReviews.ts"
+      },
+      "proof_gaps": [
+        "Need the concrete enumerable properties of errors produced by the supported MarsDB update path.",
+        "Need to determine whether any error can contain queries, paths, or stack data."
+      ],
+      "reachable_path": [
+        "Authenticated POST reaches likeProductReviews",
+        "database operations use request id and stored review state",
+        "inner failure is passed directly to res.json"
+      ],
+      "recommended_next_step": "manual-review",
+      "source_type": "sarif",
+      "title": "js/stack-trace-exposure in routes/likeProductReviews.ts",
+      "triage_item_id": "triage-019",
+      "verdict": "needs_review"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "32-32",
+          "path": "routes/createProductReviews.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "Stack is not selected or serialized by this route."
+      ],
+      "evidence": [
+        "The catch response passes utils.getErrorMessage(err), which returns Error.message or a string, not Error.stack."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-39",
+      "normalized_input": {
+        "affected_version_or_path": "routes/createProductReviews.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This information exposed to the user depends on stack trace information.",
+        "claimed_sink": "This information exposed to the user depends on stack trace information.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "internal error information disclosure",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/39",
+          "rule:js/stack-trace-exposure",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/createProductReviews.ts"
+      },
+      "proof_gaps": [
+        "The claimed stack-trace sink is absent."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/stack-trace-exposure at routes/createProductReviews.ts",
+        "The catch response passes utils.getErrorMessage(err), which returns Error.message or a string, not Error.stack.",
+        "Stack is not selected or serialized by this route."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/stack-trace-exposure in routes/createProductReviews.ts",
+      "triage_item_id": "triage-020",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "39-39",
+          "path": "routes/checkKeys.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "Stack is not selected or serialized by this route."
+      ],
+      "evidence": [
+        "The catch response passes utils.getErrorMessage(error), which returns Error.message or a string, not Error.stack."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-38",
+      "normalized_input": {
+        "affected_version_or_path": "routes/checkKeys.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This information exposed to the user depends on stack trace information.",
+        "claimed_sink": "This information exposed to the user depends on stack trace information.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "internal error information disclosure",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/38",
+          "rule:js/stack-trace-exposure",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/checkKeys.ts"
+      },
+      "proof_gaps": [
+        "The claimed stack-trace sink is absent."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/stack-trace-exposure at routes/checkKeys.ts",
+        "The catch response passes utils.getErrorMessage(error), which returns Error.message or a string, not Error.stack.",
+        "Stack is not selected or serialized by this route."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/stack-trace-exposure in routes/checkKeys.ts",
+      "triage_item_id": "triage-021",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/stack-trace-exposure instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "30-30",
+          "path": "routes/checkKeys.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "Stack is not selected or serialized by this route."
+      ],
+      "evidence": [
+        "The catch response passes utils.getErrorMessage(error), which returns Error.message or a string, not Error.stack."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-37",
+      "normalized_input": {
+        "affected_version_or_path": "routes/checkKeys.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This information exposed to the user depends on stack trace information.",
+        "claimed_sink": "This information exposed to the user depends on stack trace information.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "internal error information disclosure",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/37",
+          "rule:js/stack-trace-exposure",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/checkKeys.ts"
+      },
+      "proof_gaps": [
+        "The claimed stack-trace sink is absent."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/stack-trace-exposure at routes/checkKeys.ts",
+        "The catch response passes utils.getErrorMessage(error), which returns Error.message or a string, not Error.stack.",
+        "Stack is not selected or serialized by this route."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/stack-trace-exposure in routes/checkKeys.ts",
+      "triage_item_id": "triage-022",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/clear-text-logging instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "93-93",
+          "path": "lib/antiCheat.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "CodeQL's named sensitive sources are Challenge metadata properties, while the concrete interpolated value is challenge.key."
+      ],
+      "evidence": [
+        "The log statement emits challenge key, timing, configuration booleans, and a computed cheat score; it does not emit password or API-key challenge values."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-36",
+      "normalized_input": {
+        "affected_version_or_path": "lib/antiCheat.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to weakPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.\nThis logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.\nThis logs sensitive data returned by an access to passwordRepeatChallenge as clear text.\nThis logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.",
+        "claimed_sink": "This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to weakPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.\nThis logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.\nThis logs sensitive data returned by an access to passwordRepeatChallenge as clear text.\nThis logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "sensitive data exposure in logs",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/36",
+          "rule:js/clear-text-logging",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/antiCheat.ts"
+      },
+      "proof_gaps": [
+        "No credential value reaches the logger."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/clear-text-logging at lib/antiCheat.ts",
+        "The log statement emits challenge key, timing, configuration booleans, and a computed cheat score; it does not emit password or API-key challenge values.",
+        "CodeQL's named sensitive sources are Challenge metadata properties, while the concrete interpolated value is challenge.key."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/clear-text-logging in lib/antiCheat.ts",
+      "triage_item_id": "triage-023",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/clear-text-logging instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "64-64",
+          "path": "lib/antiCheat.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "CodeQL's named sensitive sources are Challenge metadata properties, while the concrete interpolated value is challenge.key."
+      ],
+      "evidence": [
+        "The log statement emits challenge key and a constant cheat score; it does not emit password or API-key challenge values."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-35",
+      "normalized_input": {
+        "affected_version_or_path": "lib/antiCheat.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to weakPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.\nThis logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.\nThis logs sensitive data returned by an access to passwordRepeatChallenge as clear text.\nThis logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.",
+        "claimed_sink": "This logs sensitive data returned by an access to changePasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to weakPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to dlpPasswordSprayingChallenge as clear text.\nThis logs sensitive data returned by an access to oauthUserPasswordChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordJimChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBenderChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordMortyChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordBjoernOwaspChallenge as clear text.\nThis logs sensitive data returned by an access to resetPasswordUvoginChallenge as clear text.\nThis logs sensitive data returned by an access to passwordRepeatChallenge as clear text.\nThis logs sensitive data returned by an access to leakedApiKeyChallenge as clear text.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "sensitive data exposure in logs",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/35",
+          "rule:js/clear-text-logging",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/antiCheat.ts"
+      },
+      "proof_gaps": [
+        "No credential value reaches the logger."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/clear-text-logging at lib/antiCheat.ts",
+        "The log statement emits challenge key and a constant cheat score; it does not emit password or API-key challenge values.",
+        "CodeQL's named sensitive sources are Challenge metadata properties, while the concrete interpolated value is challenge.key."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/clear-text-logging in lib/antiCheat.ts",
+      "triage_item_id": "triage-024",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/incomplete-sanitization instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "256-256",
+          "path": "server.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "matchedUrl comes from generated anchor markup and the result is emitted as a link only."
+      ],
+      "evidence": [
+        "The replace call rewrites generated relative hyperlinks in an HTML directory-index response; it is not used to validate a filesystem path or other security boundary."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-34",
+      "normalized_input": {
+        "affected_version_or_path": "server.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This replaces only the first occurrence of '..'.",
+        "claimed_sink": "This replaces only the first occurrence of '..'.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "sanitizer bypass",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/34",
+          "rule:js/incomplete-sanitization",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "server.ts"
+      },
+      "proof_gaps": [
+        "The scanner identified an incomplete replacement pattern, but no sanitizer claim or dangerous sink exists."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/incomplete-sanitization at server.ts",
+        "The replace call rewrites generated relative hyperlinks in an HTML directory-index response; it is not used to validate a filesystem path or other security boundary.",
+        "matchedUrl comes from generated anchor markup and the result is emitted as a link only."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/incomplete-sanitization in server.ts",
+      "triage_item_id": "triage-025",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/incomplete-sanitization instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "44-44",
+          "path": "lib/utils.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The returned string is used for containment comparisons, not emitted into HTML, SQL, shell, or filesystem sinks."
+      ],
+      "evidence": [
+        "containsEscaped transforms a comparison needle so challenge detectors can recognize quoted and escaped payloads; it is not an output encoder or security sanitizer."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-33",
+      "normalized_input": {
+        "affected_version_or_path": "lib/utils.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This does not escape backslash characters in the input.",
+        "claimed_sink": "This does not escape backslash characters in the input.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "sanitizer bypass",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/33",
+          "rule:js/incomplete-sanitization",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/utils.ts"
+      },
+      "proof_gaps": [
+        "No security boundary relies on this helper to neutralize backslashes."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/incomplete-sanitization at lib/utils.ts",
+        "containsEscaped transforms a comparison needle so challenge detectors can recognize quoted and escaped payloads; it is not an output encoder or security sanitizer.",
+        "The returned string is used for containment comparisons, not emitted into HTML, SQL, shell, or filesystem sinks."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/incomplete-sanitization in lib/utils.ts",
+      "triage_item_id": "triage-026",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/type-confusion-through-parameter-tampering instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "22-22",
+          "path": "routes/search.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/search.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-32",
+      "normalized_input": {
+        "affected_version_or_path": "routes/search.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/type-confusion-through-parameter-tampering",
+        "claimed_source": "Untrusted application input",
+        "impact": "unexpected input type causing control or query confusion",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/32",
+          "rule:js/type-confusion-through-parameter-tampering",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/search.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/search.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/type-confusion-through-parameter-tampering in routes/search.ts",
+      "triage_item_id": "triage-027",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/type-confusion-through-parameter-tampering instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "136-136",
+          "path": "lib/insecurity.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The function returns only a boolean and does not copy properties or execute input."
+      ],
+      "evidence": [
+        "isRedirectAllowed performs membership checks over a fixed allowlist; alternate Express query types do not create a stronger sink than the separately documented intentional redirect challenge."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-31",
+      "normalized_input": {
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "Potential type confusion as this HTTP request parameter may be either an array or a string.",
+        "claimed_sink": "Potential type confusion as this HTTP request parameter may be either an array or a string.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "unexpected input type causing control or query confusion",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/31",
+          "rule:js/type-confusion-through-parameter-tampering",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/insecurity.ts"
+      },
+      "proof_gaps": [
+        "The actual substring allowlist weakness is separately represented by alert 44 and explicit redirectChallenge annotations."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/type-confusion-through-parameter-tampering at lib/insecurity.ts",
+        "isRedirectAllowed performs membership checks over a fixed allowlist; alternate Express query types do not create a stronger sink than the separately documented intentional redirect challenge.",
+        "The function returns only a boolean and does not copy properties or execute input."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/type-confusion-through-parameter-tampering in lib/insecurity.ts",
+      "triage_item_id": "triage-028",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/insufficient-password-hash instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "41-41",
+          "path": "lib/insecurity.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "lib/insecurity.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-30",
+      "normalized_input": {
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/insufficient-password-hash",
+        "claimed_source": "Untrusted application input",
+        "impact": "offline password cracking",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/30",
+          "rule:js/insufficient-password-hash",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/insecurity.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in lib/insecurity.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/insufficient-password-hash in lib/insecurity.ts",
+      "triage_item_id": "triage-029",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/prototype-polluting-assignment instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "71-71",
+          "path": "lib/accuracy.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The request cannot provide an arbitrary object value, and unknown keys return before accuracy storage."
+      ],
+      "evidence": [
+        "Accuracy state is reached only for repository-defined challenge keys after code-challenge Map lookup; property names below the key are fixed Phase values."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-29",
+      "normalized_input": {
+        "affected_version_or_path": "lib/accuracy.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This assignment may alter Object.prototype if a malicious '__proto__' string is injected from user controlled input.\nThis assignment may alter Object.prototype if a malicious '__proto__' string is injected from user controlled input.",
+        "claimed_sink": "This assignment may alter Object.prototype if a malicious '__proto__' string is injected from user controlled input.\nThis assignment may alter Object.prototype if a malicious '__proto__' string is injected from user controlled input.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "prototype pollution",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/29",
+          "rule:js/prototype-polluting-assignment",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/accuracy.ts"
+      },
+      "proof_gaps": [
+        "No supported arbitrary __proto__ assignment path passes the challenge-key gate."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/prototype-polluting-assignment at lib/accuracy.ts",
+        "Accuracy state is reached only for repository-defined challenge keys after code-challenge Map lookup; property names below the key are fixed Phase values.",
+        "The request cannot provide an arbitrary object value, and unknown keys return before accuracy storage."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/prototype-polluting-assignment in lib/accuracy.ts",
+      "triage_item_id": "triage-030",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/missing-token-validation instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "289-289",
+          "path": "server.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "medium",
+      "counterevidence": [
+        "The scanner has modeled the presence of cookie parsing as ambient cookie authentication, but parsing itself grants no authority."
+      ],
+      "evidence": [
+        "cookieParser only parses cookies and is not a session or authorization middleware; protected APIs use explicit JWT verification, bearer extraction, or per-handler authenticated-user checks."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-28",
+      "normalized_input": {
+        "affected_version_or_path": "server.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.",
+        "claimed_sink": "This cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.\nThis cookie middleware is serving a request handler without CSRF protection.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "cross-site request forgery",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/28",
+          "rule:js/missing-token-validation",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "server.ts"
+      },
+      "proof_gaps": [
+        "The broad alert does not establish a concrete state-changing handler whose sole authorization is an automatically attached session cookie."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/missing-token-validation at server.ts",
+        "cookieParser only parses cookies and is not a session or authorization middleware; protected APIs use explicit JWT verification, bearer extraction, or per-handler authenticated-user checks.",
+        "The scanner has modeled the presence of cookie parsing as ambient cookie authentication, but parsing itself grants no authority."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/missing-token-validation in server.ts",
+      "triage_item_id": "triage-031",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/incomplete-url-substring-sanitization instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "81-81",
+          "path": "test/api/internet-resources.test.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Repository path and test runner structure identify this as test-only code.",
+        "product_surface": "test/fixture",
+        "source_trust": "trusted_developer_config"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "No production import or hosted request handler path exists from this test expression."
+      ],
+      "evidence": [
+        "test/api/internet-resources.test.ts is a test file and the flagged expression is used to verify expected behavior or an external resource."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-27",
+      "normalized_input": {
+        "affected_version_or_path": "test/api/internet-resources.test.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "test code only",
+        "claimed_sink": "js/incomplete-url-substring-sanitization",
+        "claimed_source": "test-authored URL or assertion",
+        "impact": "URL validation bypass",
+        "preconditions": [
+          "The file is executed only by the repository test suite"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/27",
+          "rule:js/incomplete-url-substring-sanitization",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "test/api/internet-resources.test.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "test/api/internet-resources.test.ts is under test/",
+        "the flagged expression is an assertion or external-resource test",
+        "it is not shipped as an application request handler"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/incomplete-url-substring-sanitization in test/api/internet-resources.test.ts",
+      "triage_item_id": "triage-032",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/incomplete-url-substring-sanitization instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "65-65",
+          "path": "test/api/internet-resources.test.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Repository path and test runner structure identify this as test-only code.",
+        "product_surface": "test/fixture",
+        "source_trust": "trusted_developer_config"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "No production import or hosted request handler path exists from this test expression."
+      ],
+      "evidence": [
+        "test/api/internet-resources.test.ts is a test file and the flagged expression is used to verify expected behavior or an external resource."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-26",
+      "normalized_input": {
+        "affected_version_or_path": "test/api/internet-resources.test.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "test code only",
+        "claimed_sink": "js/incomplete-url-substring-sanitization",
+        "claimed_source": "test-authored URL or assertion",
+        "impact": "URL validation bypass",
+        "preconditions": [
+          "The file is executed only by the repository test suite"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/26",
+          "rule:js/incomplete-url-substring-sanitization",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "test/api/internet-resources.test.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "test/api/internet-resources.test.ts is under test/",
+        "the flagged expression is an assertion or external-resource test",
+        "it is not shipped as an application request handler"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/incomplete-url-substring-sanitization in test/api/internet-resources.test.ts",
+      "triage_item_id": "triage-033",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "18-18",
+          "path": "routes/updateProductReviews.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/updateProductReviews.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-25",
+      "normalized_input": {
+        "affected_version_or_path": "routes/updateProductReviews.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/sql-injection",
+        "claimed_source": "Untrusted application input",
+        "impact": "database query injection",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/25",
+          "rule:js/sql-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/updateProductReviews.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/updateProductReviews.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/sql-injection in routes/updateProductReviews.ts",
+      "triage_item_id": "triage-034",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "23-23",
+          "path": "routes/search.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/search.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-24",
+      "normalized_input": {
+        "affected_version_or_path": "routes/search.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/sql-injection",
+        "claimed_source": "Untrusted application input",
+        "impact": "database query injection",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/24",
+          "rule:js/sql-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/search.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/search.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/sql-injection in routes/search.ts",
+      "triage_item_id": "triage-035",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "34-34",
+          "path": "routes/login.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/login.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-23",
+      "normalized_input": {
+        "affected_version_or_path": "routes/login.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/sql-injection",
+        "claimed_source": "Untrusted application input",
+        "impact": "database query injection",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/23",
+          "rule:js/sql-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/login.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/login.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/sql-injection in routes/login.ts",
+      "triage_item_id": "triage-036",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "51-51",
+          "path": "routes/likeProductReviews.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The request id is placed as the value of the fixed _id key and query operator/property names are not constructed from it."
+      ],
+      "evidence": [
+        "The flagged call is a MarsDB query-object equality lookup/update, not SQL string construction; access is additionally gated by JWT middleware and authenticatedUsers.from."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-22",
+      "normalized_input": {
+        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+        "claimed_sink": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "database query injection",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/22",
+          "rule:js/sql-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/likeProductReviews.ts"
+      },
+      "proof_gaps": [
+        "The intended race condition is separately checked through timingAttackChallenge; CodeQL's SQL-injection model does not match this sink."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/sql-injection at routes/likeProductReviews.ts",
+        "The flagged call is a MarsDB query-object equality lookup/update, not SQL string construction; access is additionally gated by JWT middleware and authenticatedUsers.from.",
+        "The request id is placed as the value of the fixed _id key and query operator/property names are not constructed from it."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/sql-injection in routes/likeProductReviews.ts",
+      "triage_item_id": "triage-037",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "43-43",
+          "path": "routes/likeProductReviews.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The request id is the value of a fixed _id key rather than executable SQL text."
+      ],
+      "evidence": [
+        "The flagged call is a MarsDB query-object equality lookup/update, not SQL string construction; access is gated by JWT middleware and an authenticated user."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-21",
+      "normalized_input": {
+        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+        "claimed_sink": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "database query injection",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/21",
+          "rule:js/sql-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/likeProductReviews.ts"
+      },
+      "proof_gaps": [
+        "CodeQL's SQL-injection sink model does not match this database API."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/sql-injection at routes/likeProductReviews.ts",
+        "The flagged call is a MarsDB query-object equality lookup/update, not SQL string construction; access is gated by JWT middleware and an authenticated user.",
+        "The request id is the value of a fixed _id key rather than executable SQL text."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/sql-injection in routes/likeProductReviews.ts",
+      "triage_item_id": "triage-038",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "36-36",
+          "path": "routes/likeProductReviews.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The request id is the value of a fixed _id key rather than executable SQL text."
+      ],
+      "evidence": [
+        "The flagged call is a MarsDB query-object equality lookup/update, not SQL string construction; access is gated by JWT middleware and an authenticated user."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-20",
+      "normalized_input": {
+        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+        "claimed_sink": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "database query injection",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/20",
+          "rule:js/sql-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/likeProductReviews.ts"
+      },
+      "proof_gaps": [
+        "CodeQL's SQL-injection sink model does not match this database API."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/sql-injection at routes/likeProductReviews.ts",
+        "The flagged call is a MarsDB query-object equality lookup/update, not SQL string construction; access is gated by JWT middleware and an authenticated user.",
+        "The request id is the value of a fixed _id key rather than executable SQL text."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/sql-injection in routes/likeProductReviews.ts",
+      "triage_item_id": "triage-039",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/sql-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "25-25",
+          "path": "routes/likeProductReviews.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The request id is the value of a fixed _id key rather than executable SQL text."
+      ],
+      "evidence": [
+        "The flagged call is a MarsDB query-object equality lookup/update, not SQL string construction; access is gated by JWT middleware and an authenticated user."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-19",
+      "normalized_input": {
+        "affected_version_or_path": "routes/likeProductReviews.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+        "claimed_sink": "This query object depends on a user-provided value.\nThis query object depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "database query injection",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/19",
+          "rule:js/sql-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/likeProductReviews.ts"
+      },
+      "proof_gaps": [
+        "CodeQL's SQL-injection sink model does not match this database API."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/sql-injection at routes/likeProductReviews.ts",
+        "The flagged call is a MarsDB query-object equality lookup/update, not SQL string construction; access is gated by JWT middleware and an authenticated user.",
+        "The request id is the value of a fixed _id key rather than executable SQL text."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/sql-injection in routes/likeProductReviews.ts",
+      "triage_item_id": "triage-040",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/template-object-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "123-126",
+          "path": "routes/dataErasure.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/dataErasure.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-18",
+      "normalized_input": {
+        "affected_version_or_path": "routes/dataErasure.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/template-object-injection",
+        "claimed_source": "Untrusted application input",
+        "impact": "server-side template injection",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/18",
+          "rule:js/template-object-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/dataErasure.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/dataErasure.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/template-object-injection in routes/dataErasure.ts",
+      "triage_item_id": "triage-041",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/template-object-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "107-110",
+          "path": "routes/dataErasure.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/dataErasure.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-17",
+      "normalized_input": {
+        "affected_version_or_path": "routes/dataErasure.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/template-object-injection",
+        "claimed_source": "Untrusted application input",
+        "impact": "server-side template injection",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/17",
+          "rule:js/template-object-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/dataErasure.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/dataErasure.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/template-object-injection in routes/dataErasure.ts",
+      "triage_item_id": "triage-042",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "17-17",
+          "path": "routes/changePassword.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/changePassword.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-16",
+      "normalized_input": {
+        "affected_version_or_path": "routes/changePassword.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/sensitive-get-query",
+        "claimed_source": "Untrusted application input",
+        "impact": "sensitive values exposed through URL query strings",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/16",
+          "rule:js/sensitive-get-query",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/changePassword.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/changePassword.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/sensitive-get-query in routes/changePassword.ts",
+      "triage_item_id": "triage-043",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "15-15",
+          "path": "routes/changePassword.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/changePassword.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-15",
+      "normalized_input": {
+        "affected_version_or_path": "routes/changePassword.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/sensitive-get-query",
+        "claimed_source": "Untrusted application input",
+        "impact": "sensitive values exposed through URL query strings",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/15",
+          "rule:js/sensitive-get-query",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/changePassword.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/changePassword.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/sensitive-get-query in routes/changePassword.ts",
+      "triage_item_id": "triage-044",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/sensitive-get-query instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "14-14",
+          "path": "routes/changePassword.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/changePassword.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-14",
+      "normalized_input": {
+        "affected_version_or_path": "routes/changePassword.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/sensitive-get-query",
+        "claimed_source": "Untrusted application input",
+        "impact": "sensitive values exposed through URL query strings",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/14",
+          "rule:js/sensitive-get-query",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/changePassword.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/changePassword.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/sensitive-get-query in routes/changePassword.ts",
+      "triage_item_id": "triage-045",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "90-90",
+          "path": "routes/vulnCodeSnippet.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The metadata suffix is used only after retrieveCodeSnippet confirms a repository-defined key."
+      ],
+      "evidence": [
+        "The key must exist in the precomputed code-challenge Map before the handler proceeds to the metadata read; unknown or traversal-shaped keys return 404 first."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-13",
+      "normalized_input": {
+        "affected_version_or_path": "routes/vulnCodeSnippet.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This path depends on a user-provided value.",
+        "claimed_sink": "This path depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "filesystem path traversal",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/13",
+          "rule:js/path-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/vulnCodeSnippet.ts"
+      },
+      "proof_gaps": [
+        "No attacker-chosen path bypassing the Map membership check is supported."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/path-injection at routes/vulnCodeSnippet.ts",
+        "The key must exist in the precomputed code-challenge Map before the handler proceeds to the metadata read; unknown or traversal-shaped keys return 404 first.",
+        "The metadata suffix is used only after retrieveCodeSnippet confirms a repository-defined key."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/path-injection in routes/vulnCodeSnippet.ts",
+      "triage_item_id": "triage-046",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "89-89",
+          "path": "routes/vulnCodeSnippet.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The metadata suffix is used only after retrieveCodeSnippet confirms a repository-defined key."
+      ],
+      "evidence": [
+        "The key must exist in the precomputed code-challenge Map before the handler proceeds to the metadata read; unknown or traversal-shaped keys return 404 first."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-12",
+      "normalized_input": {
+        "affected_version_or_path": "routes/vulnCodeSnippet.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This path depends on a user-provided value.",
+        "claimed_sink": "This path depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "filesystem path traversal",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/12",
+          "rule:js/path-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/vulnCodeSnippet.ts"
+      },
+      "proof_gaps": [
+        "No attacker-chosen path bypassing the Map membership check is supported."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/path-injection at routes/vulnCodeSnippet.ts",
+        "The key must exist in the precomputed code-challenge Map before the handler proceeds to the metadata read; unknown or traversal-shaped keys return 404 first.",
+        "The metadata suffix is used only after retrieveCodeSnippet confirms a repository-defined key."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/path-injection in routes/vulnCodeSnippet.ts",
+      "triage_item_id": "triage-047",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "81-81",
+          "path": "routes/vulnCodeFixes.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The later metadata read is reached only when enumerated fixes exist for a repository-defined key."
+      ],
+      "evidence": [
+        "readFixes enumerates files in a fixed directory and reads only an enumerated filename whose prefix matches the key; the request key is never concatenated into that read path."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-11",
+      "normalized_input": {
+        "affected_version_or_path": "routes/vulnCodeFixes.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This path depends on a user-provided value.",
+        "claimed_sink": "This path depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "filesystem path traversal",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/11",
+          "rule:js/path-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/vulnCodeFixes.ts"
+      },
+      "proof_gaps": [
+        "A traversal-shaped key cannot make an enumerated basename contain directory separators."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/path-injection at routes/vulnCodeFixes.ts",
+        "readFixes enumerates files in a fixed directory and reads only an enumerated filename whose prefix matches the key; the request key is never concatenated into that read path.",
+        "The later metadata read is reached only when enumerated fixes exist for a repository-defined key."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/path-injection in routes/vulnCodeFixes.ts",
+      "triage_item_id": "triage-048",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "80-80",
+          "path": "routes/vulnCodeFixes.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The later metadata read is reached only when enumerated fixes exist for a repository-defined key."
+      ],
+      "evidence": [
+        "readFixes enumerates files in a fixed directory and reads only an enumerated filename whose prefix matches the key; the request key is never concatenated into that read path."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-10",
+      "normalized_input": {
+        "affected_version_or_path": "routes/vulnCodeFixes.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This path depends on a user-provided value.",
+        "claimed_sink": "This path depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "filesystem path traversal",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/10",
+          "rule:js/path-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/vulnCodeFixes.ts"
+      },
+      "proof_gaps": [
+        "A traversal-shaped key cannot make an enumerated basename contain directory separators."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/path-injection at routes/vulnCodeFixes.ts",
+        "readFixes enumerates files in a fixed directory and reads only an enumerated filename whose prefix matches the key; the request key is never concatenated into that read path.",
+        "The later metadata read is reached only when enumerated fixes exist for a repository-defined key."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/path-injection in routes/vulnCodeFixes.ts",
+      "triage_item_id": "triage-049",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/path-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "29-29",
+          "path": "routes/profileImageUrlUpload.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": false,
+        "policy_basis": "Static source/control/sink inspection defeats the scanner's claimed boundary or sink for this instance.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The URL is not used as a filesystem path; unknown suffixes fall back to jpg."
+      ],
+      "evidence": [
+        "The destination filename uses an authenticated persisted user id plus an extension selected from a fixed image-extension allowlist."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-9",
+      "normalized_input": {
+        "affected_version_or_path": "routes/profileImageUrlUpload.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "This path depends on a user-provided value.",
+        "claimed_sink": "This path depends on a user-provided value.",
+        "claimed_source": "HTTP request-controlled data",
+        "impact": "filesystem path traversal",
+        "preconditions": [
+          "Attacker can reach the scanner-reported code only under the route/function's normal preconditions"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/9",
+          "rule:js/path-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/profileImageUrlUpload.ts"
+      },
+      "proof_gaps": [
+        "No attacker-controlled directory component reaches createWriteStream."
+      ],
+      "reachable_path": [
+        "CodeQL reports js/path-injection at routes/profileImageUrlUpload.ts",
+        "The destination filename uses an authenticated persisted user id plus an extension selected from a fixed image-extension allowlist.",
+        "The URL is not used as a filesystem path; unknown suffixes fall back to jpg."
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/path-injection in routes/profileImageUrlUpload.ts",
+      "triage_item_id": "triage-050",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "Public quarantine-file route",
+          "label": "entrypoint",
+          "lines": "270-271",
+          "path": "server.ts"
+        },
+        {
+          "detail": "Forward-slash-only check precedes path.resolve/sendFile",
+          "label": "control/sink",
+          "lines": "9-17",
+          "path": "routes/quarantineServer.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md treats vulnerabilities outside documented hacking challenges as reportable; route/code evidence shows this path is not required by an existing challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "Forward-slash traversal is rejected."
+      ],
+      "evidence": [
+        "README.md documents Windows as a supported runtime.",
+        "server.ts:271 exposes the route without authentication.",
+        "The test covers encoded forward slashes only; it does not defeat Windows backslash traversal."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [
+          "attacker reachability",
+          "privilege required",
+          "preconditions",
+          "source-to-sink control",
+          "guard strength"
+        ],
+        "rank": 3,
+        "rank_queue": "confirmed",
+        "rationale": "Confirmed queue rank 3: arbitrary file disclosure; ordered by unauthenticated reachability, cross-platform impact, exposed asset sensitivity, and preconditions."
+      },
+      "fix_finding_handoff": "Fix CodeQL alert #8 (js/path-injection) at routes/quarantineServer.ts. GET /ftp/quarantine/:file supplies a decoded filename -> file.includes('/') accepts backslash traversal on Windows -> path.resolve escapes the quarantine directory and sendFile returns the resolved file. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
+      "input_id": "github-codeql-alert-8",
+      "normalized_input": {
+        "affected_version_or_path": "routes/quarantineServer.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "Guard rejects only forward slash, not Windows separators or resolved-path escape",
+        "claimed_sink": "res.sendFile(path.resolve('ftp/quarantine/', file))",
+        "claimed_source": "Unauthenticated route parameter file",
+        "impact": "arbitrary file disclosure",
+        "preconditions": [
+          "Application runs on a supported Windows deployment",
+          "Attacker requests /ftp/quarantine/:file with backslash traversal"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/8",
+          "rule:js/path-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/quarantineServer.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "GET /ftp/quarantine/:file supplies a decoded filename",
+        "file.includes('/') accepts backslash traversal on Windows",
+        "path.resolve escapes the quarantine directory and sendFile returns the resolved file"
+      ],
+      "recommended_next_step": "fix-finding",
+      "source_type": "sarif",
+      "title": "js/path-injection in routes/quarantineServer.ts",
+      "triage_item_id": "triage-051",
+      "verdict": "confirmed"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "Public log-file route",
+          "label": "entrypoint",
+          "lines": "280-283",
+          "path": "server.ts"
+        },
+        {
+          "detail": "Forward-slash-only check precedes path.resolve/sendFile",
+          "label": "control/sink",
+          "lines": "9-17",
+          "path": "routes/logfileServer.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md treats vulnerabilities outside documented hacking challenges as reportable; route/code evidence shows this path is not required by an existing challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "Forward-slash traversal is rejected."
+      ],
+      "evidence": [
+        "README.md documents Windows as a supported runtime.",
+        "server.ts:283 exposes the parameterized log-file route; the preceding challenge middleware does not authorize access.",
+        "routes/logfileServer.ts checks only forward slash."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [
+          "attacker reachability",
+          "privilege required",
+          "preconditions",
+          "source-to-sink control",
+          "guard strength"
+        ],
+        "rank": 4,
+        "rank_queue": "confirmed",
+        "rationale": "Confirmed queue rank 4: arbitrary file disclosure; ordered by unauthenticated reachability, cross-platform impact, exposed asset sensitivity, and preconditions."
+      },
+      "fix_finding_handoff": "Fix CodeQL alert #7 (js/path-injection) at routes/logfileServer.ts. GET /support/logs/:file supplies a decoded filename -> file.includes('/') accepts backslash traversal on Windows -> path.resolve escapes logs and sendFile returns the resolved file. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
+      "input_id": "github-codeql-alert-7",
+      "normalized_input": {
+        "affected_version_or_path": "routes/logfileServer.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "Guard rejects only forward slash, not Windows separators or resolved-path escape",
+        "claimed_sink": "res.sendFile(path.resolve('logs/', file))",
+        "claimed_source": "Unauthenticated route parameter file",
+        "impact": "arbitrary file disclosure",
+        "preconditions": [
+          "Application runs on a supported Windows deployment",
+          "Attacker requests /support/logs/:file with backslash traversal"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/7",
+          "rule:js/path-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/logfileServer.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "GET /support/logs/:file supplies a decoded filename",
+        "file.includes('/') accepts backslash traversal on Windows",
+        "path.resolve escapes logs and sendFile returns the resolved file"
+      ],
+      "recommended_next_step": "fix-finding",
+      "source_type": "sarif",
+      "title": "js/path-injection in routes/logfileServer.ts",
+      "triage_item_id": "triage-052",
+      "verdict": "confirmed"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "Public key-file route",
+          "label": "entrypoint",
+          "lines": "276-278",
+          "path": "server.ts"
+        },
+        {
+          "detail": "Forward-slash-only check precedes path.resolve/sendFile",
+          "label": "control/sink",
+          "lines": "9-17",
+          "path": "routes/keyServer.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md treats vulnerabilities outside documented hacking challenges as reportable; route/code evidence shows this path is not required by an existing challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "Forward-slash traversal is rejected."
+      ],
+      "evidence": [
+        "README.md documents Windows as a supported runtime and package.json includes win32.",
+        "server.ts:278 exposes the file route without authentication.",
+        "routes/keyServer.ts:13 checks only '/' while node:path on Windows treats '\\\\' as a separator."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [
+          "attacker reachability",
+          "privilege required",
+          "preconditions",
+          "source-to-sink control",
+          "guard strength"
+        ],
+        "rank": 2,
+        "rank_queue": "confirmed",
+        "rationale": "Confirmed queue rank 2: arbitrary file disclosure, including encryption-key material; ordered by unauthenticated reachability, cross-platform impact, exposed asset sensitivity, and preconditions."
+      },
+      "fix_finding_handoff": "Fix CodeQL alert #6 (js/path-injection) at routes/keyServer.ts. GET /encryptionkeys/:file supplies a decoded filename -> file.includes('/') accepts backslash traversal on Windows -> path.resolve escapes encryptionkeys and sendFile returns the resolved file. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
+      "input_id": "github-codeql-alert-6",
+      "normalized_input": {
+        "affected_version_or_path": "routes/keyServer.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "Guard rejects only forward slash, not Windows separators or resolved-path escape",
+        "claimed_sink": "res.sendFile(path.resolve('encryptionkeys/', file))",
+        "claimed_source": "Unauthenticated route parameter file",
+        "impact": "arbitrary file disclosure, including encryption-key material",
+        "preconditions": [
+          "Application runs on a supported Windows deployment",
+          "Attacker requests /encryptionkeys/:file with backslash traversal"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/6",
+          "rule:js/path-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/keyServer.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "GET /encryptionkeys/:file supplies a decoded filename",
+        "file.includes('/') accepts backslash traversal on Windows",
+        "path.resolve escapes encryptionkeys and sendFile returns the resolved file"
+      ],
+      "recommended_next_step": "fix-finding",
+      "source_type": "sarif",
+      "title": "js/path-injection in routes/keyServer.ts",
+      "triage_item_id": "triage-053",
+      "verdict": "confirmed"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "Public FTP file route",
+          "label": "entrypoint",
+          "lines": "267-270",
+          "path": "server.ts"
+        },
+        {
+          "detail": "Suffix and forward-slash checks precede path.resolve/sendFile",
+          "label": "control/sink",
+          "lines": "14-36",
+          "path": "routes/fileServer.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md treats vulnerabilities outside documented hacking challenges as reportable; route/code evidence shows this path is not required by an existing challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The suffix allowlist narrows readable targets and forward-slash traversal is rejected."
+      ],
+      "evidence": [
+        "README.md documents Windows as a supported runtime.",
+        "routes/fileServer.ts:18 rejects only '/', and line 33 sends a resolved attacker-influenced path.",
+        "The existing directory-listing/null-byte challenges do not document arbitrary parent-directory reads through Windows separators."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [
+          "attacker reachability",
+          "privilege required",
+          "preconditions",
+          "source-to-sink control",
+          "guard strength"
+        ],
+        "rank": 5,
+        "rank_queue": "confirmed",
+        "rationale": "Confirmed queue rank 5: file disclosure outside the FTP directory for matching filenames; ordered by unauthenticated reachability, cross-platform impact, exposed asset sensitivity, and preconditions."
+      },
+      "fix_finding_handoff": "Fix CodeQL alert #5 (js/path-injection) at routes/fileServer.ts. GET /ftp/:file supplies a decoded filename -> backslash traversal passes the forward-slash test and can retain an allowed suffix -> path.resolve escapes ftp and sendFile returns the resolved file. Preserve documented Juice Shop challenge behavior while removing this unexpected path; verify the exact guard and supported-platform behavior.",
+      "input_id": "github-codeql-alert-5",
+      "normalized_input": {
+        "affected_version_or_path": "routes/fileServer.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "Guard rejects only forward slash and checks a suffix, but does not contain the resolved path on Windows",
+        "claimed_sink": "res.sendFile(path.resolve('ftp/', file))",
+        "claimed_source": "Unauthenticated route parameter file",
+        "impact": "file disclosure outside the FTP directory for matching filenames",
+        "preconditions": [
+          "Application runs on a supported Windows deployment",
+          "Target outside ftp has an allowlisted suffix or accepted poison-null-byte form"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/5",
+          "rule:js/path-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/fileServer.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "GET /ftp/:file supplies a decoded filename",
+        "backslash traversal passes the forward-slash test and can retain an allowed suffix",
+        "path.resolve escapes ftp and sendFile returns the resolved file"
+      ],
+      "recommended_next_step": "fix-finding",
+      "source_type": "sarif",
+      "title": "js/path-injection in routes/fileServer.ts",
+      "triage_item_id": "triage-054",
+      "verdict": "confirmed"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/code-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "18-18",
+          "path": "routes/trackOrder.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/trackOrder.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-4",
+      "normalized_input": {
+        "affected_version_or_path": "routes/trackOrder.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/code-injection",
+        "claimed_source": "Untrusted application input",
+        "impact": "server-side code execution",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/4",
+          "rule:js/code-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/trackOrder.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/trackOrder.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/code-injection in routes/trackOrder.ts",
+      "triage_item_id": "triage-055",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/code-injection instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "36-36",
+          "path": "routes/showProductReviews.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/showProductReviews.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-3",
+      "normalized_input": {
+        "affected_version_or_path": "routes/showProductReviews.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/code-injection",
+        "claimed_source": "Untrusted application input",
+        "impact": "server-side code execution",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/3",
+          "rule:js/code-injection",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/showProductReviews.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/showProductReviews.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/code-injection in routes/showProductReviews.ts",
+      "triage_item_id": "triage-056",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "CodeQL js/request-forgery instance on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+          "label": "scanner location",
+          "lines": "24-24",
+          "path": "routes/profileImageUrlUpload.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": true,
+        "policy_basis": "SECURITY.md plus vuln-code-snippet/challengeUtils/data/static/challenges.yml evidence documents this behavior as an intentional hacking challenge.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "high",
+      "counterevidence": [
+        "The security impact is real, but it is the intended product behavior of this training application rather than an unexpected repository vulnerability."
+      ],
+      "evidence": [
+        "routes/profileImageUrlUpload.ts contains explicit vuln-code-snippet or challengeUtils linkage for the reported weakness.",
+        "data/static/challenges.yml documents the corresponding attack and mitigation context."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [],
+        "rank": null,
+        "rank_queue": null,
+        "rationale": "not actionable"
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-2",
+      "normalized_input": {
+        "affected_version_or_path": "routes/profileImageUrlUpload.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "The reported weakness is deliberately retained as a named Juice Shop hacking challenge",
+        "claimed_sink": "js/request-forgery",
+        "claimed_source": "Untrusted application input",
+        "impact": "server-side request forgery",
+        "preconditions": [
+          "The relevant challenge is enabled"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/2",
+          "rule:js/request-forgery",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "routes/profileImageUrlUpload.ts"
+      },
+      "proof_gaps": [],
+      "reachable_path": [
+        "An HTTP route accepts attacker-controlled data in routes/profileImageUrlUpload.ts",
+        "repository challenge annotations or challenge checks connect the path to a named hacking challenge",
+        "SECURITY.md classifies existing challenge vulnerabilities as intentional"
+      ],
+      "recommended_next_step": "no-action",
+      "source_type": "sarif",
+      "title": "js/request-forgery in routes/profileImageUrlUpload.ts",
+      "triage_item_id": "triage-057",
+      "verdict": "not_actionable"
+    },
+    {
+      "affected_locations": [
+        {
+          "detail": "denyAll uses Math.random as JWT secret",
+          "label": "control",
+          "lines": "52-54",
+          "path": "lib/insecurity.ts"
+        },
+        {
+          "detail": "Middleware protects multiple API methods",
+          "label": "consumers",
+          "lines": "366-446",
+          "path": "server.ts"
+        }
+      ],
+      "boundary_assessment": {
+        "boundary_crossed": null,
+        "policy_basis": "SECURITY.md reports vulnerabilities not part of a hacking challenge; static evidence does not conclusively establish or defeat this boundary.",
+        "product_surface": "hosted service",
+        "source_trust": "untrusted"
+      },
+      "confidence": "medium",
+      "counterevidence": [
+        "The secret is not returned or logged, and denyAll is intended to reject all requests rather than issue tokens.",
+        "A remote guessing path is not established."
+      ],
+      "evidence": [
+        "lib/insecurity.ts:53 directly uses Math.random in a JWT-verification secret.",
+        "server.ts applies denyAll to multiple methods intended to be inaccessible."
+      ],
+      "exploitability_stack_rank": {
+        "drivers": [
+          "attacker reachability",
+          "preconditions",
+          "source-to-sink control",
+          "unresolved runtime semantics"
+        ],
+        "rank": 3,
+        "rank_queue": "needs_review",
+        "rationale": "Needs-review queue rank 3: prioritized by potential confidentiality/control impact and closeness of the static path."
+      },
+      "fix_finding_handoff": null,
+      "input_id": "github-codeql-alert-1",
+      "normalized_input": {
+        "affected_version_or_path": "lib/insecurity.ts on refs/heads/feature01-newPages at 1dc7ba33a037005030a3b374975acc062d5e02d9",
+        "claimed_control": "denyAll creates an express-jwt secret from Math.random()",
+        "claimed_sink": "JWT verification for routes intended to reject every caller",
+        "claimed_source": "Repeated attacker attempts to protected API routes",
+        "impact": "possible bypass of deny-all API controls if the random secret can be recovered or guessed",
+        "preconditions": [
+          "Attacker can mint a JWT matching the express-jwt algorithm",
+          "Generated secret entropy or observability is low enough to recover"
+        ],
+        "references": [
+          "https://github.com/jessicatechdemo/juice-shop/security/code-scanning/1",
+          "rule:js/insecure-randomness",
+          "tool:CodeQL",
+          "ref:refs/heads/feature01-newPages",
+          "commit:1dc7ba33a037005030a3b374975acc062d5e02d9"
+        ],
+        "vulnerable_component": "lib/insecurity.ts"
+      },
+      "proof_gaps": [
+        "Exact Math.random entropy, middleware initialization lifetime, accepted JWT algorithm, and practical offline verification oracle are unresolved."
+      ],
+      "reachable_path": [
+        "Server initializes denyAll middleware with a Math.random-derived secret",
+        "attacker submits crafted JWTs to protected routes",
+        "a correctly guessed secret would make express-jwt accept a request"
+      ],
+      "recommended_next_step": "manual-review",
+      "source_type": "sarif",
+      "title": "js/insecure-randomness in lib/insecurity.ts",
+      "triage_item_id": "triage-058",
+      "verdict": "needs_review"
+    }
+  ],
+  "repository": {
+    "path": "/Users/jessica/Library/CloudStorage/OneDrive-IBM/GitHub/demo/juice-shop",
+    "revision": "1dc7ba33a037005030a3b374975acc062d5e02d9"
+  },
+  "schema_version": "triage-finding/v0"
+}

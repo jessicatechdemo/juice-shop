@@ -96,7 +96,7 @@ export const findChallengeByName = (challengeName: string) => {
       return challenge
     }
   }
-  logger.warn('Missing challenge with name: ' + challengeName)
+  logger.warn('Missing challenge with name: ' + challengeName.replace(/[\r\n]/g, ''))
 }
 
 export const findChallengeById = (challengeId: number) => {
