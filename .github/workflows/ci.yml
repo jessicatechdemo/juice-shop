@@ -199,7 +199,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_DEFAULT_VERSION }}
       - name: "Install application"
-        if: github.repository == 'juice-shop/juice-shop' || (github.repository != 'juice-shop/juice-shop' && matrix.os == 'ubuntu-latest' && matrix.node-version == '24')
+        if: github.repository == 'juice-shop/juice-shop' || github.repository == 'jessicatechdemo/juice-shop' || (github.repository != 'juice-shop/juice-shop' && matrix.os == 'ubuntu-latest' && matrix.node-version == '24')
         run: npm install
       - name: "Execute server tests for each custom configuration"
         uses: nick-invision/retry@7152eba30c6575329ac0576536151aca5a72780e #v3.0.0
