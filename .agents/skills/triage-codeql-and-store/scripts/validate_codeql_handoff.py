@@ -115,8 +115,8 @@ def validate(
     else:
         if metadata.get("scope") != "branch":
             raise HandoffError('metadata.scope must be "branch"')
-        if branch != "main":
-            raise HandoffError("scheduled handoff branch must be main")
+        if branch != "master":
+            raise HandoffError("scheduled handoff branch must be master")
         for field in ("base_revision", "pull_request_number", "pull_request_url"):
             if field in metadata:
                 raise HandoffError(f"branch handoff must omit metadata.{field}")

@@ -7,13 +7,25 @@ on:
     types: [completed]
   workflow_dispatch:
     inputs:
-      plan_run_id:
-        description: "Run ID that produced the reviewed codeql-jira-preview artifact"
+      mode:
+        description: "plan = generate Jira preview from a scan run; apply = publish an approved preview"
         required: true
+        type: choice
+        options:
+          - plan
+          - apply
+        default: plan
+      source_run_id:
+        description: "Run ID of the CodeQL scan that produced the codeql-jira-handoff artifact (plan mode)"
+        required: false
+        type: string
+      plan_run_id:
+        description: "Run ID that produced the reviewed codeql-jira-preview artifact (apply mode)"
+        required: false
         type: string
       approval_token:
-        description: "SHA-256 approval token shown in the reviewed Jira preview"
-        required: true
+        description: "SHA-256 approval token shown in the reviewed Jira preview (apply mode)"
+        required: false
         type: string
 
 jobs:
@@ -43,8 +55,9 @@ jobs:
     env:
       JIRA_PROJECT: KAN
       JIRA_SITE: https://jesssg50mail.atlassian.net
-      HANDOFF_DIR: ${{ runner.temp }}/codeql-jira-handoff
     steps:
+    - name: Set temp paths
+      run: echo "HANDOFF_DIR=$RUNNER_TEMP/codeql-jira-handoff" >> "$GITHUB_ENV"
     - name: Checkout trusted Jira tooling
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
@@ -197,9 +210,9 @@ jobs:
       actions: read
       contents: read
       pull-requests: read
-    env:
-      PLAN_BUNDLE_DIR: ${{ runner.temp }}/codeql-jira-preview
     steps:
+    - name: Set temp paths
+      run: echo "PLAN_BUNDLE_DIR=$RUNNER_TEMP/codeql-jira-preview" >> "$GITHUB_ENV"
     - name: Validate approval inputs
       env:
         APPROVAL_TOKEN: ${{ inputs.approval_token }}
