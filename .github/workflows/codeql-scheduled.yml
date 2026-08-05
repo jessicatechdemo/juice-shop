@@ -122,7 +122,6 @@ jobs:
         permission-profile: ":read-only"
         output-file: ${{ env.CODEQL_TRIAGE_FILE }}
         output-schema-file: .github/codex/triage-finding.schema.json
-        codex-args: "--json"
         prompt: |
           Use $codex-security:triage-finding to triage every existing CodeQL
           finding in ${{ env.CODEQL_INTAKE_FILE }} against this repository.
