@@ -20,7 +20,7 @@ class ValidateCodeqlHandoffTest(unittest.TestCase):
     def digest(self, path):
         return hashlib.sha256(path.read_bytes()).hexdigest()
 
-    def write_branch_handoff(self, root, branch="main"):
+    def write_branch_handoff(self, root, branch="master"):
         revision = "c" * 40
         intake = {
             "schema_version": "codeql-branch-intake/v1",
@@ -79,6 +79,49 @@ class ValidateCodeqlHandoffTest(unittest.TestCase):
         }
         self.write_json(root / "intake.json", intake)
         self.write_json(root / "current.json", triage)
+        codex = {
+            "documentType": "codex-security.findings",
+            "schemaVersion": "1.0",
+            "scanId": "scan-1",
+            "findings": [],
+        }
+        self.write_json(root / "codex-findings.json", codex)
+        self.write_json(
+            root / "codex-scan-metadata.json",
+            {
+                "schema_version": "codex-security-scan-metadata/v1",
+                "revision": revision,
+                "scan_id": "scan-1",
+                "status": "complete",
+                "finding_count": 0,
+                "findings_sha256": self.digest(root / "codex-findings.json"),
+            },
+        )
+        self.write_json(
+            root / "relationships.json",
+            {
+                "schema_version": "security-relationships/v1",
+                "repository": {"revision": revision},
+                "relationships": [
+                    {
+                        "relationship_id": "rel-9",
+                        "status": "proposed",
+                        "classification": "no_candidate",
+                        "codeql_finding_id": "github-codeql-alert-9",
+                        "codex_finding_ids": [],
+                        "same_source": None,
+                        "same_failed_control": None,
+                        "same_sink": None,
+                        "same_precondition": None,
+                        "same_impact": None,
+                        "rationale": "No Codex Security candidate was found.",
+                        "evidence": [],
+                        "human_review_required": True,
+                    }
+                ],
+                "codex_finding_accounting": [],
+            },
+        )
         (root / "report.html").write_text("<html></html>\n", encoding="utf-8")
         (root / "summary.md").write_text("summary\n", encoding="utf-8")
         self.write_json(
@@ -93,6 +136,8 @@ class ValidateCodeqlHandoffTest(unittest.TestCase):
             {
                 "sha256": self.digest(root / "report.html"),
                 "finding_count": 1,
+                "codex_finding_count": 0,
+                "relationship_count": 1,
             },
         )
         files = {
@@ -100,6 +145,9 @@ class ValidateCodeqlHandoffTest(unittest.TestCase):
             for name in (
                 "intake.json",
                 "current.json",
+                "codex-findings.json",
+                "codex-scan-metadata.json",
+                "relationships.json",
                 "report.html",
                 "summary.md",
                 "persist-receipt.json",
@@ -226,7 +274,7 @@ class ValidateCodeqlHandoffTest(unittest.TestCase):
             self.assertEqual(result["revision"], revision)
             self.assertEqual(result["pull_request_url"], "https://github.com/example/repo/pull/42")
 
-    def test_validates_main_branch_handoff(self):
+    def test_validates_master_branch_handoff(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             self.write_branch_handoff(root)
@@ -240,17 +288,17 @@ class ValidateCodeqlHandoffTest(unittest.TestCase):
             )
 
             self.assertEqual(result["scope"], "branch")
-            self.assertEqual(result["branch"], "main")
+            self.assertEqual(result["branch"], "master")
             self.assertNotIn("pull_request_url", result)
 
-    def test_rejects_scheduled_handoff_for_non_main_branch(self):
+    def test_rejects_scheduled_handoff_for_non_master_branch(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             self.write_branch_handoff(root, "develop")
 
             with self.assertRaisesRegex(
                 validate_codeql_handoff.HandoffError,
-                "branch must be main",
+                "branch must be master",
             ):
                 validate_codeql_handoff.validate(root, "example/repo")
 

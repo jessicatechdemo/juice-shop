@@ -1,6 +1,6 @@
 ---
 name: triage-codeql-and-store
-description: Import open GitHub CodeQL alerts for the exact checked-out branch, triage every alert as `confirmed`, `needs_review`, or `not_actionable`, persist the triage-finding/v0 contract, generate a filterable HTML report, and track every persisted finding as an approval-gated Jira Task. Use for complete CodeQL triage, durable reporting, fix-finding handoff, and audited Jira coverage. Put the full finding record, stable Finding ID, report path, CodeQL severity, and optional user-supplied PR in Jira. Use the fixed Jira destination and environment-supplied API credentials, generate one consolidated HTML approval preview, and never create GitHub tracking issues or mutate Code Scanning alerts.
+description: Import and triage CodeQL alerts, correlate scheduled CodeQL results with an independent same-revision Codex Security scan, generate a combined report, and track every scanner finding as a separate approval-gated Jira Task. Human approval of the exact preview may add reciprocal relates-to links and the same relationship rationale to both scanner Tasks. Never create GitHub tracking issues or mutate Code Scanning alerts.
 ---
 
 # Triage CodeQL, Store, and Track in Jira
@@ -122,12 +122,15 @@ evaluated combinations. The workflow's explicit fail-open policy reports an
 indeterminate warning and passes when triage or gate evaluation is unavailable.
 The required check name is `Codex + CodeQL SAST gate`.
 
-### Scheduled main-branch intake
+### Scheduled master-branch intake
 
-The `CodeQL Scheduled Scan` workflow scans only `main`. After analysis, use
-`scripts/codeql_branch_intake.py` to import every open alert for exactly
-`refs/heads/main`, then run the same schema-constrained Codex triage and
-persistence flow used for current-branch intake.
+The `CodeQL Scheduled Scan` workflow resolves one exact `master` revision, then
+runs CodeQL and a standard Codex Security repository scan independently and in
+parallel. Neither scan is conditional on the other scanner's finding count.
+After both complete, use `scripts/codeql_branch_intake.py` to import every open
+alert for exactly `refs/heads/master`, triage every CodeQL finding, and propose
+relationships against the completed Codex Security findings in the same
+reasoning pass. Preserve separate scanner identities and require human review.
 
 Package a successful non-empty scheduled result as
 `codeql-jira-branch-handoff/v1`, including the exact branch, ref, revision,
@@ -183,11 +186,13 @@ instead of including mismatched PR data.
 
 ## Phase 4: Plan every Jira Task
 
-Create one Jira Task for every persisted `confirmed`, `needs_review`, and
-`not_actionable` finding. Use stable summary:
+Create one Jira Task for every persisted CodeQL finding and one separate Jira
+Task for every completed Codex Security finding. This includes CodeQL
+`confirmed`, `needs_review`, and `not_actionable` findings. Use stable summary:
 
 ```text
 [CodeQL][#<alert-number>] <finding title>
+[Codex Security][<finding-id>] <finding title>
 ```
 
 The description must include:
@@ -338,7 +343,10 @@ never rewrite or delete them.
 - Never omit any persisted finding from a complete run.
 - Never infer a PR, assignee, priority, Jira field, or destination.
 - Never overwrite an existing Jira description or add unchanged-field comments.
-- Never transition, resolve, delete, link, attach, or log work on Jira Tasks.
+- Never transition, resolve, delete, attach, or log work on Jira Tasks.
+- Create Jira issue links only for exact-overlap or related-distinct pairs in
+  the exact approved preview. Add the same approved rationale to both Tasks and
+  verify both comments and the reciprocal link by readback.
 - Never mutate GitHub alerts or create GitHub tracking issues.
 - Never continue after branch, revision, artifact, identity, permission,
   metadata, duplicate, or destination drift.

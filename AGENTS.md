@@ -110,6 +110,10 @@ git commit -s -m "Your commit message"
 - Keep PRs focused on a single scope.
 - Reference related issues in PR descriptions.
 
+### 6. Plan Documents
+
+All plan documents created by AI agents must be written under the repository's `decision/` directory. Do not create plan files at the repository root or in another directory unless the user explicitly requests a different location.
+
 ## Development Workflow
 
 ### 1. Understanding the Codebase

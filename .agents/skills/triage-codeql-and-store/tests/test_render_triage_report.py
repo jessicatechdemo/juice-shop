@@ -96,6 +96,56 @@ class RenderTriageReportTest(unittest.TestCase):
         self.assertEqual(sum(counts.values()), 0)
         self.assertIn("No CodeQL findings were imported.", report)
 
+    def test_report_renders_both_scanners_and_relationship_rationale(self):
+        codex = {
+            "documentType": "codex-security.findings",
+            "findings": [
+                {
+                    "findingId": "csf-1",
+                    "title": "Codex finding",
+                    "summary": "Codex summary",
+                    "locations": [
+                        {
+                            "path": "routes/example.ts",
+                            "startLine": 10,
+                            "endLine": 12,
+                            "role": "sink",
+                        }
+                    ],
+                    "severity": {"level": "medium"},
+                    "validation": {"evidence": ["Validated path"]},
+                }
+            ],
+        }
+        relationships = {
+            "schema_version": "security-relationships/v1",
+            "repository": {"revision": "a" * 40},
+            "relationships": [
+                {
+                    "relationship_id": "rel-1",
+                    "classification": "exact_overlap",
+                    "codeql_finding_id": "github-codeql-alert-1",
+                    "codex_finding_ids": ["csf-1"],
+                    "same_source": True,
+                    "same_failed_control": True,
+                    "same_sink": True,
+                    "same_precondition": True,
+                    "same_impact": True,
+                    "rationale": "Same source, control and sink.",
+                    "evidence": ["routes/example.ts:10-12"],
+                }
+            ],
+        }
+
+        report, _ = render_triage_report.build_report(
+            self.payload(), "master", codex, relationships
+        )
+
+        self.assertIn("CodeQL ↔ Codex Security correlation", report)
+        self.assertIn("Codex Security Finding ID:</strong> csf-1", report)
+        self.assertIn("Same source, control and sink.", report)
+        self.assertIn("pending human review", report)
+
     def test_load_triage_rejects_unknown_verdict(self):
         payload = self.payload()
         payload["findings"][0]["verdict"] = "unknown"

@@ -193,6 +193,61 @@ class JiraWritebackTest(unittest.TestCase):
         self.assertIn("### Pull request", description)
         self.assertIn("URL: https://github.com/example/repo/pull/42", description)
 
+    def test_codex_description_contains_reciprocal_relationship_rationale(self):
+        codex = {
+            "documentType": "codex-security.findings",
+            "scanId": "scan-1",
+            "findings": [
+                {
+                    "findingId": "csf-1",
+                    "title": "Codex finding",
+                    "summary": "Validated summary",
+                    "locations": [],
+                    "severity": {"level": "medium"},
+                    "validation": {
+                        "evidence": ["Validated evidence"],
+                        "counterEvidence": [],
+                    },
+                }
+            ],
+        }
+        finding = jira_writeback.validate_codex_findings(codex)[0]
+        relationship = {
+            "relationship_id": "rel-1",
+            "classification": "exact_overlap",
+            "counterpart_finding_ids": ["github-codeql-alert-7"],
+            "same_source": True,
+            "same_failed_control": True,
+            "same_sink": True,
+            "same_precondition": True,
+            "same_impact": True,
+            "rationale": "Both scanners identified the same data flow.",
+        }
+
+        description = jira_writeback.build_description(
+            finding,
+            "example/repo",
+            "master",
+            "a" * 40,
+            "report.html",
+            "b" * 64,
+            None,
+            0,
+            "Codex Security scan scan-1",
+            "c" * 64,
+            "medium",
+            {"id": "3", "name": "Medium"},
+            "codex_security_severity",
+            None,
+            "codex_security",
+            relationship,
+        )
+
+        self.assertIn("## Codex Security finding", description)
+        self.assertIn("Relationship ID: rel-1", description)
+        self.assertIn("github-codeql-alert-7", description)
+        self.assertIn("Both scanners identified the same data flow.", description)
+
     def test_update_comment_contains_only_changed_fields(self):
         previous = {
             "status": "needs_review",
@@ -219,13 +274,43 @@ class JiraWritebackTest(unittest.TestCase):
         self.assertIn("## [Update]", comment)
         self.assertIn(f"Update fingerprint: {fingerprint}", comment)
 
+    def test_relationship_comment_and_link_readback_are_reciprocal(self):
+        operation = {
+            "relationship_id": "rel-1",
+            "relationship_fingerprint": "f" * 64,
+            "classification": "exact_overlap",
+            "rationale": "Both scanners found the same source, control and sink.",
+        }
+        comment = jira_writeback.relationship_comment(
+            operation, "csf-1", "SEC-2"
+        )
+        issue = {
+            "fields": {
+                "issuelinks": [
+                    {"outwardIssue": {"key": "SEC-2"}}
+                ]
+            }
+        }
+
+        self.assertIn("Relationship ID: rel-1", comment)
+        self.assertIn("Related Jira Task: SEC-2", comment)
+        self.assertIn("Both scanners found", comment)
+        self.assertTrue(jira_writeback.issue_has_link(issue, "SEC-2"))
+        self.assertFalse(jira_writeback.issue_has_link(issue, "SEC-3"))
+
     def test_labels_preserve_unowned_values_and_replace_triage_status(self):
         labels = jira_writeback.labels_for(
             "confirmed", ["team-security", "triage-needs-review", "codex-codeql"]
         )
 
         self.assertEqual(
-            labels, ["codex-codeql", "team-security", "triage-confirmed"]
+            labels,
+            [
+                "codex-codeql",
+                "scanner-codeql",
+                "team-security",
+                "triage-confirmed",
+            ],
         )
 
     def test_html_is_authoritative_plan_without_credentials(self):

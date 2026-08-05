@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plan and apply approval-gated Jira tracking for persisted CodeQL triage."""
+"""Plan and apply Jira tracking for CodeQL and Codex Security findings."""
 
 from __future__ import annotations
 
@@ -22,9 +22,11 @@ from urllib.parse import quote, urlencode, urlparse
 from urllib.request import Request, urlopen
 
 
-PREVIEW_SCHEMA = "codeql-triage-jira-preview/v1"
-RECEIPT_SCHEMA = "codeql-triage-jira-receipt/v1"
+PREVIEW_SCHEMA = "combined-security-triage-jira-preview/v1"
+RECEIPT_SCHEMA = "combined-security-triage-jira-receipt/v1"
 TRIAGE_SCHEMA = "triage-finding/v0"
+RELATIONSHIP_SCHEMA = "security-relationships/v1"
+CODEX_DOCUMENT_TYPE = "codex-security.findings"
 VERDICTS = ("confirmed", "needs_review", "not_actionable")
 TRIAGE_LABELS = {f"triage-{verdict.replace('_', '-')}" for verdict in VERDICTS}
 MAX_TECHNICAL_BATCH = 25
@@ -343,8 +345,134 @@ def codeql_security_severity(finding: dict[str, Any]) -> str | None:
     return None
 
 
-def finding_fingerprint(repository: str, number: int, finding_id: str) -> str:
-    return sha256(f"{repository}\n{number}\n{finding_id}\n".encode("utf-8"))
+def finding_fingerprint(
+    repository: str, number: int | None, finding_id: str, scanner: str = "codeql"
+) -> str:
+    identity = str(number) if number is not None else finding_id
+    return sha256(f"{repository}\n{scanner}\n{identity}\n{finding_id}\n".encode("utf-8"))
+
+
+def validate_codex_findings(value: dict[str, Any]) -> list[dict[str, Any]]:
+    if value.get("documentType") != CODEX_DOCUMENT_TYPE:
+        raise JiraWritebackError(
+            f'Codex findings documentType must be "{CODEX_DOCUMENT_TYPE}"'
+        )
+    findings = value.get("findings")
+    if not isinstance(findings, list):
+        raise JiraWritebackError("Codex findings must be an array")
+    normalized = []
+    seen: set[str] = set()
+    for index, finding in enumerate(findings):
+        field = f"codex.findings[{index}]"
+        if not isinstance(finding, dict):
+            raise JiraWritebackError(f"{field} must be an object")
+        finding_id = require_string(finding.get("findingId"), f"{field}.findingId")
+        if finding_id in seen:
+            raise JiraWritebackError(f"duplicate Codex finding ID: {finding_id}")
+        seen.add(finding_id)
+        severity = finding.get("severity")
+        severity = severity if isinstance(severity, dict) else {}
+        level = str(severity.get("level", "")).lower()
+        if level not in {"critical", "high", "medium", "low"}:
+            level = None
+        validation = finding.get("validation")
+        validation = validation if isinstance(validation, dict) else {}
+        affected_locations = []
+        for location in finding.get("locations", []):
+            if not isinstance(location, dict):
+                continue
+            start = location.get("startLine")
+            end = location.get("endLine")
+            lines = (
+                f"{start}-{end}"
+                if isinstance(start, int) and isinstance(end, int)
+                else "unknown"
+            )
+            affected_locations.append(
+                {
+                    "label": clean_line(location.get("role", "location")),
+                    "path": clean_line(location.get("path", "unknown")),
+                    "lines": lines,
+                }
+            )
+        normalized.append(
+            {
+                "input_id": finding_id,
+                "triage_item_id": f"codex-security-{finding_id}",
+                "source_type": "codex-security",
+                "verdict": "confirmed",
+                "confidence": clean_line(
+                    (finding.get("confidence") or {}).get("level", "high")
+                    if isinstance(finding.get("confidence"), dict)
+                    else "high"
+                ),
+                "title": clean_line(finding.get("title", "Codex Security finding")),
+                "normalized_input": {"references": []},
+                "affected_locations": affected_locations,
+                "evidence": list_values(
+                    validation.get("evidence"), clean_line(finding.get("summary", "No evidence recorded."))
+                ),
+                "counterevidence": list_values(
+                    validation.get("counterEvidence"), "No counterevidence recorded."
+                ),
+                "proof_gaps": [],
+                "recommended_next_step": "fix-finding",
+                "fix_finding_handoff": (
+                    f"Use $codex-security:fix-finding for {finding_id}."
+                ),
+                "_scanner": "codex_security",
+                "_severity": level,
+                "_scanner_reference": f"Codex Security scan {clean_line(value.get('scanId'))}",
+            }
+        )
+    return normalized
+
+
+def validate_relationships(
+    value: dict[str, Any], revision: str, finding_ids: set[str]
+) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
+    if value.get("schema_version") != RELATIONSHIP_SCHEMA:
+        raise JiraWritebackError(
+            f'relationship schema_version must be "{RELATIONSHIP_SCHEMA}"'
+        )
+    repository = value.get("repository")
+    if not isinstance(repository, dict) or repository.get("revision") != revision:
+        raise JiraWritebackError("relationship revision does not match triage")
+    by_finding: dict[str, dict[str, Any]] = {}
+    by_id: dict[str, dict[str, Any]] = {}
+    for index, relationship in enumerate(value.get("relationships", [])):
+        field = f"relationships[{index}]"
+        if not isinstance(relationship, dict):
+            raise JiraWritebackError(f"{field} must be an object")
+        relationship_id = require_string(
+            relationship.get("relationship_id"), f"{field}.relationship_id"
+        )
+        if relationship_id in by_id:
+            raise JiraWritebackError(f"duplicate relationship ID: {relationship_id}")
+        codeql_id = require_string(
+            relationship.get("codeql_finding_id"), f"{field}.codeql_finding_id"
+        )
+        codex_ids = relationship.get("codex_finding_ids")
+        if not isinstance(codex_ids, list) or any(
+            not isinstance(identifier, str) for identifier in codex_ids
+        ):
+            raise JiraWritebackError(f"{field}.codex_finding_ids is invalid")
+        referenced = [codeql_id, *codex_ids]
+        unknown = sorted(set(referenced) - finding_ids)
+        if unknown:
+            raise JiraWritebackError(f"{field} references unknown findings: {unknown}")
+        by_id[relationship_id] = relationship
+        for identifier in referenced:
+            if identifier in by_finding:
+                raise JiraWritebackError(
+                    f"finding {identifier} has more than one relationship record"
+                )
+            counterpart_ids = [item for item in referenced if item != identifier]
+            by_finding[identifier] = {
+                **relationship,
+                "counterpart_finding_ids": counterpart_ids,
+            }
+    return by_finding, by_id
 
 
 def list_values(value: Any, fallback: str) -> list[str]:
@@ -406,12 +534,18 @@ def validate_pr(
 
 
 def jira_context(
-    client: JiraClient, project_key: str, issue_type_name: str
+    client: JiraClient,
+    project_key: str,
+    issue_type_name: str,
+    require_relationship_links: bool = False,
 ) -> dict[str, Any]:
+    required_permissions = list(JIRA_PERMISSIONS)
+    if require_relationship_links:
+        required_permissions.append("LINK_ISSUES")
     myself = client.request("GET", "/rest/api/3/myself")
     project = client.request("GET", f"/rest/api/3/project/{quote(project_key)}")
     query = urlencode(
-        {"projectKey": project_key, "permissions": ",".join(JIRA_PERMISSIONS)}
+        {"projectKey": project_key, "permissions": ",".join(required_permissions)}
     )
     permissions = client.request("GET", f"/rest/api/3/mypermissions?{query}")
     permission_values = permissions.get("permissions") if isinstance(permissions, dict) else None
@@ -419,7 +553,7 @@ def jira_context(
         raise JiraWritebackError("Jira returned invalid permission metadata")
     missing_permissions = [
         key
-        for key in JIRA_PERMISSIONS
+        for key in required_permissions
         if not isinstance(permission_values.get(key), dict)
         or permission_values[key].get("havePermission") is not True
     ]
@@ -494,6 +628,37 @@ def jira_context(
         for item in priority_metadata.get("allowedValues", [])
         if isinstance(item, dict) and item.get("id") and item.get("name")
     ]
+    relationship_link_type = None
+    if require_relationship_links:
+        link_types_value = client.request("GET", "/rest/api/3/issueLinkType")
+        link_types = (
+            link_types_value.get("issueLinkTypes")
+            if isinstance(link_types_value, dict)
+            else None
+        )
+        if not isinstance(link_types, list):
+            raise JiraWritebackError("Jira returned invalid issue link types")
+        relates = [
+            item
+            for item in link_types
+            if isinstance(item, dict)
+            and (
+                str(item.get("name", "")).lower() == "relates"
+                or (
+                    str(item.get("inward", "")).lower() == "relates to"
+                    and str(item.get("outward", "")).lower() == "relates to"
+                )
+            )
+        ]
+        if len(relates) != 1:
+            raise JiraWritebackError(
+                "Jira must provide one unambiguous relates-to link type"
+            )
+        link_type = relates[0]
+        relationship_link_type = {
+            "id": require_identifier(link_type.get("id"), "Jira link type id"),
+            "name": require_string(link_type.get("name"), "Jira link type name"),
+        }
     return {
         "site": client.site,
         "account_id": require_string(myself.get("accountId"), "Jira accountId"),
@@ -504,7 +669,8 @@ def jira_context(
         "issue_type_id": require_identifier(issue_type.get("id"), "Jira issue type id"),
         "issue_type_name": issue_type_name,
         "priorities": priorities,
-        "permissions": list(JIRA_PERMISSIONS),
+        "permissions": required_permissions,
+        "relationship_link_type": relationship_link_type,
     }
 
 
@@ -592,16 +758,20 @@ def build_description(
     priority: dict[str, str] | None,
     priority_source: str,
     pr: dict[str, Any] | None,
+    scanner: str = "codeql",
+    relationship: dict[str, Any] | None = None,
 ) -> str:
     handoff = finding.get("fix_finding_handoff")
     handoff_text = handoff.strip() if isinstance(handoff, str) and handoff.strip() else "Not applicable."
+    scanner_label = "CodeQL" if scanner == "codeql" else "Codex Security"
     parts = [
-        "## CodeQL finding",
+        f"## {scanner_label} finding",
+        f"Scanner: {scanner_label}",
         f"Status: {finding['verdict']}",
         f"Finding ID: {finding['input_id']}",
         f"Triage item ID: {finding['triage_item_id']}",
         f"Finding fingerprint: {fingerprint}",
-        f"CodeQL security severity: {severity or 'not provided'}",
+        f"Scanner security severity: {severity or 'not provided'}",
         f"Jira priority: {priority['name'] if priority else 'Jira default'}",
         f"Priority source: {priority_source}",
         f"Report path: {report_path}",
@@ -611,7 +781,7 @@ def build_description(
         parts.append(f"Report URL: {report_url}")
     parts.extend(
         [
-            f"Code scanning alert: {url}",
+            f"Scanner reference: {url}",
             f"Repository: {repository}",
             f"Branch: {branch}",
             f"Revision: {revision}",
@@ -637,6 +807,42 @@ def build_description(
         ("Proof gaps", finding.get("proof_gaps"), "None recorded."),
     ):
         parts.extend([f"### {heading}", *[f"- {item}" for item in list_values(values, fallback)]])
+    if relationship:
+        classification = relationship.get("classification")
+        if classification in {"exact_overlap", "related_distinct"}:
+            relationship_status = (
+                "Human-confirmed by application of this exact Jira approval preview."
+            )
+        elif classification == "no_candidate":
+            relationship_status = "No cross-scan candidate identified for this revision."
+        else:
+            relationship_status = "Pending further human review; no Jira issue link is authorized."
+        criteria = []
+        for field, label in (
+            ("same_source", "Source"),
+            ("same_failed_control", "Failed control"),
+            ("same_sink", "Sink"),
+            ("same_precondition", "Precondition"),
+            ("same_impact", "Impact"),
+        ):
+            value = relationship.get(field)
+            criteria.append(
+                f"{label}: {'match' if value is True else 'different' if value is False else 'unknown'}"
+            )
+        parts.extend(
+            [
+                "### Cross-scan relationship",
+                f"Relationship status: {relationship_status}",
+                f"Relationship ID: {clean_line(relationship.get('relationship_id'))}",
+                f"Classification: {clean_line(classification)}",
+                "Related scanner finding IDs: "
+                + ", ".join(relationship.get("counterpart_finding_ids", [])),
+                "Identity criteria:",
+                *[f"- {criterion}" for criterion in criteria],
+                "Rationale:",
+                clean_line(relationship.get("rationale")),
+            ]
+        )
     parts.extend(
         [
             "### Recommended next step",
@@ -644,7 +850,11 @@ def build_description(
             "### Fix-finding handoff",
             handoff_text,
             "### Tracking information",
-            f"This Jira Task tracks Code Scanning alert #{number} without changing or dismissing the alert.",
+            (
+                f"This Jira Task tracks Code Scanning alert #{number} without changing or dismissing the alert."
+                if scanner == "codeql"
+                else "This Jira Task independently tracks the Codex Security finding."
+            ),
         ]
     )
     return "\n\n".join(parts).strip() + "\n"
@@ -656,6 +866,8 @@ def snapshot(
     priority: dict[str, str] | None,
     priority_source: str,
     pr: dict[str, Any] | None,
+    scanner: str = "codeql",
+    relationship: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "status": finding["verdict"],
@@ -670,6 +882,8 @@ def snapshot(
         "recommended_next_step": clean_line(finding.get("recommended_next_step", "unspecified")),
         "fix_finding_handoff": finding.get("fix_finding_handoff"),
         "pull_request": pr,
+        "scanner": scanner,
+        "relationship": relationship,
     }
 
 
@@ -756,7 +970,7 @@ def search_candidates(client: JiraClient, project_key: str, value: str) -> list[
 
 
 def get_issue(client: JiraClient, key: str) -> dict[str, Any]:
-    fields = "summary,description,labels,priority,issuetype,project,comment"
+    fields = "summary,description,labels,priority,issuetype,project,comment,issuelinks"
     value = client.request(
         "GET", f"/rest/api/3/issue/{quote(key)}?fields={quote(fields)}"
     )
@@ -832,13 +1046,45 @@ def load_previous_receipt(path: Path) -> tuple[dict[str, Any], str | None]:
     }, sha256(raw)
 
 
-def labels_for(status: str, existing: list[str] | None = None) -> list[str]:
+def labels_for(
+    status: str,
+    existing: list[str] | None = None,
+    scanner: str = "codeql",
+    relationship: dict[str, Any] | None = None,
+) -> list[str]:
+    owned = {
+        "codex-codeql",
+        "scanner-codeql",
+        "scanner-codex-security",
+        "relationship-review-pending",
+        "relationship-exact-overlap",
+        "relationship-related-distinct",
+        "relationship-none",
+        "relationship-review-required",
+    }
     retained = {
         value
         for value in existing or []
-        if isinstance(value, str) and value not in TRIAGE_LABELS and value != "codex-codeql"
+        if isinstance(value, str) and value not in TRIAGE_LABELS and value not in owned
     }
-    retained.update({"codex-codeql", f"triage-{status.replace('_', '-')}"})
+    retained.update(
+        {
+            "codex-codeql",
+            "scanner-codeql" if scanner == "codeql" else "scanner-codex-security",
+            f"triage-{status.replace('_', '-')}",
+        }
+    )
+    if relationship:
+        classification = relationship.get("classification")
+        if classification == "exact_overlap":
+            retained.add("relationship-exact-overlap")
+        elif classification == "related_distinct":
+            retained.add("relationship-related-distinct")
+        elif classification == "no_candidate":
+            retained.add("relationship-none")
+        else:
+            retained.add("relationship-review-pending")
+            retained.add("relationship-review-required")
     return sorted(retained)
 
 
@@ -855,9 +1101,55 @@ def current_issue_state(issue: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def relationship_fingerprint(relationship: dict[str, Any]) -> str:
+    payload = {
+        "relationship_id": relationship.get("relationship_id"),
+        "classification": relationship.get("classification"),
+        "codeql_finding_id": relationship.get("codeql_finding_id"),
+        "codex_finding_ids": relationship.get("codex_finding_ids"),
+        "rationale": relationship.get("rationale"),
+    }
+    return sha256(json.dumps(payload, sort_keys=True).encode("utf-8"))
+
+
+def relationship_comment(
+    operation: dict[str, Any], counterpart_finding_id: str, counterpart_key: str
+) -> str:
+    return "\n\n".join(
+        [
+            "## Cross-scan relationship",
+            f"Relationship fingerprint: {operation['relationship_fingerprint']}",
+            f"Relationship ID: {operation['relationship_id']}",
+            f"Classification: {operation['classification']}",
+            f"Related Jira Task: {counterpart_key}",
+            f"Related scanner finding ID: {counterpart_finding_id}",
+            "Human approval: confirmed by application of the exact Jira approval preview.",
+            "### Rationale",
+            operation["rationale"],
+        ]
+    ) + "\n"
+
+
+def issue_has_link(issue: dict[str, Any], counterpart_key: str) -> bool:
+    fields = issue.get("fields")
+    links = fields.get("issuelinks") if isinstance(fields, dict) else None
+    if not isinstance(links, list):
+        return False
+    for link in links:
+        if not isinstance(link, dict):
+            continue
+        for direction in ("inwardIssue", "outwardIssue"):
+            related = link.get(direction)
+            if isinstance(related, dict) and related.get("key") == counterpart_key:
+                return True
+    return False
+
+
 def build_plan(
     *,
     triage_path: Path,
+    codex_findings_path: Path | None = None,
+    relationships_path: Path | None = None,
     report_path: Path,
     repository: str,
     branch: str,
@@ -878,11 +1170,44 @@ def build_plan(
     report_relative, report_raw = relative_file(report_path, root, "HTML report")
     triage = json.loads(triage_raw)
     revision, findings = validate_triage(triage)
+    codeql_findings = [{**finding, "_scanner": "codeql"} for finding in findings]
+    codex_relative = None
+    codex_raw = None
+    relationship_relative = None
+    relationship_raw = None
+    codex_findings: list[dict[str, Any]] = []
+    relationship_by_finding: dict[str, dict[str, Any]] = {}
+    relationship_by_id: dict[str, dict[str, Any]] = {}
+    if (codex_findings_path is None) != (relationships_path is None):
+        raise JiraWritebackError(
+            "Codex findings and relationships must be supplied together"
+        )
+    if codex_findings_path is not None and relationships_path is not None:
+        codex_relative, codex_raw = relative_file(
+            codex_findings_path, root, "Codex findings artifact"
+        )
+        relationship_relative, relationship_raw = relative_file(
+            relationships_path, root, "relationship artifact"
+        )
+        codex_findings = validate_codex_findings(json.loads(codex_raw))
+        all_ids = {
+            finding["input_id"] for finding in [*codeql_findings, *codex_findings]
+        }
+        relationship_by_finding, relationship_by_id = validate_relationships(
+            json.loads(relationship_raw), revision, all_ids
+        )
+    findings = [*codeql_findings, *codex_findings]
     if git_value(root, "symbolic-ref", "--quiet", "--short", "HEAD") != branch:
         raise JiraWritebackError("requested branch is not the current checkout")
     if git_value(root, "rev-parse", "HEAD") != revision:
         raise JiraWritebackError("triage revision is not the current checkout revision")
-    context = jira_context(client, project_key, issue_type)
+    require_relationship_links = any(
+        relationship.get("classification") in {"exact_overlap", "related_distinct"}
+        for relationship in relationship_by_id.values()
+    )
+    context = jira_context(
+        client, project_key, issue_type, require_relationship_links
+    )
     if context["site"] != canonical_site(site) or context["project_key"] != project_key:
         raise JiraWritebackError("live Jira destination does not match the selected destination")
     pr = validate_pr(pr_url, repository, branch, revision)
@@ -894,15 +1219,39 @@ def build_plan(
     )
 
     items = []
-    for finding in sorted(findings, key=alert_number):
-        number = alert_number(finding)
+    for finding in sorted(
+        findings, key=lambda item: (str(item.get("_scanner")), str(item.get("input_id")))
+    ):
+        scanner = str(finding.get("_scanner", "codeql"))
+        number = alert_number(finding) if scanner == "codeql" else None
         finding_id = finding["input_id"]
-        fingerprint = finding_fingerprint(repository, number, finding_id)
-        severity = codeql_security_severity(finding)
+        relationship = relationship_by_finding.get(finding_id)
+        fingerprint = finding_fingerprint(repository, number, finding_id, scanner)
+        severity = (
+            codeql_security_severity(finding)
+            if scanner == "codeql"
+            else finding.get("_severity")
+        )
         priority, priority_source = mapped_priority(severity, context["priorities"])
-        summary = f"[CodeQL][#{number}] {clean_line(finding.get('title', 'CodeQL finding'))}"[:255]
-        url = alert_url(finding, repository, number)
-        current_snapshot = snapshot(finding, severity, priority, priority_source, pr)
+        summary = (
+            f"[CodeQL][#{number}] {clean_line(finding.get('title', 'CodeQL finding'))}"
+            if scanner == "codeql"
+            else f"[Codex Security][{finding_id}] {clean_line(finding.get('title', 'Codex Security finding'))}"
+        )[:255]
+        url = (
+            alert_url(finding, repository, int(number))
+            if scanner == "codeql" and number is not None
+            else clean_line(finding.get("_scanner_reference", "Codex Security scan"))
+        )
+        current_snapshot = snapshot(
+            finding,
+            severity,
+            priority,
+            priority_source,
+            pr,
+            scanner,
+            relationship,
+        )
         description = build_description(
             finding,
             repository,
@@ -911,13 +1260,15 @@ def build_plan(
             report_relative,
             report_digest,
             report_url,
-            number,
+            int(number or 0),
             url,
             fingerprint,
             severity,
             priority,
             priority_source,
             pr,
+            scanner,
+            relationship,
         )
         duplicate = find_issue(client, project_key, finding_id, fingerprint)
         action = "create"
@@ -966,7 +1317,9 @@ def build_plan(
                             f"finding {finding_id}: live Jira comments disagree with the previous receipt"
                         )
                 changes = changed_fields(baseline["snapshot"], current_snapshot)
-                desired_labels = labels_for(finding["verdict"], live["labels"])
+                desired_labels = labels_for(
+                    finding["verdict"], live["labels"], scanner, relationship
+                )
                 if desired_labels != live["labels"]:
                     changes["jira_labels"] = {
                         "previous": live["labels"],
@@ -997,7 +1350,7 @@ def build_plan(
             "issuetype": {"id": context["issue_type_id"]},
             "summary": summary,
             "description": adf_document(description),
-            "labels": labels_for(finding["verdict"]),
+            "labels": labels_for(finding["verdict"], None, scanner, relationship),
         }
         if priority:
             create_fields["priority"] = {"id": priority["id"]}
@@ -1010,6 +1363,8 @@ def build_plan(
                 "finding_fingerprint": fingerprint,
                 "alert_number": number,
                 "alert_url": url,
+                "scanner": scanner,
+                "relationship_id": relationship.get("relationship_id") if relationship else None,
                 "verdict": finding["verdict"],
                 "summary": summary,
                 "description": description,
@@ -1024,6 +1379,31 @@ def build_plan(
                 "last_update_fingerprint": last_update_fingerprint,
             }
         )
+    relationship_operations = []
+    for relationship_id, relationship in sorted(relationship_by_id.items()):
+        if relationship.get("classification") not in {
+            "exact_overlap",
+            "related_distinct",
+        }:
+            continue
+        fingerprint = relationship_fingerprint(relationship)
+        for codex_id in relationship.get("codex_finding_ids", []):
+            relationship_operations.append(
+                {
+                    "relationship_id": relationship_id,
+                    "relationship_fingerprint": fingerprint,
+                    "classification": relationship["classification"],
+                    "codeql_finding_id": relationship["codeql_finding_id"],
+                    "codex_finding_id": codex_id,
+                    "rationale": clean_line(relationship.get("rationale")),
+                    "link_type": context["relationship_link_type"],
+                    "comment_template": (
+                        "The apply job resolves verified Jira keys, creates one "
+                        "reciprocal relates-to link, and posts this approved "
+                        "relationship rationale to both Tasks."
+                    ),
+                }
+            )
     return {
         "schema_version": PREVIEW_SCHEMA,
         "repository": repository,
@@ -1031,6 +1411,14 @@ def build_plan(
         "revision": revision,
         "triage_path": triage_relative,
         "triage_sha256": sha256(triage_raw),
+        "codex_findings_path": codex_relative,
+        "codex_findings_sha256": sha256(codex_raw) if codex_raw is not None else None,
+        "relationships_path": relationship_relative,
+        "relationships_sha256": (
+            sha256(relationship_raw) if relationship_raw is not None else None
+        ),
+        "relationship_count": len(relationship_by_id),
+        "relationship_operations": relationship_operations,
         "report_path": report_relative,
         "report_sha256": report_digest,
         "report_url": report_url,
@@ -1063,7 +1451,8 @@ def render_preview(plan: dict[str, Any]) -> tuple[bytes, str]:
         cards.append(
             f'''<article class="finding" data-status="{html.escape(item['verdict'])}" data-action="{html.escape(item['action'])}">
 <h2>{html.escape(item['summary'])}</h2>
-<p><strong>Finding ID:</strong> <code>{html.escape(item['finding_id'])}</code></p>
+<p><strong>Scanner:</strong> {html.escape(item.get('scanner', 'codeql'))} · <strong>Finding ID:</strong> <code>{html.escape(item['finding_id'])}</code></p>
+<p><strong>Relationship ID:</strong> <code>{html.escape(item.get('relationship_id') or 'none')}</code></p>
 <p><strong>Action:</strong> {html.escape(item['action'])} · <strong>Technical batch:</strong> {item['technical_batch']}</p>
 <h3>Exact create metadata</h3><pre>{html.escape(json.dumps(create_metadata, indent=2, sort_keys=True))}</pre>
 <h3>Exact Jira description</h3><pre>{html.escape(item['description'])}</pre>
@@ -1073,17 +1462,30 @@ def render_preview(plan: dict[str, Any]) -> tuple[bytes, str]:
         )
     actions = sorted({item["action"] for item in plan["items"]})
     action_options = "".join(f'<option value="{html.escape(value)}">{html.escape(value)}</option>' for value in actions)
+    relationship_cards = "".join(
+        f'''<article class="relationship">
+<h2>Relationship {html.escape(item['relationship_id'])}</h2>
+<p><strong>Classification:</strong> {html.escape(item['classification'])}</p>
+<p><strong>CodeQL finding:</strong> <code>{html.escape(item['codeql_finding_id'])}</code></p>
+<p><strong>Codex Security finding:</strong> <code>{html.escape(item['codex_finding_id'])}</code></p>
+<p><strong>Approved Jira operation:</strong> {html.escape(item['comment_template'])}</p>
+<h3>Rationale written to both Jira Tasks</h3><pre>{html.escape(item['rationale'])}</pre>
+</article>'''
+        for item in plan.get("relationship_operations", [])
+    )
     document = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CodeQL Jira approval preview</title>
+<title>Combined security Jira approval preview</title>
 <style>body{{font:15px system-ui;margin:2rem;max-width:1200px}}.controls{{position:sticky;top:0;background:#fff;padding:1rem 0}}article{{border:1px solid #ccc;border-radius:8px;padding:1rem;margin:1rem 0}}pre{{white-space:pre-wrap;background:#f6f8fa;padding:1rem;overflow:auto}}code{{font-family:ui-monospace,monospace}}.warning{{background:#fff4ce;padding:1rem;border-left:4px solid #d29922}}</style>
-</head><body><h1>CodeQL Jira approval preview</h1>
+</head><body><h1>Combined CodeQL and Codex Security Jira approval preview</h1>
 <p class="warning">This preview authorizes Jira writes for every visible finding. Credentials are not embedded.</p>
 <p><strong>Jira:</strong> {html.escape(plan['jira']['site'])} / {html.escape(plan['jira']['project_key'])} / {html.escape(plan['jira']['issue_type_name'])}</p>
 <p><strong>Identity:</strong> {html.escape(plan['jira']['display_name'])} (<code>{html.escape(plan['jira']['account_id'])}</code>)</p>
-<p><strong>Findings:</strong> {plan['finding_count']} · <strong>Technical batches:</strong> {plan['technical_batch_count']} · <strong>Approval token:</strong> <code>{token}</code></p>
+<p><strong>Findings:</strong> {plan['finding_count']} · <strong>Relationships:</strong> {plan.get('relationship_count', 0)} · <strong>Technical batches:</strong> {plan['technical_batch_count']} · <strong>Approval token:</strong> <code>{token}</code></p>
 <div class="controls"><label>Status <select id="status"><option value="">all</option><option>confirmed</option><option>needs_review</option><option>not_actionable</option></select></label> <label>Action <select id="action"><option value="">all</option>{action_options}</select></label></div>
 {''.join(cards)}
+<h1>Reciprocal relationship operations</h1>
+{relationship_cards or '<p>No reciprocal relationship operations are proposed.</p>'}
 <script id="jira-plan" type="application/json">{embedded_plan(raw)}</script>
 <script>const s=document.querySelector('#status'),a=document.querySelector('#action');function f(){{document.querySelectorAll('.finding').forEach(x=>x.hidden=(s.value&&x.dataset.status!==s.value)||(a.value&&x.dataset.action!==a.value))}}s.onchange=f;a.onchange=f;</script>
 </body></html>'''
@@ -1126,6 +1528,16 @@ def plan_command(args: argparse.Namespace) -> int:
     client = JiraClient.from_environment(args.site)
     plan = build_plan(
         triage_path=Path(args.triage),
+        codex_findings_path=(
+            Path(args.codex_findings)
+            if getattr(args, "codex_findings", None)
+            else None
+        ),
+        relationships_path=(
+            Path(args.relationships)
+            if getattr(args, "relationships", None)
+            else None
+        ),
         report_path=Path(args.report),
         repository=args.repository,
         branch=args.branch,
@@ -1219,6 +1631,16 @@ def apply_command(args: argparse.Namespace) -> int:
     client = JiraClient.from_environment(approved["jira"]["site"])
     rebuilt = build_plan(
         triage_path=repo_root() / approved["triage_path"],
+        codex_findings_path=(
+            repo_root() / approved["codex_findings_path"]
+            if approved.get("codex_findings_path")
+            else None
+        ),
+        relationships_path=(
+            repo_root() / approved["relationships_path"]
+            if approved.get("relationships_path")
+            else None
+        ),
         report_path=repo_root() / approved["report_path"],
         repository=approved["repository"],
         branch=approved["branch"],
@@ -1252,6 +1674,7 @@ def apply_command(args: argparse.Namespace) -> int:
         "completed_at": None,
         "complete": False,
         "results": [],
+        "relationships": [],
     }
     for item in approved["items"]:
         result = {
@@ -1317,6 +1740,119 @@ def apply_command(args: argparse.Namespace) -> int:
                 f"finding {item['finding_id']}: Jira write or readback failed; inspect the partial receipt"
             ) from error
         receipt["results"].append(result)
+    result_by_finding = {
+        result["finding_id"]: result for result in receipt["results"]
+    }
+    for operation in approved.get("relationship_operations", []):
+        codeql_result = result_by_finding.get(operation["codeql_finding_id"])
+        codex_result = result_by_finding.get(operation["codex_finding_id"])
+        relationship_result = {
+            "relationship_id": operation["relationship_id"],
+            "relationship_fingerprint": operation["relationship_fingerprint"],
+            "codeql_finding_id": operation["codeql_finding_id"],
+            "codex_finding_id": operation["codex_finding_id"],
+            "codeql_issue_key": codeql_result.get("issue_key") if codeql_result else None,
+            "codex_issue_key": codex_result.get("issue_key") if codex_result else None,
+            "link_created": False,
+            "comments_added": [],
+            "outcome": None,
+        }
+        try:
+            if not codeql_result or not codex_result:
+                raise JiraWritebackError("relationship findings are missing Jira results")
+            codeql_key = require_string(
+                codeql_result.get("issue_key"), "CodeQL relationship Jira key"
+            )
+            codex_key = require_string(
+                codex_result.get("issue_key"), "Codex relationship Jira key"
+            )
+            codeql_issue = get_issue(client, codeql_key)
+            if not issue_has_link(codeql_issue, codex_key):
+                client.request(
+                    "POST",
+                    "/rest/api/3/issueLink",
+                    {
+                        "type": {"name": operation["link_type"]["name"]},
+                        "inwardIssue": {"key": codeql_key},
+                        "outwardIssue": {"key": codex_key},
+                    },
+                )
+                relationship_result["link_created"] = True
+            for finding_id, key, counterpart_id, counterpart_key in (
+                (
+                    operation["codeql_finding_id"],
+                    codeql_key,
+                    operation["codex_finding_id"],
+                    codex_key,
+                ),
+                (
+                    operation["codex_finding_id"],
+                    codex_key,
+                    operation["codeql_finding_id"],
+                    codeql_key,
+                ),
+            ):
+                comments = get_comments(client, key)
+                if not any(
+                    operation["relationship_fingerprint"]
+                    in adf_text(comment.get("body"))
+                    for comment in comments
+                    if isinstance(comment, dict)
+                ):
+                    response = client.request(
+                        "POST",
+                        f"/rest/api/3/issue/{quote(key)}/comment",
+                        {
+                            "body": adf_document(
+                                relationship_comment(
+                                    operation, counterpart_id, counterpart_key
+                                )
+                            )
+                        },
+                    )
+                    if not isinstance(response, dict):
+                        raise JiraWritebackError(
+                            f"relationship {operation['relationship_id']}: invalid comment response"
+                        )
+                    relationship_result["comments_added"].append(
+                        {
+                            "finding_id": finding_id,
+                            "issue_key": key,
+                            "comment_id": require_string(
+                                response.get("id"), "relationship Jira comment id"
+                            ),
+                        }
+                    )
+            codeql_issue = get_issue(client, codeql_key)
+            codex_issue = get_issue(client, codex_key)
+            if not issue_has_link(codeql_issue, codex_key) or not issue_has_link(
+                codex_issue, codeql_key
+            ):
+                raise JiraWritebackError(
+                    f"relationship {operation['relationship_id']}: Jira link readback failed"
+                )
+            for key in (codeql_key, codex_key):
+                comments = get_comments(client, key)
+                if not any(
+                    operation["relationship_fingerprint"]
+                    in adf_text(comment.get("body"))
+                    for comment in comments
+                    if isinstance(comment, dict)
+                ):
+                    raise JiraWritebackError(
+                        f"relationship {operation['relationship_id']}: comment readback failed"
+                    )
+            relationship_result["outcome"] = "verified"
+        except (JiraWritebackError, OSError) as error:
+            relationship_result["outcome"] = "uncertain"
+            relationship_result["error"] = str(error)
+            receipt["relationships"].append(relationship_result)
+            receipt["completed_at"] = utc_timestamp()
+            persist_receipt(receipt, current_receipt, history_receipt)
+            raise JiraWritebackError(
+                f"relationship {operation['relationship_id']}: Jira write or readback failed; inspect the partial receipt"
+            ) from error
+        receipt["relationships"].append(relationship_result)
     receipt["complete"] = True
     receipt["completed_at"] = utc_timestamp()
     persist_receipt(receipt, current_receipt, history_receipt)
@@ -1327,7 +1863,13 @@ def apply_command(args: argparse.Namespace) -> int:
                 "finding_count": len(receipt["results"]),
                 "receipt_path": str(current_receipt),
                 "history_receipt_path": str(history_receipt),
-                "jira_modified": any(result["outcome"] != "reused" for result in receipt["results"]),
+                "jira_modified": (
+                    any(result["outcome"] != "reused" for result in receipt["results"])
+                    or any(
+                        result.get("link_created") or result.get("comments_added")
+                        for result in receipt["relationships"]
+                    )
+                ),
             },
             indent=2,
             sort_keys=True,
@@ -1338,11 +1880,13 @@ def apply_command(args: argparse.Namespace) -> int:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Plan and apply approval-gated Jira tracking for CodeQL triage."
+        description="Plan and apply approval-gated combined security Jira tracking."
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     plan = subparsers.add_parser("plan", help="Create an authoritative HTML Jira preview.")
     plan.add_argument("--triage", required=True)
+    plan.add_argument("--codex-findings")
+    plan.add_argument("--relationships")
     plan.add_argument("--report", required=True)
     plan.add_argument("--repository", required=True)
     plan.add_argument("--branch", required=True)

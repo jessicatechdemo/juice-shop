@@ -35,6 +35,8 @@ def parse_args() -> argparse.Namespace:
         description="Render a filterable HTML report from CodeQL triage JSON."
     )
     parser.add_argument("--triage", required=True)
+    parser.add_argument("--codex-findings")
+    parser.add_argument("--relationships")
     parser.add_argument("--branch", required=True)
     parser.add_argument("--output", required=True)
     return parser.parse_args()
@@ -64,6 +66,18 @@ def load_triage(path: Path) -> dict[str, Any]:
         if finding.get("verdict") not in VERDICTS:
             raise ReportError(f"triage.findings[{index}].verdict is invalid")
     return payload
+
+
+def load_optional_object(path: Path | None, field: str) -> dict[str, Any] | None:
+    if path is None:
+        return None
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ReportError(f"cannot read {field} JSON from {path}: {error}") from error
+    if not isinstance(value, dict):
+        raise ReportError(f"{field} JSON must be an object")
+    return value
 
 
 def text(value: Any, fallback: str = "unknown") -> str:
@@ -160,7 +174,38 @@ def searchable_text(finding: dict[str, Any]) -> str:
     return " ".join(values).lower()
 
 
-def finding_html(finding: dict[str, Any]) -> str:
+def relationship_html(relationship: dict[str, Any] | None) -> str:
+    if relationship is None:
+        return ""
+    classification = html_text(relationship.get("classification"))
+    related = ", ".join(string_list(relationship.get("codex_finding_ids"))) or "None"
+    criteria = []
+    for field, label in (
+        ("same_source", "Source"),
+        ("same_failed_control", "Failed control"),
+        ("same_sink", "Sink"),
+        ("same_precondition", "Precondition"),
+        ("same_impact", "Impact"),
+    ):
+        value = relationship.get(field)
+        criteria.append(f"{label}: {'match' if value is True else 'different' if value is False else 'unknown'}")
+    return f"""
+        <details open class="relationship-detail">
+          <summary>Cross-scan relationship · {classification} · pending human review</summary>
+          <dl>
+            <dt>Relationship ID</dt><dd><code>{html_text(relationship.get('relationship_id'))}</code></dd>
+            <dt>Codex findings</dt><dd><code>{escape(related)}</code></dd>
+            <dt>Identity criteria</dt><dd>{escape(' · '.join(criteria))}</dd>
+            <dt>Rationale</dt><dd>{html_text(relationship.get('rationale'))}</dd>
+          </dl>
+          {list_html(relationship.get('evidence'), 'No relationship evidence recorded')}
+        </details>
+    """
+
+
+def finding_html(
+    finding: dict[str, Any], relationship: dict[str, Any] | None = None
+) -> str:
     verdict = finding["verdict"]
     normalized = finding.get("normalized_input")
     normalized = normalized if isinstance(normalized, dict) else {}
@@ -222,20 +267,105 @@ def finding_html(finding: dict[str, Any]) -> str:
             <dt>Policy basis</dt><dd>{html_text(boundary.get('policy_basis'))}</dd>
           </dl>
         </details>
+        {relationship_html(relationship)}
         <p class="next-step"><strong>Next step:</strong> {html_text(finding.get('recommended_next_step'))}</p>
       </article>
     """
 
 
-def build_report(payload: dict[str, Any], branch: str) -> tuple[str, Counter[str]]:
+def codex_finding_html(
+    finding: dict[str, Any], relationships: list[dict[str, Any]]
+) -> str:
+    severity = finding.get("severity")
+    severity = severity if isinstance(severity, dict) else {}
+    validation = finding.get("validation")
+    validation = validation if isinstance(validation, dict) else {}
+    locations = []
+    for location in finding.get("locations", []):
+        if not isinstance(location, dict):
+            continue
+        path = html_text(location.get("path"))
+        start = location.get("startLine")
+        end = location.get("endLine")
+        lines = f":{start}-{end}" if isinstance(start, int) and isinstance(end, int) else ""
+        locations.append(f"<li><code>{path}{escape(lines)}</code> {html_text(location.get('role'), 'location')}</li>")
+    relationship_items = "".join(
+        f"<li><code>{html_text(item.get('relationship_id'))}</code> · {html_text(item.get('classification'))} · CodeQL <code>{html_text(item.get('codeql_finding_id'))}</code><br>{html_text(item.get('rationale'))}</li>"
+        for item in relationships
+    )
+    return f"""
+      <article class="finding codex-finding">
+        <header>
+          <div>
+            <p class="eyebrow"><strong>Codex Security Finding ID:</strong> {html_text(finding.get('findingId'))}</p>
+            <h2>{html_text(finding.get('title'))}</h2>
+          </div>
+          <span class="badge confirmed">{html_text(severity.get('level'), 'reported')}</span>
+        </header>
+        <p>{html_text(finding.get('summary'))}</p>
+        <section><h3>Affected locations</h3><ul>{''.join(locations)}</ul></section>
+        <details open><summary>Validation evidence</summary>{list_html(validation.get('evidence'))}</details>
+        <details open><summary>Cross-scan relationships</summary>{f'<ul>{relationship_items}</ul>' if relationship_items else '<p class="empty">No CodeQL relationship candidate</p>'}</details>
+      </article>
+    """
+
+
+def build_report(
+    payload: dict[str, Any],
+    branch: str,
+    codex: dict[str, Any] | None = None,
+    relationship_payload: dict[str, Any] | None = None,
+) -> tuple[str, Counter[str]]:
     findings = payload["findings"]
     counts = Counter(finding["verdict"] for finding in findings)
     repository = payload["repository"]
     generated_at = datetime.now(timezone.utc).isoformat()
-    cards = "".join(finding_html(finding) for finding in findings)
+    relationships = (
+        relationship_payload.get("relationships", [])
+        if isinstance(relationship_payload, dict)
+        else []
+    )
+    relationships = [item for item in relationships if isinstance(item, dict)]
+    by_codeql = {item.get("codeql_finding_id"): item for item in relationships}
+    cards = "".join(
+        finding_html(finding, by_codeql.get(finding.get("input_id")))
+        for finding in findings
+    )
     if not cards:
         cards = '<p id="empty-state" class="empty-state">No CodeQL findings were imported.</p>'
     total = len(findings)
+    codex_findings = codex.get("findings", []) if isinstance(codex, dict) else []
+    codex_findings = [item for item in codex_findings if isinstance(item, dict)]
+    by_codex: dict[str, list[dict[str, Any]]] = {}
+    for relationship in relationships:
+        for identifier in string_list(relationship.get("codex_finding_ids")):
+            by_codex.setdefault(identifier, []).append(relationship)
+    codex_cards = "".join(
+        codex_finding_html(finding, by_codex.get(str(finding.get("findingId")), []))
+        for finding in codex_findings
+    )
+    relationship_counts = Counter(
+        str(item.get("classification", "unknown")) for item in relationships
+    )
+    relationship_summary = ""
+    codex_section = ""
+    if codex is not None or relationship_payload is not None:
+        relationship_summary = f"""
+    <section class="cross-scan-summary">
+      <h2>CodeQL ↔ Codex Security correlation</h2>
+      <p>Relationships are proposals until a human approves the exact Jira preview. Scanner findings retain separate identities and Jira Tasks.</p>
+      <div class="summary relationship-summary">
+        <div><strong>{len(codex_findings)}</strong>Codex Security findings</div>
+        <div><strong>{relationship_counts['exact_overlap']}</strong>Proposed exact overlaps</div>
+        <div><strong>{relationship_counts['related_distinct']}</strong>Related but distinct</div>
+        <div><strong>{relationship_counts['needs_further_review']}</strong>Further review</div>
+      </div>
+    </section>"""
+        codex_section = f"""
+    <section class="codex-results">
+      <h2>Codex Security findings</h2>
+      {codex_cards or '<p class="empty-state">Codex Security completed with no findings.</p>'}
+    </section>"""
     html = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -258,6 +388,9 @@ def build_report(payload: dict[str, Any], branch: str) -> tuple[str, Counter[str
     .summary button {{ text-align:left; border:1px solid var(--line); border-radius:14px; padding:16px; background:var(--panel); color:var(--ink); cursor:pointer; }}
     .summary button[aria-pressed="true"] {{ outline:3px solid #5b8def; outline-offset:1px; }}
     .summary strong {{ display:block; font-size:1.8rem; }}
+    .relationship-summary div {{ text-align:left; border:1px solid var(--line); border-radius:14px; padding:16px; background:var(--panel); }}
+    .cross-scan-summary {{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; margin:0 0 24px; }}
+    .relationship-detail {{ border-left:4px solid #5b8def; padding-left:12px; }}
     .controls {{ display:flex; gap:12px; align-items:center; margin:0 0 18px; }}
     input {{ flex:1; border:1px solid var(--line); border-radius:10px; padding:11px 13px; background:var(--panel); color:var(--ink); }}
     .finding {{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; margin:0 0 14px; box-shadow:0 8px 20px rgb(15 23 42 / 6%); }}
@@ -292,12 +425,14 @@ def build_report(payload: dict[str, Any], branch: str) -> tuple[str, Counter[str
       <button type="button" data-filter="needs_review" aria-pressed="false"><strong>{counts['needs_review']}</strong>Needs review</button>
       <button type="button" data-filter="not_actionable" aria-pressed="false"><strong>{counts['not_actionable']}</strong>Not actionable</button>
     </div>
+    {relationship_summary}
     <div class="controls">
       <label for="search"><strong>Search</strong></label>
       <input id="search" type="search" placeholder="Finding ID, alert number, rule, path, title, or evidence">
       <span id="visible-count" aria-live="polite">{total} shown</span>
     </div>
     <div id="findings">{cards}</div>
+    {codex_section}
   </main>
   <script>
     (() => {{
@@ -354,7 +489,26 @@ def main() -> int:
         triage_path = Path(args.triage)
         output_path = Path(args.output)
         payload = load_triage(triage_path)
-        report, counts = build_report(payload, args.branch)
+        codex = load_optional_object(
+            Path(args.codex_findings) if args.codex_findings else None,
+            "Codex findings",
+        )
+        relationships = load_optional_object(
+            Path(args.relationships) if args.relationships else None,
+            "relationships",
+        )
+        if codex is not None and codex.get("documentType") != "codex-security.findings":
+            raise ReportError("Codex findings documentType is invalid")
+        if relationships is not None:
+            if relationships.get("schema_version") != "security-relationships/v1":
+                raise ReportError("relationships schema is invalid")
+            relationship_repository = relationships.get("repository")
+            if (
+                not isinstance(relationship_repository, dict)
+                or relationship_repository.get("revision") != payload["repository"]["revision"]
+            ):
+                raise ReportError("relationships revision does not match triage")
+        report, counts = build_report(payload, args.branch, codex, relationships)
         content = report.encode("utf-8")
         atomic_write(output_path, content)
         if output_path.read_bytes() != content:
@@ -364,6 +518,8 @@ def main() -> int:
             "triage_path": str(triage_path),
             "report_path": str(output_path),
             "finding_count": len(payload["findings"]),
+            "codex_finding_count": len(codex.get("findings", [])) if codex else 0,
+            "relationship_count": len(relationships.get("relationships", [])) if relationships else 0,
             "verdict_counts": {verdict: counts[verdict] for verdict in VERDICTS},
             "sha256": hashlib.sha256(content).hexdigest(),
             "github_modified": False,

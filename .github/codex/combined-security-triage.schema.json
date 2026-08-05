@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "combined-security-triage/v1"
+    },
+    "codeql_triage": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "schema_version": { "type": "string", "const": "triage-finding/v0" },
+        "repository": { "type": "object" },
+        "findings": { "type": "array" }
+      },
+      "required": ["schema_version", "repository", "findings"]
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "relationship_id": { "type": "string", "minLength": 1 },
+          "status": { "type": "string", "const": "proposed" },
+          "classification": {
+            "type": "string",
+            "enum": ["exact_overlap", "related_distinct", "no_candidate", "needs_further_review"]
+          },
+          "codeql_finding_id": { "type": "string", "minLength": 1 },
+          "codex_finding_ids": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "same_source": { "type": ["boolean", "null"] },
+          "same_failed_control": { "type": ["boolean", "null"] },
+          "same_sink": { "type": ["boolean", "null"] },
+          "same_precondition": { "type": ["boolean", "null"] },
+          "same_impact": { "type": ["boolean", "null"] },
+          "rationale": { "type": "string", "minLength": 1 },
+          "evidence": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "human_review_required": { "type": "boolean", "const": true }
+        },
+        "required": [
+          "relationship_id",
+          "status",
+          "classification",
+          "codeql_finding_id",
+          "codex_finding_ids",
+          "same_source",
+          "same_failed_control",
+          "same_sink",
+          "same_precondition",
+          "same_impact",
+          "rationale",
+          "evidence",
+          "human_review_required"
+        ]
+      }
+    },
+    "codex_finding_accounting": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "codex_finding_id": { "type": "string", "minLength": 1 },
+          "relationship_ids": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "status": { "type": "string", "enum": ["candidate", "no_candidate"] }
+        },
+        "required": ["codex_finding_id", "relationship_ids", "status"]
+      }
+    }
+  },
+  "required": ["schema_version", "codeql_triage", "relationships", "codex_finding_accounting"]
+}

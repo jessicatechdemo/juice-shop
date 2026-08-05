@@ -16,6 +16,7 @@ if str(SCRIPT_DIRECTORY) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIRECTORY))
 
 import persist_triage
+import split_combined_triage
 
 
 PR_HANDOFF_SCHEMA = "codeql-jira-handoff/v1"
@@ -148,14 +149,22 @@ def validate(
     files = metadata.get("files")
     if not isinstance(files, dict):
         raise HandoffError("metadata.files must be an object")
-    required_files = (
+    required_files = [
         "intake.json",
         "current.json",
         "report.html",
         "summary.md",
         "persist-receipt.json",
         "report-receipt.json",
-    )
+    ]
+    if scope == "branch":
+        required_files.extend(
+            [
+                "codex-findings.json",
+                "codex-scan-metadata.json",
+                "relationships.json",
+            ]
+        )
     for name in required_files:
         expected_digest = require_string(files.get(name), f"metadata.files.{name}")
         if not re.fullmatch(r"[0-9a-f]{64}", expected_digest):
@@ -185,6 +194,40 @@ def validate(
     if not isinstance(triage_repository, dict) or triage_repository.get("revision") != revision:
         raise HandoffError("triage revision does not match the handoff")
 
+    codex_count = 0
+    relationship_count = 0
+    if scope == "branch":
+        codex, codex_raw = load_object(directory / "codex-findings.json"), (
+            directory / "codex-findings.json"
+        ).read_bytes()
+        codex_ids = split_combined_triage.validate_codex_findings(codex)
+        codex_metadata = load_object(directory / "codex-scan-metadata.json")
+        split_combined_triage.validate_metadata(
+            codex_metadata,
+            revision,
+            codex_raw,
+            str(codex.get("scanId")),
+            len(codex_ids),
+        )
+        relationships = load_object(directory / "relationships.json")
+        if relationships.get("schema_version") != split_combined_triage.RELATIONSHIP_SCHEMA:
+            raise HandoffError("relationship handoff schema is invalid")
+        codeql_ids = {
+            require_string(finding.get("input_id"), "triage finding input_id")
+            for finding in triage["findings"]
+        }
+        combined_relationships = {
+            "relationships": relationships.get("relationships"),
+            "codex_finding_accounting": relationships.get(
+                "codex_finding_accounting"
+            ),
+        }
+        split_combined_triage.validate_relationships(
+            combined_relationships, codeql_ids, codex_ids, revision
+        )
+        codex_count = len(codex_ids)
+        relationship_count = len(relationships.get("relationships", []))
+
     persist_receipt = load_object(directory / "persist-receipt.json")
     report_receipt = load_object(directory / "report-receipt.json")
     if (
@@ -192,6 +235,8 @@ def validate(
         or persist_receipt.get("stored_result_count") != expected_count
         or report_receipt.get("sha256") != digest(directory / "report.html")
         or report_receipt.get("finding_count") != expected_count
+        or report_receipt.get("codex_finding_count", 0) != codex_count
+        or report_receipt.get("relationship_count", 0) != relationship_count
     ):
         raise HandoffError("handoff receipts do not match the triage artifacts")
     result = {
@@ -200,6 +245,9 @@ def validate(
         "branch": branch,
         "ref": ref,
         "revision": revision,
+        "codeql_finding_count": str(expected_count),
+        "codex_finding_count": str(codex_count),
+        "relationship_count": str(relationship_count),
     }
     if scope == "pull_request":
         result.update(
@@ -250,7 +298,12 @@ def main() -> int:
             write_github_output(Path(args.github_output), values)
         print(json.dumps(values, indent=2, sort_keys=True))
         return 0
-    except (HandoffError, persist_triage.ValidationError, OSError) as error:
+    except (
+        HandoffError,
+        persist_triage.ValidationError,
+        split_combined_triage.CombinedTriageError,
+        OSError,
+    ) as error:
         print(f"error: {error}", file=sys.stderr)
         return 2
 

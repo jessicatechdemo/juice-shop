@@ -153,6 +153,11 @@ jobs:
         for file in intake.json current.json report.html summary.md persist-receipt.json report-receipt.json metadata.json; do
           install -m 0600 "$HANDOFF_DIR/$file" "$target/$file"
         done
+        for file in codex-findings.json codex-scan-metadata.json relationships.json; do
+          if [ -f "$HANDOFF_DIR/$file" ]; then
+            install -m 0600 "$HANDOFF_DIR/$file" "$target/$file"
+          fi
+        done
     - name: Build duplicate-checked Jira preview
       if: steps.handoff-artifact.outputs.available == 'true'
       id: jira-plan
@@ -181,6 +186,12 @@ jobs:
         )
         if [[ "$HANDOFF_SCOPE" == 'pull_request' ]]; then
           args+=(--pr-url "$PR_URL")
+        fi
+        if [[ -f security-results/triage/codeql/pr/codex-findings.json ]]; then
+          args+=(
+            --codex-findings security-results/triage/codeql/pr/codex-findings.json
+            --relationships security-results/triage/codeql/pr/relationships.json
+          )
         fi
         python3 ../trusted/.agents/skills/triage-codeql-and-store/scripts/jira_writeback.py plan \
           "${args[@]}" > "$result"
@@ -295,6 +306,11 @@ jobs:
         mkdir -p "$target/jira-tracking"
         for file in intake.json current.json report.html summary.md persist-receipt.json report-receipt.json metadata.json; do
           install -m 0600 "$PLAN_BUNDLE_DIR/$file" "$target/$file"
+        done
+        for file in codex-findings.json codex-scan-metadata.json relationships.json; do
+          if [ -f "$PLAN_BUNDLE_DIR/$file" ]; then
+            install -m 0600 "$PLAN_BUNDLE_DIR/$file" "$target/$file"
+          fi
         done
         install -m 0600 "$PLAN_BUNDLE_DIR/jira-tracking/preview.html" "$target/jira-tracking/preview.html"
         install -m 0600 "$PLAN_BUNDLE_DIR/jira-tracking/plan-result.json" "$target/jira-tracking/plan-result.json"
