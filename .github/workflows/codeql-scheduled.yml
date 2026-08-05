@@ -121,10 +121,9 @@ jobs:
         codex_stdout="$RUNNER_TEMP/codex-stdout.log"
 
         npx --yes @openai/codex@0.146.0 exec \
-          --output-file "$CODEQL_TRIAGE_FILE" \
-          --output-schema-file .github/codex/triage-finding.schema.json \
-          --permission-profile ":read-only" \
-          --codex-home "$CODEX_HOME" \
+          -o "$CODEQL_TRIAGE_FILE" \
+          --output-schema .github/codex/triage-finding.schema.json \
+          -s read-only \
           "Use \$codex-security:triage-finding to triage every existing CodeQL \
         finding in $CODEQL_INTAKE_FILE against this repository. \
         The input is a codeql-branch-intake/v1 document restricted to the \
