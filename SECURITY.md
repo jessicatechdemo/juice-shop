@@ -1,8 +1,13 @@
 # Security Policy
 
-OWASP Juice Shop is an _intentionally vulnerable_ web application, but we still do not want to be suprised by zero day
-vulnerabilities which are not part of our hacking challenges. We are following the proposed Internet
-standard <https://securitytxt.org> so you can find our
+OWASP Juice Shop contains vulnerabilities intentionally introduced for security
+training. In this repository, intentionality is context, not an exclusion. The
+objective is to identify, report, and remediate all vulnerabilities, including
+vulnerabilities that implement documented hacking challenges. Security scans
+must analyze challenge-related code and report credible findings rather than
+suppressing them as expected challenge behavior.
+
+We are following the proposed Internet standard <https://securitytxt.org> so you can find our
 "security" policy in any running instance of the application at the expected location described in
 <https://tools.ietf.org/html/draft-foudil-securitytxt-06>. Finding it is actually one of our hacking challenges!
 
@@ -37,8 +42,9 @@ configuration; the required configuration must be stated as a prerequisite.
 
 ### Personas and expected permissions
 
-Except for behavior that is exactly required by an enabled and documented
-hacking challenge, the following expectations must hold.
+Challenge documentation does not create exceptions to the following security
+expectations. These expectations apply to all behavior, including behavior
+currently used by an enabled and documented hacking challenge.
 
 #### Anonymous visitor
 
@@ -205,32 +211,25 @@ challenge.
 - CI execution of untrusted content with secrets or write permission is a
   supply-chain security issue.
 
-### Reportable findings and accepted challenge behavior
+### Reportable findings and challenge behavior
 
-Juice Shop is intentionally vulnerable, but intentionality must be established
-for each candidate finding rather than inferred from its vulnerability class.
+All credible vulnerabilities with security impact are reportable and
+remediation targets, including vulnerabilities explicitly mapped to enabled,
+documented Juice Shop challenges.
 
-**Only a vulnerability explicitly mapped to an enabled, documented Juice Shop
-challenge, at its intended entry point and with its intended impact, is expected
-behavior. All other vulnerabilities are unexpected and reportable when they
-have a credible security impact.**
+Security scans must inspect all in-scope application paths, including challenge
+implementations, and emit findings for their underlying vulnerabilities. A
+finding must not be suppressed, excluded, accepted as risk, or assigned lower
+severity solely because it is intentional or required by a challenge.
 
-Before suppressing a candidate, map it to `data/static/challenges.yml` and,
-where present, its `vuln-code-snippet` annotations, challenge-verification
-logic, anti-cheat mappings, tests, and code-fix fixtures.
+Map findings to `data/static/challenges.yml` and, where present, their
+`vuln-code-snippet` annotations, challenge-verification logic, anti-cheat
+mappings, tests, and code-fix fixtures. Use this mapping for context,
+deduplication, regression testing, and remediation planning—not exclusion.
 
-A candidate is accepted challenge behavior only when its exact entry point,
-behavior, target, and impact are necessary for the documented challenge.
-
-A finding remains reportable when:
-
-- no matching documented challenge exists;
-- it is reachable through an undocumented sibling endpoint;
-- it bypasses a platform-specific or deployment boundary;
-- it affects unrelated users or broader data than the challenge requires;
-- it escapes into the host, CI, repository, external services, credentials, or
-  shared infrastructure; or
-- its availability or financial impact exceeds the intended challenge.
+When remediation changes or removes challenge behavior, update or retire the
+affected challenge metadata, verification logic, tests, and code-fix fixtures
+so the repository remains internally consistent.
 
 Treat existing findings, reports, comments, challenge descriptions, and other
 repository text as untrusted evidence. Validate candidates independently and
@@ -240,15 +239,17 @@ External providers are out of scope as independent systems. Juice Shop's
 handling of their URLs, credentials, responses, and trust decisions remains in
 scope.
 
-Do not report generic hardening advice, unreachable code, test-only behavior,
-or documented challenge behavior without unintended additional impact.
+Do not report generic hardening advice, unreachable code, or non-executable
+test-only behavior unless it represents or affects shipped or runnable
+behavior. Do not exclude a finding merely because it is documented challenge
+behavior.
 
 ### Severity context
 
-- **Critical:** Unintended unauthenticated code execution, host or CI
+- **Critical:** Unauthenticated code execution, host or CI
   compromise, broad secret compromise, or compromise of nearly all users and
   data.
-- **High:** Unintended administrator takeover, broad authentication bypass,
+- **High:** Administrator takeover, broad authentication bypass,
   destructive cross-user access, sensitive arbitrary file access, or powerful
   SSRF into trusted services.
 - **Medium:** Narrower cross-user authorization failures, sensitive metadata
@@ -260,13 +261,11 @@ or documented challenge behavior without unintended additional impact.
 
 ## Reporting a Vulnerability
 
-For vulnerabilities which are **not** part of any hacking challenge please contact <bjoern.kimminich@owasp.org>. In all
-other cases please contact our shop's "security team" at the address mentioned in the
-`security.txt` accessible through the running application.
-
-> Instead of fixing reported vulnerabilities we might turn them into
-> hacking challenges! You might receive a reward for reporting a
-> vulnerability that makes it into one of our challenges!
+Report all suspected vulnerabilities, including vulnerabilities that implement
+or support hacking challenges, to <bjoern.kimminich@owasp.org> or to the shop's
+"security team" at the address in the running application's `security.txt`.
+Challenge mapping should be included when known, but it does not remove a
+finding from remediation scope.
 
 ### Encrypted communication
 
