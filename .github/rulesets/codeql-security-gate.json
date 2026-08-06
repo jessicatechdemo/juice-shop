@@ -13,6 +13,18 @@
   },
   "rules": [
     {
+      "type": "code_scanning",
+      "parameters": {
+        "code_scanning_tools": [
+          {
+            "tool": "CodeQL",
+            "alerts_threshold": "none",
+            "security_alerts_threshold": "high_or_higher"
+          }
+        ]
+      }
+    },
+    {
       "type": "required_status_checks",
       "parameters": {
         "do_not_enforce_on_create": true,
