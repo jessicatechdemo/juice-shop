@@ -1,0 +1,137 @@
+name: "Codex Security PR Scan"
+
+on:
+  pull_request:
+
+concurrency:
+  group: codex-security-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  codex-security-high-severity-gate:
+    name: Codex Security high-severity warning
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      CODEX_ELIGIBLE: ${{ github.event.pull_request.head.repo.full_name == github.repository && !endsWith(github.actor, '[bot]') }}
+      CODEX_SECURITY_INSTALL_DIR: ${{ runner.temp }}/codex-security-pr/cli
+      CODEX_SECURITY_BIN: ${{ runner.temp }}/codex-security-pr/cli/node_modules/.bin/codex-security
+      CODEX_SECURITY_STATE_DIR: ${{ runner.temp }}/codex-security-pr/state
+      CODEX_SECURITY_DIR: ${{ runner.temp }}/codex-security-pr/results
+      CODEX_FINDINGS_FILE: ${{ runner.temp }}/codex-security-pr/results/findings.json
+      CODEX_GATE_RESULT: ${{ runner.temp }}/codex-security-pr/results/gate.json
+    steps:
+    - name: Report ineligible pull request
+      if: env.CODEX_ELIGIBLE != 'true'
+      run: |
+        {
+          echo '## Codex Security high-severity warning'
+          echo
+          echo 'Result: **Not applicable (pass)**'
+          echo
+          echo 'Credentialed Codex Security scans run only for same-repository, non-bot pull requests.'
+        } >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Set up Node.js
+      if: env.CODEX_ELIGIBLE == 'true'
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      with:
+        node-version: "24"
+
+    - name: Set up Python
+      if: env.CODEX_ELIGIBLE == 'true'
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      with:
+        python-version: "3.12"
+
+    - name: Install Codex Security CLI
+      if: env.CODEX_ELIGIBLE == 'true'
+      run: |
+        set -euo pipefail
+        npm install \
+          --prefix "$CODEX_SECURITY_INSTALL_DIR" \
+          --ignore-scripts \
+          --no-audit \
+          --no-fund \
+          @openai/codex-security@0.1.3
+        test -x "$CODEX_SECURITY_BIN"
+        "$CODEX_SECURITY_BIN" --version
+
+    - name: Checkout pull request head
+      if: env.CODEX_ELIGIBLE == 'true'
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+
+    - name: Resolve pull request revisions
+      id: revisions
+      if: env.CODEX_ELIGIBLE == 'true'
+      env:
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      run: |
+        set -euo pipefail
+        base_revision="$(git merge-base "$BASE_SHA" "$HEAD_SHA")"
+        test -n "$base_revision"
+        echo "base=$base_revision" >> "$GITHUB_OUTPUT"
+        echo "head=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+
+    - name: Scan pull request changes with Codex Security
+      if: env.CODEX_ELIGIBLE == 'true'
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      run: |
+        set -euo pipefail
+        "$CODEX_SECURITY_BIN" scan . \
+          --diff "${{ steps.revisions.outputs.base }}" \
+          --head "${{ steps.revisions.outputs.head }}" \
+          --auth api-key \
+          --output-dir "$CODEX_SECURITY_DIR"
+
+    - name: Evaluate Codex Security warnings
+      if: env.CODEX_ELIGIBLE == 'true'
+      run: |
+        set -euo pipefail
+        jq -er '.documentType == "codex-security.findings"' \
+          "$CODEX_FINDINGS_FILE" > /dev/null
+        python3 .github/codex/evaluate_codex_security_gate.py \
+          --findings "$CODEX_FINDINGS_FILE" \
+          --output "$CODEX_GATE_RESULT"
+
+        decision="$(jq -er '.decision' "$CODEX_GATE_RESULT")"
+        finding_count="$(jq -er '.finding_count' "$CODEX_GATE_RESULT")"
+        warning_count="$(jq -er '.warning_count' "$CODEX_GATE_RESULT")"
+        {
+          echo '## Codex Security high-severity warning'
+          echo
+          echo "Findings evaluated: $finding_count"
+          echo "High/critical warnings: $warning_count"
+          echo
+          if [[ "$decision" == 'warn' ]]; then
+            echo 'Result: **Warning (PR is not blocked)**'
+            echo
+            echo '| Finding | Severity | Title |'
+            echo '| --- | --- | --- |'
+            jq -r '.warning_findings[] | "| `\(.finding_id)` | \(.severity) | \(.title) |"' \
+              "$CODEX_GATE_RESULT"
+          else
+            echo 'Result: **Pass**'
+          fi
+        } >> "$GITHUB_STEP_SUMMARY"
+
+        if [[ "$decision" == 'warn' ]]; then
+          echo "::warning::$warning_count high/critical Codex Security finding(s) require review."
+        fi
+
+    - name: Preserve Codex Security results
+      if: always() && env.CODEX_ELIGIBLE == 'true'
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      with:
+        name: codex-security-pr-scan
+        path: ${{ env.CODEX_SECURITY_DIR }}
+        if-no-files-found: warn
+        retention-days: 7
