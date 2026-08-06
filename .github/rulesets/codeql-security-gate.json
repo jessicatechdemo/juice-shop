@@ -1,5 +1,5 @@
 {
-  "name": "Combined CodeQL and Codex SAST gate",
+  "name": "CodeQL SAST gate",
   "target": "branch",
   "enforcement": "active",
   "bypass_actors": [],
@@ -18,7 +18,7 @@
         "do_not_enforce_on_create": true,
         "required_status_checks": [
           {
-            "context": "Codex + CodeQL SAST gate"
+            "context": "CodeQL"
           }
         ],
         "strict_required_status_checks_policy": false
