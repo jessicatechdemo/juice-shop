@@ -33,7 +33,7 @@ This document is the **primary authoritative source** of context for all AI assi
 
 ## Important Constraints
 
-1. **Security Context**: This project contains intentional vulnerabilities for training. New vulnerabilities must be approved by maintainers and well-documented.
+1. **Security Context**: This project contains intentional vulnerabilities for training. Intentionality is context, not an exclusion: credible vulnerabilities in challenge implementations must still be treated, validated, and reported as vulnerabilities. Do not suppress a finding or lower its severity solely because the vulnerable behavior implements a documented challenge. New vulnerabilities must be approved by maintainers and well-documented. Follow the reporting policy in [`SECURITY.md`](./SECURITY.md).
 2. **Challenge Development**: Consult maintainers before creating new challenges. AI-generated challenges risk being duplicate, unsolvable, or dysfunctional.
 3. **Code Changes and RSN**: When modifying challenge-related code, the Refactoring Safety Net must pass.
 4. **Dependency Updates**: Verify compatibility with `package.json` and `frontend/package.json`.
