@@ -84,6 +84,7 @@ jobs:
     - name: Set Codex Security paths
       run: |
         echo "CODEX_SECURITY_DIR=$RUNNER_TEMP/codex-security-scan" >> "$GITHUB_ENV"
+        echo "CODEX_FINDINGS_RESPONSE_FILE=$RUNNER_TEMP/codex-security-scan/codex-findings-response.json" >> "$GITHUB_ENV"
         echo "CODEX_FINDINGS_FILE=$RUNNER_TEMP/codex-security-scan/codex-findings.json" >> "$GITHUB_ENV"
         echo "CODEX_METADATA_FILE=$RUNNER_TEMP/codex-security-scan/codex-scan-metadata.json" >> "$GITHUB_ENV"
     - name: Checkout exact scheduled revision
@@ -125,8 +126,8 @@ jobs:
         codex-version: 0.146.0
         codex-home: ${{ env.CODEX_HOME }}
         permission-profile: ":workspace"
-        output-file: ${{ env.CODEX_FINDINGS_FILE }}
-        output-schema-file: .github/codex/codex-security-findings.schema.json
+        output-file: ${{ env.CODEX_FINDINGS_RESPONSE_FILE }}
+        output-schema-file: .github/codex/codex-security-findings-output.schema.json
         prompt: |
           Use $codex-security:security-scan to run a standard, complete,
           repository-wide security scan of this checkout. The checkout is
@@ -136,16 +137,34 @@ jobs:
           Do not change repository source files, run application tests, publish
           findings, or interact with Jira or GitHub issues.
 
-          Return only the completed canonical codex-security.findings JSON
-          document selected by the output schema. Preserve the authoritative
-          scanId, findingId, fingerprints, locations, validation, attack-path,
-          severity, remediation, and evidence fields. Return a valid document
-          with an empty findings array when the completed scan finds nothing.
+          Return only the codex-security.findings-output JSON selected by the
+          output schema. Put the complete canonical codex-security.findings
+          JSON document in codex_findings_json as a JSON-encoded string.
+          Preserve the authoritative scanId, findingId, fingerprints,
+          locations, validation, attack-path, severity, remediation, and
+          evidence fields. Return a valid canonical document with an empty
+          findings array when the completed scan finds nothing.
     - name: Validate completed Codex Security artifact
       env:
         SCANNED_REVISION: ${{ needs.resolve-revision.outputs.revision }}
       run: |
         set -euo pipefail
+        jq -er '.document_type == "codex-security.findings-output"' "$CODEX_FINDINGS_RESPONSE_FILE" >/dev/null
+        jq -er '.codex_findings_json | fromjson' "$CODEX_FINDINGS_RESPONSE_FILE" > "$CODEX_FINDINGS_FILE"
+        jq -er '
+          .documentType == "codex-security.findings"
+          and (.schemaVersion | type == "string" and length > 0)
+          and (.scanId | type == "string" and length > 0)
+          and (.findings | type == "array")
+          and all(.findings[];
+            (.findingId | type == "string" and length > 0)
+            and (.title | type == "string" and length > 0)
+            and (.summary | type == "string")
+            and (.locations | type == "array")
+            and (.severity | type == "object")
+            and (.validation | type == "object")
+          )
+        ' "$CODEX_FINDINGS_FILE" >/dev/null
         test "$(jq -r '.documentType' "$CODEX_FINDINGS_FILE")" = 'codex-security.findings'
         scan_id="$(jq -er '.scanId | select(type == "string" and length > 0)' "$CODEX_FINDINGS_FILE")"
         finding_count="$(jq -er '.findings | length' "$CODEX_FINDINGS_FILE")"

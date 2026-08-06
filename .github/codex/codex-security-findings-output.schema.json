@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "document_type": {
+      "type": "string",
+      "const": "codex-security.findings-output"
+    },
+    "codex_findings_json": {
+      "type": "string",
+      "minLength": 2
+    }
+  },
+  "required": ["document_type", "codex_findings_json"]
+}

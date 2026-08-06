@@ -8,14 +8,258 @@
       "const": "combined-security-triage/v1"
     },
     "codeql_triage": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
-        "schema_version": { "type": "string", "const": "triage-finding/v0" },
-        "repository": { "type": "object" },
-        "findings": { "type": "array" }
+        "schema_version": {
+          "type": "string",
+          "const": "triage-finding/v0"
+        },
+        "repository": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "revision"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "triage_item_id": {
+                "type": "string"
+              },
+              "input_id": {
+                "type": "string"
+              },
+              "source_type": {
+                "type": "string",
+                "const": "sarif"
+              },
+              "verdict": {
+                "type": "string",
+                "enum": [
+                  "confirmed",
+                  "needs_review",
+                  "not_actionable"
+                ]
+              },
+              "confidence": {
+                "type": "string",
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "title": {
+                "type": "string"
+              },
+              "normalized_input": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "affected_version_or_path": {
+                    "type": "string"
+                  },
+                  "claimed_control": {
+                    "type": "string"
+                  },
+                  "claimed_sink": {
+                    "type": "string"
+                  },
+                  "claimed_source": {
+                    "type": "string"
+                  },
+                  "impact": {
+                    "type": "string"
+                  },
+                  "preconditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "references": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "vulnerable_component": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "affected_version_or_path",
+                  "claimed_control",
+                  "claimed_sink",
+                  "claimed_source",
+                  "impact",
+                  "preconditions",
+                  "references",
+                  "vulnerable_component"
+                ]
+              },
+              "affected_locations": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": {
+                      "type": "string"
+                    },
+                    "lines": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "lines",
+                    "label",
+                    "detail"
+                  ]
+                }
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "counterevidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "proof_gaps": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "boundary_assessment": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "boundary_crossed": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "policy_basis": {
+                    "type": "string"
+                  },
+                  "product_surface": {
+                    "type": "string"
+                  },
+                  "source_trust": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "boundary_crossed",
+                  "policy_basis",
+                  "product_surface",
+                  "source_trust"
+                ]
+              },
+              "exploitability_stack_rank": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "drivers": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "rank": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "rank_queue": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "rationale": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "drivers",
+                  "rank",
+                  "rank_queue",
+                  "rationale"
+                ]
+              },
+              "reachable_path": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "recommended_next_step": {
+                "type": "string"
+              },
+              "fix_finding_handoff": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "triage_item_id",
+              "input_id",
+              "source_type",
+              "verdict",
+              "confidence",
+              "title",
+              "normalized_input",
+              "affected_locations",
+              "evidence",
+              "counterevidence",
+              "proof_gaps",
+              "boundary_assessment",
+              "exploitability_stack_rank",
+              "reachable_path",
+              "recommended_next_step",
+              "fix_finding_handoff"
+            ]
+          }
+        }
       },
-      "required": ["schema_version", "repository", "findings"]
+      "required": [
+        "schema_version",
+        "repository",
+        "findings"
+      ]
     },
     "relationships": {
       "type": "array",
@@ -23,29 +267,79 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "relationship_id": { "type": "string", "minLength": 1 },
-          "status": { "type": "string", "const": "proposed" },
+          "relationship_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "const": "proposed"
+          },
           "classification": {
             "type": "string",
-            "enum": ["exact_overlap", "related_distinct", "no_candidate", "needs_further_review"]
+            "enum": [
+              "exact_overlap",
+              "related_distinct",
+              "no_candidate",
+              "needs_further_review"
+            ]
           },
-          "codeql_finding_id": { "type": "string", "minLength": 1 },
+          "codeql_finding_id": {
+            "type": "string",
+            "minLength": 1
+          },
           "codex_finding_ids": {
             "type": "array",
-            "items": { "type": "string", "minLength": 1 },
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
             "uniqueItems": true
           },
-          "same_source": { "type": ["boolean", "null"] },
-          "same_failed_control": { "type": ["boolean", "null"] },
-          "same_sink": { "type": ["boolean", "null"] },
-          "same_precondition": { "type": ["boolean", "null"] },
-          "same_impact": { "type": ["boolean", "null"] },
-          "rationale": { "type": "string", "minLength": 1 },
+          "same_source": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "same_failed_control": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "same_sink": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "same_precondition": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "same_impact": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
           "evidence": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
-          "human_review_required": { "type": "boolean", "const": true }
+          "human_review_required": {
+            "type": "boolean",
+            "const": true
+          }
         },
         "required": [
           "relationship_id",
@@ -70,17 +364,38 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "codex_finding_id": { "type": "string", "minLength": 1 },
+          "codex_finding_id": {
+            "type": "string",
+            "minLength": 1
+          },
           "relationship_ids": {
             "type": "array",
-            "items": { "type": "string", "minLength": 1 },
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
             "uniqueItems": true
           },
-          "status": { "type": "string", "enum": ["candidate", "no_candidate"] }
+          "status": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "no_candidate"
+            ]
+          }
         },
-        "required": ["codex_finding_id", "relationship_ids", "status"]
+        "required": [
+          "codex_finding_id",
+          "relationship_ids",
+          "status"
+        ]
       }
     }
   },
-  "required": ["schema_version", "codeql_triage", "relationships", "codex_finding_accounting"]
+  "required": [
+    "schema_version",
+    "codeql_triage",
+    "relationships",
+    "codex_finding_accounting"
+  ]
 }
