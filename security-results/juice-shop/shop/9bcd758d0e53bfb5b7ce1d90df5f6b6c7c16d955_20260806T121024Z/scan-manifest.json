@@ -1,0 +1,107 @@
+{
+  "documentType": "codex-security.scan-manifest",
+  "scan": {
+    "artifacts": [
+      {
+        "mediaType": "application/json",
+        "path": "findings.json",
+        "sha256": "4e32d277496a69e3783a30f5be391bca00feb382e563601776dba4cc185cd92f"
+      },
+      {
+        "mediaType": "application/json",
+        "path": "coverage.json",
+        "sha256": "ea6ba6236aeed73f29480070a3805d8279e46711d2527ec009abf464563b3a01"
+      },
+      {
+        "mediaType": "application/octet-stream",
+        "path": "artifacts/02_discovery/finding_discovery_report.md",
+        "sha256": "ba9087cf3f7d644cd9a2ba252a073f9ba7bc0ddaa445744d2c8945f3f50090be"
+      },
+      {
+        "mediaType": "application/octet-stream",
+        "path": "artifacts/02_discovery/work_ledger.jsonl",
+        "sha256": "2c5e553e8d04965dec2cbc8baa135968617d78cf643dfb07e1e398a986c14e21"
+      },
+      {
+        "mediaType": "application/octet-stream",
+        "path": "artifacts/05_findings/routes-search-q-type-confusion/attack_path_analysis_report.md",
+        "sha256": "4bbcff87391fc5c6e46e8a01212c70b083336f319aa569c84128befd7c49b7ea"
+      },
+      {
+        "mediaType": "application/octet-stream",
+        "path": "artifacts/05_findings/routes-search-q-type-confusion/candidate_ledger.jsonl",
+        "sha256": "7dfffd03c14401213cf514ede8573e0ea69d5677e0c60e0443eb28dae8efd0dd"
+      },
+      {
+        "mediaType": "application/octet-stream",
+        "path": "artifacts/05_findings/routes-search-q-type-confusion/validation_report.md",
+        "sha256": "13c4accf93c197be2bda1531fd7fac9e8bab8ed02004189c209d7c11abe4ccb5"
+      }
+    ],
+    "completedAt": "2026-08-06T12:26:34Z",
+    "coverageRef": "coverage.json",
+    "findingsRef": "findings.json",
+    "id": "9bcd758d0e53bfb5b7ce1d90df5f6b6c7c16d955_20260806T121024Z",
+    "producer": {
+      "name": "codex-security-plugin",
+      "version": "0.1.17"
+    },
+    "scope": {
+      "artifactsReviewed": [
+        "Exact Git revision diff",
+        "routes/search.ts in both revisions",
+        "supporting public route registration, Express/qs parsing behavior, error handling, focused test source, repository security guidance, and the omitted fix commit"
+      ],
+      "context": "Resolved SECURITY.md guidance and the repository-scoped threat model matching the target revision were used as the threat-model source of truth.",
+      "excludePaths": [],
+      "includePaths": [
+        "routes/search.ts"
+      ],
+      "limitations": [
+        "Application execution was forbidden, so operational resource amplification was not measured.",
+        "Uncommitted working-tree changes were outside the requested revision range and were not scanned."
+      ],
+      "runtimeStatus": "Static review only; application tests and application execution were not run per user instruction.",
+      "summary": "Security diff review of refs/heads/master through refs/heads/add-vul-back, resolved to the exact base and head revisions recorded above. The deterministic diff inventory contained one source file and it was reviewed in full.",
+      "validationMode": "Full-file diff review with static source/control/sink validation and attack-path analysis."
+    },
+    "sealedAt": "2026-08-06T12:26:34Z",
+    "startedAt": "2026-08-06T12:10:24Z",
+    "status": "completed",
+    "target": {
+      "baseRevision": "c448bad38b57b017d2ad8bc6e1ea249ed178d6ca",
+      "displayName": "juice-shop",
+      "headRevision": "9bcd758d0e53bfb5b7ce1d90df5f6b6c7c16d955",
+      "kind": "git_diff",
+      "snapshotDigest": "codex-security-snapshot/v1:sha256:a99cbae551756e4f35a0ae4d69dbb6346930999083e7328a2a6de537f21bb94d",
+      "targetId": "target_sha256_942e4454c5a63661aa7378d57768341491657f4df9014a8cac1a157dd6f8ba9e"
+    },
+    "threatModel": {
+      "assets": [
+        "Application availability and bounded server/database resource use",
+        "User identities, credentials, tokens, private customer data, and privileged application capabilities",
+        "Application and deployment secrets, host filesystem, and repository integrity"
+      ],
+      "assumptions": [
+        "The product-search route is publicly reachable under the application's default Express query-parser configuration",
+        "Intentional challenge vulnerabilities remain reportable under repository policy"
+      ],
+      "attackerCapabilities": [
+        "Anonymous users can send arbitrary query-string syntax, including duplicate and structured parameters, to public routes",
+        "Authenticated users can control request bodies, headers, files, and client-selected identifiers"
+      ],
+      "securityObjectives": [
+        "Validate and bound attacker-controlled input before type-dependent or resource-sensitive processing",
+        "Enforce server-side identity, role, and object ownership",
+        "Contain file, parser, network, database, and model-driven operations"
+      ],
+      "summary": "A public OWASP Juice Shop deployment must preserve input-validation, availability, user, administrative, filesystem, network, credential, and source-integrity boundaries even for intentional challenge behavior.",
+      "trustBoundaries": [
+        "Public HTTP query parameters crossing into Express route handlers and database operations",
+        "Authenticated identity and object-ownership boundaries",
+        "Untrusted repository content and privileged automation"
+      ]
+    }
+  },
+  "schemaVersion": "1.0"
+}
