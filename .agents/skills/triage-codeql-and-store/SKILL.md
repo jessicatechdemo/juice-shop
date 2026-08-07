@@ -226,18 +226,16 @@ triage-confirmed | triage-needs-review | triage-not-actionable
 
 Leave assignee unset. Do not transition or resolve Tasks.
 
-Map CodeQL security severity to a live allowed Jira priority:
+Map CodeQL security severity based on CodeQL's `security_severity_level` to Jira priority as follows:
 
 ```text
-critical -> Critical, or Highest when Critical is unavailable
-high     -> High
-medium   -> Medium
-low      -> Low
-missing  -> omit priority and record priority_source: jira_default
+critical -> Highest
+high -> High
+medium -> Medium
+low -> Low      
 ```
 
-Do not map generic CodeQL `error`, `warning`, or `note`. Do not derive priority
-from verdict or confidence.
+Derive priority from triage verdict or confidence.
 
 Search the exact project across all Jira statuses for Finding ID and fingerprint
 separately. Read every plausible candidate and compare exact labeled bindings.

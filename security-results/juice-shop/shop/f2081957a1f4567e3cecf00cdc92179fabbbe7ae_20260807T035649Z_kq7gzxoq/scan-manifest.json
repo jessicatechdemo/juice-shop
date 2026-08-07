@@ -1,0 +1,101 @@
+{
+  "documentType": "codex-security.scan-manifest",
+  "scan": {
+    "artifacts": [
+      {
+        "mediaType": "application/json",
+        "path": "findings.json",
+        "sha256": "d6cb2b07e629873b23c858dfae76b3bfccf7abd5c392b1fd05ef88c7e963348a"
+      },
+      {
+        "mediaType": "application/json",
+        "path": "coverage.json",
+        "sha256": "f4d7670cbb27d459c7f84d7492ff253fbe9e3c42bb7bb2bfd430c88378d8ba03"
+      },
+      {
+        "mediaType": "application/octet-stream",
+        "path": "artifacts/02_discovery/work_ledger.jsonl",
+        "sha256": "d0aa59fa530d50626065cd22f8d4f332393f85d316183a98cff40a7ce4b8977e"
+      },
+      {
+        "mediaType": "application/octet-stream",
+        "path": "artifacts/05_findings/candidate-ca51cfb4ceda98d6/candidate_ledger.jsonl",
+        "sha256": "4eb468b7ff5a4b58ea6001b69adac611e9ddca09ec1c98557d836e159997bd3a"
+      }
+    ],
+    "completedAt": "2026-08-07T04:13:54.354883Z",
+    "coverageRef": "coverage.json",
+    "findingsRef": "findings.json",
+    "id": "1077317d-2494-4a9f-a1f4-f61d1ce55dc7",
+    "producer": {
+      "name": "codex-security-plugin",
+      "version": "0.1.17"
+    },
+    "scope": {
+      "artifactsReviewed": [
+        "routes/search.ts",
+        ".github/workflows/ci.yml",
+        ".github/workflows/codeql-scheduled.yml",
+        "server.ts",
+        "lib/utils.ts",
+        "SECURITY.md"
+      ],
+      "context": "The scan reviewed every security-relevant changed source or executable workflow file. The repository threat model was derived from repository SECURITY.md guidance and preserved as a scan artifact.",
+      "excludePaths": [],
+      "includePaths": [
+        "."
+      ],
+      "limitations": [
+        "No application tests or dynamic reproduction were permitted.",
+        "No live GitHub repository settings, Jira state, GitHub issues, or deployment state were queried.",
+        "Only security-relevant changes between the selected refs were assessed; unchanged intentional vulnerabilities were not reported as diff findings."
+      ],
+      "runtimeStatus": "Application tests and runtime reproduction were not run, as required by the user.",
+      "summary": "Security diff review of refs/heads/master at 6b6637bc45042c25aef5b31daac0033043ddd5d1 against refs/heads/add-vul-back at f2081957a1f4567e3cecf00cdc92179fabbbe7ae.",
+      "validationMode": "Static immutable-revision diff and source/control/sink analysis."
+    },
+    "sealedAt": "2026-08-07T04:13:54.354883Z",
+    "startedAt": "2026-08-07T03:56:49.278392Z",
+    "status": "completed",
+    "target": {
+      "baseRevision": "6b6637bc45042c25aef5b31daac0033043ddd5d1",
+      "displayName": "juice-shop",
+      "headRevision": "f2081957a1f4567e3cecf00cdc92179fabbbe7ae",
+      "kind": "git_diff",
+      "snapshotDigest": "codex-security-snapshot/v1:sha256:efb7194dded32ab8de41ac0dea3259308f8b817e269da6e9d0b6c8a4cfaec63f",
+      "targetId": "target_sha256_942e4454c5a63661aa7378d57768341491657f4df9014a8cac1a157dd6f8ba9e"
+    },
+    "threatModel": {
+      "assets": [
+        "Application availability",
+        "Application data and database integrity",
+        "User credentials and sessions",
+        "CI credentials and repository integrity"
+      ],
+      "assumptions": [
+        "The application is deployed with its normal public HTTP routes.",
+        "Express 4 query parsing may represent query values as strings, arrays, or objects.",
+        "Centralized Express error handling confines ordinary handler exceptions unless additional evidence shows broader failure."
+      ],
+      "attackerCapabilities": [
+        "Send unauthenticated HTTP requests with crafted and repeated query parameters",
+        "Supply nested or structured query-string values accepted by Express parsing",
+        "Submit repository changes only where a workflow trigger and repository policy permit"
+      ],
+      "securityObjectives": [
+        "Validate untrusted input types before string processing",
+        "Prevent attacker input from causing practical service availability failures",
+        "Keep CI secrets and write permissions isolated from untrusted pull-request code",
+        "Distinguish intentional unchanged training vulnerabilities from diff-introduced regressions"
+      ],
+      "summary": "OWASP Juice Shop is a publicly reachable Node.js/Express training application that intentionally contains vulnerabilities. Public routes, attacker-controlled query parameters, runtime availability, and privileged CI workflows are in scope; challenge intentionality does not by itself exclude a diff-introduced regression.",
+      "trustBoundaries": [
+        "Unauthenticated internet client to Express HTTP route",
+        "Parsed HTTP query values to route-handler type assumptions",
+        "Repository content to privileged CI workflow execution",
+        "Application route to database query execution"
+      ]
+    }
+  },
+  "schemaVersion": "1.0"
+}

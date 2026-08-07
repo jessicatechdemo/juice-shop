@@ -1,0 +1,4 @@
+No token to /api/Cards: HTTP/1.1 401 Unauthorized with message "Cannot read properties of undefined (reading 'data')".
+Forged alg:none JWT with data.id=1 to /api/Cards: HTTP/1.1 200 OK and response contains two Administrator cards with UserId 1.
+Forged alg:none JWT with data.id=2 to /api/Cards: HTTP/1.1 200 OK and response contains Jim card with UserId 2.
+Forged alg:none JWT with data.id=1,bid=1 to /rest/basket/1: HTTP/1.1 200 OK and response contains basket data for UserId 1.

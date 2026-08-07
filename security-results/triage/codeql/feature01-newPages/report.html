@@ -20,6 +20,24 @@
     .summary button { text-align:left; border:1px solid var(--line); border-radius:14px; padding:16px; background:var(--panel); color:var(--ink); cursor:pointer; }
     .summary button[aria-pressed="true"] { outline:3px solid #5b8def; outline-offset:1px; }
     .summary strong { display:block; font-size:1.8rem; }
+    .relationship { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; margin:0 0 24px; box-shadow:0 8px 20px rgb(15 23 42 / 6%); }
+    .relationship > header { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; }
+    .relationship > header p { max-width:72ch; margin:.35rem 0 0; }
+    .relationship-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:18px 0; }
+    .relationship-stat { border:1px solid var(--line); border-radius:12px; padding:12px; }
+    .relationship-stat strong { display:block; font-size:1.55rem; }
+    .relationship table { width:100%; border-collapse:collapse; margin-top:8px; }
+    .relationship th,.relationship td { border-bottom:1px solid var(--line); padding:9px 10px; text-align:left; vertical-align:top; }
+    .relationship th { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; }
+    .relationship-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .relationship-flow { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:10px; align-items:stretch; margin:12px 0; }
+    .relationship-flow-step { border:1px solid var(--line); border-radius:12px; padding:12px; }
+    .relationship-flow-step strong { display:block; margin-bottom:5px; }
+    .relationship-flow-arrow { align-self:center; color:var(--muted); font-size:1.35rem; }
+    .relationship-example { border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--bg); }
+    .relationship-example p { margin:.3rem 0; }
+    .relationship-callout { border-left:4px solid #5b8def; padding:10px 14px; margin:16px 0 0; background:color-mix(in srgb,var(--panel) 85%,#5b8def 15%); }
+    .relationship-callout p { margin:0; }
     .controls { display:flex; gap:12px; align-items:center; margin:0 0 18px; }
     input { flex:1; border:1px solid var(--line); border-radius:10px; padding:11px 13px; background:var(--panel); color:var(--ink); }
     .finding { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; margin:0 0 14px; box-shadow:0 8px 20px rgb(15 23 42 / 6%); }
@@ -39,7 +57,8 @@
     .next-step { margin-bottom:0; }
     .empty-state { text-align:center; padding:56px; background:var(--panel); border:1px dashed var(--line); border-radius:16px; color:var(--muted); }
     [hidden] { display:none !important; }
-    @media (max-width:760px) { .summary { grid-template-columns:repeat(2,1fr); } .finding header { display:block; } .badge { display:inline-block; margin-top:10px; } }
+    @media (max-width:760px) { .summary,.relationship-stats,.relationship-columns { grid-template-columns:repeat(2,1fr); } .relationship-flow { grid-template-columns:1fr; } .relationship-flow-arrow { transform:rotate(90deg); justify-self:center; } .relationship > header,.finding header { display:block; } .badge { display:inline-block; margin-top:10px; } .relationship { overflow-x:auto; } }
+    @media (max-width:520px) { .relationship-stats,.relationship-columns { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
@@ -54,6 +73,104 @@
       <button type="button" data-filter="needs_review" aria-pressed="false"><strong>3</strong>Needs review</button>
       <button type="button" data-filter="not_actionable" aria-pressed="false"><strong>49</strong>Not actionable</button>
     </div>
+    <section class="relationship" aria-labelledby="relationship-title">
+      <header>
+        <div>
+          <p class="eyebrow">Cross-scan evidence correlation</p>
+          <h2 id="relationship-title">Codex Security ↔ CodeQL relationship</h2>
+          <p class="muted">The two scans are complementary evidence sets. CodeQL identifies query and data-flow candidates; Codex Security evaluates application semantics, trust boundaries, resource lifecycle, business authorization, and CI configuration. Findings are deduplicated only when their source, failed control, and security impact match.</p>
+        </div>
+        <span class="badge confirmed">3 exact overlaps</span>
+      </header>
+
+      <div class="relationship-stats" aria-label="Cross-scan relationship summary">
+        <div class="relationship-stat"><strong>3</strong>Exact overlaps</div>
+        <div class="relationship-stat"><strong>10</strong>Codex-only claims</div>
+        <div class="relationship-stat"><strong>3</strong>CodeQL-only confirmed at snapshot</div>
+        <div class="relationship-stat"><strong>1</strong>CodeQL-only item now fixed</div>
+      </div>
+
+      <section>
+        <h3>Exact overlaps: one vulnerability, two independent evidence sources</h3>
+        <table>
+          <thead>
+            <tr><th>Codex Security finding</th><th>CodeQL result</th><th>Relationship</th><th>Remediation unit</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Encryption-key filter bypass with Windows path separators</td><td>Alert #6 · <code>js/path-injection</code></td><td>Same untrusted filename, forward-slash-only control, and file-read sink</td><td rowspan="3">Use one separator-independent path-containment helper and regression-test all three routes. A CodeQL rerun is still required to close each alert.</td></tr>
+            <tr><td>Quarantine filter bypass with Windows path separators</td><td>Alert #8 · <code>js/path-injection</code></td><td>Same untrusted filename, forward-slash-only control, and file-read sink</td></tr>
+            <tr><td>Log-file filter bypass with Windows path separators</td><td>Alert #7 · <code>js/path-injection</code></td><td>Same untrusted filename, forward-slash-only control, and file-read sink</td></tr>
+          </tbody>
+        </table>
+
+        <h3>What “forward-slash-only control” and “file-read sink” mean</h3>
+        <div class="relationship-flow" aria-label="Shared path traversal data flow">
+          <div class="relationship-flow-step"><strong>1 · Untrusted source</strong>The public route parameter <code>:file</code> is decoded by Express and assigned to <code>params.file</code>.</div>
+          <div class="relationship-flow-arrow" aria-hidden="true">→</div>
+          <div class="relationship-flow-step"><strong>2 · Incomplete control</strong><code>if (!file.includes('/'))</code> rejects only the forward slash character. It does not reject a backslash or verify that the resolved path remains below the intended directory.</div>
+          <div class="relationship-flow-arrow" aria-hidden="true">→</div>
+          <div class="relationship-flow-step"><strong>3 · File-read sink</strong><code>path.resolve(root, file)</code> constructs an absolute path, then <code>res.sendFile(...)</code> reads that path and returns the file to the requester. This is the security-sensitive operation where unsafe input can become file disclosure.</div>
+        </div>
+        <div class="relationship-example">
+          <p><strong>Why the control is bypassable:</strong> Unix-like systems normally use <code>/</code> as the path separator, while Windows accepts <code>\</code>. A URL-encoded backslash such as <code>%5c</code> can therefore become a Windows traversal segment without ever containing the literal <code>/</code> tested by the guard.</p>
+          <p><strong>Concrete trace:</strong> a filename shaped like <code>..%5c..%5c&lt;readable-file&gt;</code> can decode to <code>..\..\&lt;readable-file&gt;</code>. The slash check accepts it; on Windows, <code>path.resolve</code> interprets the backslashes and parent segments, potentially resolves outside <code>encryptionkeys/</code>, <code>ftp/quarantine/</code>, or <code>logs/</code>; and <code>sendFile</code> returns the escaped file.</p>
+          <p><strong>Platform scope:</strong> the bypass requires a Windows deployment. That narrows likelihood, but Windows is a supported runtime, so it does not eliminate the finding.</p>
+        </div>
+
+        <h3>Why the Codex and CodeQL results are the same vulnerability</h3>
+        <table>
+          <thead>
+            <tr><th>Identity criterion</th><th>CodeQL triage evidence</th><th>Codex Security evidence</th><th>Match?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Source</td><td>Unauthenticated <code>:file</code> route parameter</td><td>The same public route and attacker-controlled filename</td><td>Yes</td></tr>
+            <tr><td>Failed control</td><td>Guard rejects <code>/</code>, but not Windows separators or resolved-path escape</td><td>The same <code>file.includes('/')</code> guard is incomplete on Windows</td><td>Yes</td></tr>
+            <tr><td>Sink</td><td><code>res.sendFile(path.resolve(root, file))</code></td><td>The same resolve-and-send file operation</td><td>Yes</td></tr>
+            <tr><td>Precondition</td><td>Supported Windows deployment and backslash traversal</td><td>The same operating-system and encoding condition</td><td>Yes</td></tr>
+            <tr><td>Impact</td><td>Path escape and disclosure of a process-readable file</td><td>The same arbitrary-read boundary crossing</td><td>Yes</td></tr>
+          </tbody>
+        </table>
+        <p class="muted"><strong>Rationale:</strong> the scanner names and severity labels are metadata, not vulnerability identity. CodeQL reached these locations through its <code>js/path-injection</code> query and the triage established the Windows-specific bypass. Codex Security independently reconstructed the same source → guard → resolve/sendFile path and checked reachability and challenge intentionality. Because each pair has the same endpoint, input, failed guard, filesystem operation, precondition, and impact, it is one underlying vulnerability supported by two evidence sources—not two vulnerabilities. The three routes remain three separate instances because each exposes a different endpoint and file root.</p>
+      </section>
+
+      <section>
+        <h3>Same component does not mean the same vulnerability</h3>
+        <table>
+          <thead>
+            <tr><th>Component</th><th>CodeQL evidence</th><th>Codex Security evidence</th><th>Conclusion</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>routes/profileImageUrlUpload.ts</code></td><td>Alert #45: confirmed polynomial ReDoS. Alerts #2 and #9: not actionable.</td><td>Remote download has no response-size or duration limit.</td><td>Independent denial-of-service modes; keep separate tests and fixes.</td></tr>
+            <tr><td><code>routes/web3Wallet.ts</code></td><td>Alert #43: stack-trace exposure is not actionable because the response uses the error message, not the stack.</td><td>Public listener retains attacker-controlled addresses in an unbounded global <code>Set</code>.</td><td>The CodeQL claim is rejected; the semantic resource-exhaustion finding remains.</td></tr>
+            <tr><td><code>lib/insecurity.ts</code></td><td>Alerts #55 and #56: remote-property-injection claims are not actionable. Alert #1 remains needs review.</td><td>Authenticated token cache grows without bounds or expiration cleanup.</td><td>The scans touch the same state but test different security invariants.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div class="relationship-columns">
+        <section>
+          <h3>Unique Codex Security coverage</h3>
+          <ul>
+            <li>Authentication metadata disclosure and committed CTF signing key</li>
+            <li>Chatbot, profile-download, Web3-listener, and token-cache resource exhaustion</li>
+            <li>Checkout and coupon cross-user basket authorization failures</li>
+            <li>Mutable third-party CI action references</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Unique CodeQL confirmed coverage</h3>
+          <ul>
+            <li>Alert #5: Windows path traversal in <code>routes/fileServer.ts</code></li>
+            <li>Alert #45: polynomial ReDoS in <code>routes/profileImageUrlUpload.ts</code></li>
+            <li>Alert #46: log injection in <code>lib/challengeUtils.ts</code>; confirmed at the CodeQL snapshot and fixed on the current branch by stripping CR/LF</li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="relationship-callout">
+        <p><strong>Revision context:</strong> this CodeQL report describes <code>a01265c821d0ac5c8ff5c3401871a7798309fe1d</code> on <code>feature01-newPages</code>. The 13 Codex Security findings from <code>security-results/findings.json</code> were rechecked against current revision <code>cb796890243da1c2a7d3e86048a9628371251db6</code>. Among the relevant confirmed CodeQL files, only <code>lib/challengeUtils.ts</code> changed materially, fixing alert #46. Therefore, use the union of both evidence sets, merge only the three exact overlaps, and retain scanner-specific alert identities for rerun and closure.</p>
+      </div>
+    </section>
     <div class="controls">
       <label for="search"><strong>Search</strong></label>
       <input id="search" type="search" placeholder="Finding ID, alert number, rule, path, title, or evidence">

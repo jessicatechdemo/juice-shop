@@ -1,0 +1,1 @@
+Use $codex-security:fix-finding to fix finding {finding-id} from {report-path}. Validate the issue, make the smallest safe change, and add a focused regression test that fails before the fix and passes after it. If that test is unsafe or infeasible, record the proof gap and provide the strongest repeatable validation artifact instead. Verify that the issue no longer reproduces.
