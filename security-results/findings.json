@@ -1,0 +1,1804 @@
+{
+  "documentType": "codex-security.findings",
+  "findings": [
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Any authenticated user can enumerate all users and authentication metadata",
+          "sink": "Any authenticated user can enumerate all users and authentication metadata at routes/authenticatedUsers.ts:10-31.",
+          "source": "The attacker-controlled trigger for \u201cAny authenticated user can enumerate all users and authentication metadata\u201d reaches the path beginning at server.ts:398-398.",
+          "summary": "Ordinary authenticated bearer token -> GET /rest/user/authentication-details -> UserModel.findAll() -> spread user.dataValues -> cross-user authentication metadata response."
+        },
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "server.ts:398",
+          "outcome": "Any authenticated user can enumerate all users and authentication metadata",
+          "preconditions": [
+            "The attacker has the ordinary authenticated account/session described by the candidate."
+          ],
+          "summary": "Self-registration and login provide the only required privilege. The server applies isAuthorized(), not an administrator-role check, before returning every user to the caller. Counterevidence: Passwords and TOTP secrets are masked and the Angular consumer is the administration page. Those controls reduce field sensitivity but do not enforce the backend administrator boundary; email, role, deluxeToken, lastLoginIp, activity state, and session timing remain exposed."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "  app.use('/rest/user/authentication-details', security.isAuthorized())",
+          "endLine": 398,
+          "explanation": "This entrypoint location is part of the validated path for any authenticated user can enumerate all users and authentication metadata.",
+          "id": "evidence-1",
+          "label": "Entrypoint",
+          "language": "typescript",
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 398
+        },
+        {
+          "code": "async function retrieveUserList (req: Request, res: Response, next: NextFunction) {\n  try {\n    const users = await UserModel.findAll()\n\n    res.json({\n      status: 'success',\n      data: users.map((user) => {\n        const userToken = security.authenticatedUsers.tokenOf(user)\n        let lastLoginTime: number | null = null\n        if (userToken) {\n          const parsedToken = decode(userToken, { json: true })\n          lastLoginTime = parsedToken ? Math.floor(new Date(parsedToken?.iat ?? 0 * 1000).getTime()) : null\n        }\n\n        return {\n          ...user.dataValues,\n          password: user.password?.replace(/./g, '*'),\n          totpSecret: user.totpSecret?.replace(/./g, '*'),\n          lastLoginTime\n        }\n      })\n    })",
+          "endLine": 31,
+          "explanation": "This sink location is part of the validated path for any authenticated user can enumerate all users and authentication metadata.",
+          "id": "evidence-2",
+          "label": "Sink",
+          "language": "typescript",
+          "path": "routes/authenticatedUsers.ts",
+          "role": "sink",
+          "startLine": 10
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-5529f8df3cec5505",
+        "impact": "medium",
+        "intentionality": {
+          "evidence": "Passwords and TOTP secrets are masked and the Angular consumer is the administration page. Those controls reduce field sensitivity but do not enforce the backend administrator boundary; email, role, deluxeToken, lastLoginIp, activity state, and session timing remain exposed.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "high",
+        "owaspTop10_2025": [
+          {
+            "id": "A01:2025",
+            "rationale": "The finding is classified as Broken object-level authorization; CWE-200, CWE-862 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality.",
+            "sourceUrl": "https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/",
+            "status": "mapped",
+            "title": "Broken Access Control"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Broken object-level authorization"
+      },
+      "findingId": "csf_5e27afca831e2df4b6833b01",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:ab5270194cea204f12dd8f40713969ca5f8291c80900469a370024dcc73b3743"
+      },
+      "identity": {
+        "anchor": "authentication-details-low-privilege-disclosure",
+        "instance": "candidate-5529f8df3cec5505"
+      },
+      "locations": [
+        {
+          "endLine": 398,
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 398
+        },
+        {
+          "endLine": 31,
+          "path": "routes/authenticatedUsers.ts",
+          "role": "sink",
+          "startLine": 10
+        }
+      ],
+      "occurrenceId": "occ_c89fa0448e8f801bad0c5ff0",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Derive the subject and target object from the authenticated server-side principal, enforce authorization immediately before the state-changing/read operation, and ignore or reject client-supplied ownership/role fields.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Any authenticated user can enumerate all users and authentication metadata.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "summary": "Closest authentication/role/object-ownership binding control at routes/authenticatedUsers.ts:10-31; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/authentication-details-low-privilege-disclosure",
+      "severity": {
+        "changeConditions": "Raise if returned tokens or stronger PII are shown exploitable; lower if the route adds an administrator check and a least-privilege response projection.",
+        "level": "medium",
+        "rationale": "A low-privilege user can enumerate cross-user identity and authentication metadata through an admin-facing API. The data is useful for targeting but does not directly disclose plaintext credentials, so medium impact with high likelihood yields medium."
+      },
+      "summary": "The authentication-details route is protected only by isAuthorized(), not an administrator check. Its handler queries every user and spreads each dataValues object into the response while masking only password and TOTP, disclosing email, role, IP and other account metadata to ordinary customers. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Broken object-level authorization",
+        "cwe": [
+          "CWE-200",
+          "CWE-862"
+        ]
+      },
+      "title": "Any authenticated user can enumerate all users and authentication metadata",
+      "validation": {
+        "counterEvidence": [
+          "No exact complete control at the cited instance defeats the source-to-action path. Nearby safe paths and intentional challenge markers are not suppression evidence; no fresh live PoC was needed for this deterministic source/test trace.",
+          "No material validity uncertainty remains; deployment-specific impact and intentional-challenge classification remain separate downstream questions."
+        ],
+        "evidence": [
+          "The authentication-details route is protected only by isAuthorized(), not an administrator check. Its handler queries every user and spreads each dataValues object into the response while masking only password and TOTP, disclosing email, role, IP and other account metadata to ordinary customers.",
+          "Validated source/control/sink locations: server.ts:398-398[entrypoint]; routes/authenticatedUsers.ts:10-31[sink]."
+        ],
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance. OWASP Top 10:2025 classification (separate from technical status): A01:2025 Broken Access Control: The finding is classified as Broken object-level authorization; CWE-200, CWE-862 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Encryption-key file filter is bypassable with Windows path separators",
+          "sink": "Encryption-key file filter is bypassable with Windows path separators at routes/keyServer.ts:9-18.",
+          "source": "An unauthenticated caller controls the requested path/name handled at server.ts:273-278.",
+          "summary": "Remote encoded backslash traversal in /encryptionkeys/:file -> forward-slash-only filename check -> Windows path.resolve('encryptionkeys/', file) -> sendFile() outside the intended root."
+        },
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "server.ts:273",
+          "outcome": "Encryption-key file filter is bypassable with Windows path separators",
+          "preconditions": [
+            "The application runs on Windows, where backslash is a path separator."
+          ],
+          "summary": "The encryption-key file route is public. On a supported Windows deployment, an encoded backslash remains a path separator after route decoding and can escape the intended directory. Counterevidence: The path is host-OS-specific, browsers may normalize literal backslashes, and the surrounding file-serving surfaces intentionally expose challenge files. Encoded backslashes plus Node Windows path semantics preserve the broader arbitrary-read path, which is not required by a named challenge."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "  app.use('/.well-known', serveIndexMiddleware, serveIndex('.well-known', { icons: true, view: 'details' }))\n  app.use('/.well-known', express.static('.well-known'))\n\n  /* /encryptionkeys directory browsing */\n  app.use('/encryptionkeys', serveIndexMiddleware, serveIndex('encryptionkeys', { icons: true, view: 'details' }))\n  app.use('/encryptionkeys/:file', serveKeyFiles())",
+          "endLine": 278,
+          "explanation": "This entrypoint location is part of the validated path for encryption-key file filter is bypassable with windows path separators.",
+          "id": "evidence-1",
+          "label": "Entrypoint",
+          "language": "typescript",
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 273
+        },
+        {
+          "code": "export function serveKeyFiles () {\n  return ({ params }: Request, res: Response, next: NextFunction) => {\n    const file = params.file\n\n    if (!file.includes('/')) {\n      res.sendFile(path.resolve('encryptionkeys/', file))\n    } else {\n      res.status(403)\n      next(new Error('File names cannot contain forward slashes!'))\n    }",
+          "endLine": 18,
+          "explanation": "This sink location is part of the validated path for encryption-key file filter is bypassable with windows path separators.",
+          "id": "evidence-2",
+          "label": "Sink",
+          "language": "typescript",
+          "path": "routes/keyServer.ts",
+          "role": "sink",
+          "startLine": 9
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-e7fd9d192569dcdc",
+        "impact": "high",
+        "intentionality": {
+          "evidence": "The path is host-OS-specific, browsers may normalize literal backslashes, and the surrounding file-serving surfaces intentionally expose challenge files. Encoded backslashes plus Node Windows path semantics preserve the broader arbitrary-read path, which is not required by a named challenge.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "medium",
+        "owaspTop10_2025": [
+          {
+            "id": "A01:2025",
+            "rationale": "The finding is classified as Path traversal; CWE-22 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality.",
+            "sourceUrl": "https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/",
+            "status": "mapped",
+            "title": "Broken Access Control"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Path traversal"
+      },
+      "findingId": "csf_48553fb35a461772018e387f",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:bda66cb2022d5c338176fcf7ba1d50c27200784b6e4159791322031508598c4f"
+      },
+      "identity": {
+        "anchor": "encryptionkeys-windows-backslash-traversal",
+        "instance": "candidate-e7fd9d192569dcdc"
+      },
+      "locations": [
+        {
+          "endLine": 278,
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 273
+        },
+        {
+          "endLine": 18,
+          "path": "routes/keyServer.ts",
+          "role": "sink",
+          "startLine": 9
+        }
+      ],
+      "occurrenceId": "occ_4a0d3389d3702c1bcbd001dc",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Reject path separators and traversal segments, resolve the candidate path against the intended root, verify canonical containment before every read/write/extract operation, and use generated names where possible.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Encryption-key file filter is bypassable with Windows path separators.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "summary": "Closest decode-then-canonicalize containment and file allowlisting control at routes/keyServer.ts:9-18; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/encryptionkeys-windows-backslash-traversal",
+      "severity": {
+        "changeConditions": "Raise if a supported public Windows deployment and a sensitive-file read are reproduced; lower if containment is enforced with a canonical descendant check on every platform.",
+        "level": "medium",
+        "rationale": "The path can cross the filesystem boundary and read files available to the Juice Shop process, but it requires a Windows deployment and an encoded separator. High impact with medium likelihood yields medium."
+      },
+      "summary": "The key server checks for '/' but not '\\' before resolving attacker-controlled file names. On Windows, a backslash traversal sequence can resolve outside encryptionkeys and expose another readable file. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Path traversal",
+        "cwe": [
+          "CWE-22"
+        ]
+      },
+      "title": "Encryption-key file filter is bypassable with Windows path separators",
+      "validation": {
+        "counterEvidence": [
+          "No complete Windows-safe containment control exists: only forward slash is rejected before path resolution. The platform requirement scopes the row but does not defeat it.",
+          "No material validity uncertainty remains; deployment-specific impact and intentional-challenge classification remain separate downstream questions."
+        ],
+        "evidence": [
+          "The key server checks for '/' but not '\\' before resolving attacker-controlled file names. On Windows, a backslash traversal sequence can resolve outside encryptionkeys and expose another readable file.",
+          "Validated source/control/sink locations: server.ts:273-278[entrypoint]; routes/keyServer.ts:9-18[sink]."
+        ],
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance. OWASP Top 10:2025 classification (separate from technical status): A01:2025 Broken Access Control: The finding is classified as Path traversal; CWE-22 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Quarantine file filter is bypassable with Windows path separators",
+          "sink": "Quarantine file filter is bypassable with Windows path separators at routes/quarantineServer.ts:9-18.",
+          "source": "An unauthenticated caller controls the requested path/name handled at server.ts:285-287.",
+          "summary": "Remote encoded backslash traversal in /ftp/quarantine/:file -> forward-slash-only filename check -> Windows path.resolve('ftp/quarantine/', file) -> sendFile() outside the intended root."
+        },
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "server.ts:285",
+          "outcome": "Quarantine file filter is bypassable with Windows path separators",
+          "preconditions": [
+            "The application runs on Windows, where backslash is a path separator."
+          ],
+          "summary": "The quarantine file route is public. On a supported Windows deployment, an encoded backslash remains a path separator after route decoding and can escape the intended directory. Counterevidence: The path is host-OS-specific, browsers may normalize literal backslashes, and the surrounding file-serving surfaces intentionally expose challenge files. Encoded backslashes plus Node Windows path semantics preserve the broader arbitrary-read path, which is not required by a named challenge."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "  /* Swagger documentation for B2B v2 endpoints */\n  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))\n",
+          "endLine": 287,
+          "explanation": "This entrypoint location is part of the validated path for quarantine file filter is bypassable with windows path separators.",
+          "id": "evidence-1",
+          "label": "Entrypoint",
+          "language": "typescript",
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 285
+        },
+        {
+          "code": "export function serveQuarantineFiles () {\n  return ({ params, query }: Request, res: Response, next: NextFunction) => {\n    const file = params.file\n\n    if (!file.includes('/')) {\n      res.sendFile(path.resolve('ftp/quarantine/', file))\n    } else {\n      res.status(403)\n      next(new Error('File names cannot contain forward slashes!'))\n    }",
+          "endLine": 18,
+          "explanation": "This sink location is part of the validated path for quarantine file filter is bypassable with windows path separators.",
+          "id": "evidence-2",
+          "label": "Sink",
+          "language": "typescript",
+          "path": "routes/quarantineServer.ts",
+          "role": "sink",
+          "startLine": 9
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-bcadfbf9ffbd6225",
+        "impact": "high",
+        "intentionality": {
+          "evidence": "The path is host-OS-specific, browsers may normalize literal backslashes, and the surrounding file-serving surfaces intentionally expose challenge files. Encoded backslashes plus Node Windows path semantics preserve the broader arbitrary-read path, which is not required by a named challenge.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "medium",
+        "owaspTop10_2025": [
+          {
+            "id": "A01:2025",
+            "rationale": "The finding is classified as Path traversal; CWE-22 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality.",
+            "sourceUrl": "https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/",
+            "status": "mapped",
+            "title": "Broken Access Control"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Path traversal"
+      },
+      "findingId": "csf_af883dc04b7002a5bc010ec6",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:211327d214f243806dc6fc66f23a613d2035a203e53e08b2ae2d23ee5a47b62f"
+      },
+      "identity": {
+        "anchor": "quarantine-windows-backslash-traversal",
+        "instance": "candidate-bcadfbf9ffbd6225"
+      },
+      "locations": [
+        {
+          "endLine": 287,
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 285
+        },
+        {
+          "endLine": 18,
+          "path": "routes/quarantineServer.ts",
+          "role": "sink",
+          "startLine": 9
+        }
+      ],
+      "occurrenceId": "occ_4b25dac74148f197130d918a",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Reject path separators and traversal segments, resolve the candidate path against the intended root, verify canonical containment before every read/write/extract operation, and use generated names where possible.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Quarantine file filter is bypassable with Windows path separators.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "summary": "Closest decode-then-canonicalize containment and file allowlisting control at routes/quarantineServer.ts:9-18; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/quarantine-windows-backslash-traversal",
+      "severity": {
+        "changeConditions": "Raise if a supported public Windows deployment and a sensitive-file read are reproduced; lower if containment is enforced with a canonical descendant check on every platform.",
+        "level": "medium",
+        "rationale": "The path can cross the filesystem boundary and read files available to the Juice Shop process, but it requires a Windows deployment and an encoded separator. High impact with medium likelihood yields medium."
+      },
+      "summary": "The quarantine download route rejects only forward slash and then calls path.resolve with the attacker-supplied name. Windows treats backslash as a separator, permitting encoded backslash traversal outside the quarantine directory. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Path traversal",
+        "cwe": [
+          "CWE-22"
+        ]
+      },
+      "title": "Quarantine file filter is bypassable with Windows path separators",
+      "validation": {
+        "counterEvidence": [
+          "No complete Windows-safe containment control exists: only forward slash is rejected before path resolution. The platform requirement scopes the row but does not defeat it.",
+          "No material validity uncertainty remains; deployment-specific impact and intentional-challenge classification remain separate downstream questions."
+        ],
+        "evidence": [
+          "The quarantine download route rejects only forward slash and then calls path.resolve with the attacker-supplied name. Windows treats backslash as a separator, permitting encoded backslash traversal outside the quarantine directory.",
+          "Validated source/control/sink locations: server.ts:285-287[entrypoint]; routes/quarantineServer.ts:9-18[sink]."
+        ],
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance. OWASP Top 10:2025 classification (separate from technical status): A01:2025 Broken Access Control: The finding is classified as Path traversal; CWE-22 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Log file traversal filter is bypassable with Windows path separators",
+          "sink": "Log file traversal filter is bypassable with Windows path separators at routes/logfileServer.ts:9-19.",
+          "source": "An unauthenticated caller controls the requested path/name handled at server.ts:281-283.",
+          "summary": "Remote encoded backslash traversal in /support/logs/:file -> forward-slash-only filename check -> Windows path.resolve('logs/', file) -> sendFile() outside the intended root."
+        },
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "server.ts:281",
+          "outcome": "Log file traversal filter is bypassable with Windows path separators",
+          "preconditions": [
+            "The application runs on Windows, where backslash is a path separator."
+          ],
+          "summary": "The support-log file route is public. On a supported Windows deployment, an encoded backslash remains a path separator after route decoding and can escape the intended directory. Counterevidence: The path is host-OS-specific, browsers may normalize literal backslashes, and the surrounding file-serving surfaces intentionally expose challenge files. Encoded backslashes plus Node Windows path semantics preserve the broader arbitrary-read path, which is not required by a named challenge."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "  app.use('/support/logs', serveIndexMiddleware, serveIndex('logs', { icons: true, view: 'details' })) // vuln-code-snippet vuln-line accessLogDisclosureChallenge\n  app.use('/support/logs', verify.accessControlChallenges()) // vuln-code-snippet hide-line\n  app.use('/support/logs/:file', serveLogFiles()) // vuln-code-snippet vuln-line accessLogDisclosureChallenge",
+          "endLine": 283,
+          "explanation": "This entrypoint location is part of the validated path for log file traversal filter is bypassable with windows path separators.",
+          "id": "evidence-1",
+          "label": "Entrypoint",
+          "language": "typescript",
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 281
+        },
+        {
+          "code": "export function serveLogFiles () {\n  return ({ params }: Request, res: Response, next: NextFunction) => {\n    const file = params.file\n\n    if (!file.includes('/')) {\n      res.sendFile(path.resolve('logs/', file))\n    } else {\n      res.status(403)\n      next(new Error('File names cannot contain forward slashes!'))\n    }\n  }",
+          "endLine": 19,
+          "explanation": "This sink location is part of the validated path for log file traversal filter is bypassable with windows path separators.",
+          "id": "evidence-2",
+          "label": "Sink",
+          "language": "typescript",
+          "path": "routes/logfileServer.ts",
+          "role": "sink",
+          "startLine": 9
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-23d2053a3813e708",
+        "impact": "high",
+        "intentionality": {
+          "evidence": "The path is host-OS-specific, browsers may normalize literal backslashes, and the surrounding file-serving surfaces intentionally expose challenge files. Encoded backslashes plus Node Windows path semantics preserve the broader arbitrary-read path, which is not required by a named challenge.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "medium",
+        "owaspTop10_2025": [
+          {
+            "id": "A01:2025",
+            "rationale": "The finding is classified as Path traversal; CWE-22 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality.",
+            "sourceUrl": "https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/",
+            "status": "mapped",
+            "title": "Broken Access Control"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Path traversal"
+      },
+      "findingId": "csf_220e0207dea679859afc6cac",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:3b43037439d83a9b9ad8d9c0a6fded253d3a29953d7f41373c5feb8e1df080cc"
+      },
+      "identity": {
+        "anchor": "support-logs-windows-backslash-traversal",
+        "instance": "candidate-23d2053a3813e708"
+      },
+      "locations": [
+        {
+          "endLine": 283,
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 281
+        },
+        {
+          "endLine": 19,
+          "path": "routes/logfileServer.ts",
+          "role": "sink",
+          "startLine": 9
+        }
+      ],
+      "occurrenceId": "occ_ea7337cf79736435f015bfce",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Reject path separators and traversal segments, resolve the candidate path against the intended root, verify canonical containment before every read/write/extract operation, and use generated names where possible.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Log file traversal filter is bypassable with Windows path separators.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "summary": "Closest decode-then-canonicalize containment and file allowlisting control at routes/logfileServer.ts:9-19; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/support-logs-windows-backslash-traversal",
+      "severity": {
+        "changeConditions": "Raise if a supported public Windows deployment and a sensitive-file read are reproduced; lower if containment is enforced with a canonical descendant check on every platform.",
+        "level": "medium",
+        "rationale": "The path can cross the filesystem boundary and read files available to the Juice Shop process, but it requires a Windows deployment and an encoded separator. High impact with medium likelihood yields medium."
+      },
+      "summary": "The handler rejects only forward slash in the supplied file name before passing it to path.resolve. On supported Windows deployments, backslash is a path separator, so encoded backslash-dot-dot segments can escape the logs directory. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Path traversal",
+        "cwe": [
+          "CWE-22"
+        ]
+      },
+      "title": "Log file traversal filter is bypassable with Windows path separators",
+      "validation": {
+        "counterEvidence": [
+          "No complete Windows-safe containment control exists: only forward slash is rejected before path resolution. The platform requirement scopes the row but does not defeat it.",
+          "No material validity uncertainty remains; deployment-specific impact and intentional-challenge classification remain separate downstream questions."
+        ],
+        "evidence": [
+          "The handler rejects only forward slash in the supplied file name before passing it to path.resolve. On supported Windows deployments, backslash is a path separator, so encoded backslash-dot-dot segments can escape the logs directory.",
+          "Validated source/control/sink locations: server.ts:281-283[entrypoint]; routes/logfileServer.ts:9-19[sink]."
+        ],
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance. OWASP Top 10:2025 classification (separate from technical status): A01:2025 Broken Access Control: The finding is classified as Path traversal; CWE-22 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "CTF flag-signing secret is committed in plaintext",
+          "sink": "CTF flag-signing secret is committed in plaintext at ctf.key:1-1.",
+          "source": "Any recipient of the public source or source distribution can read the embedded material at ctf.key:1-1.",
+          "summary": "Public repository ctf.key -> getCtfKey() default -> HMAC-SHA1 ctfFlag(challenge.name) -> forgeable CTF flags."
+        },
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "ctf.key:1",
+          "outcome": "CTF flag-signing secret is committed in plaintext",
+          "preconditions": [
+            "The checked-in route, feature, artifact, or workflow is used as shipped."
+          ],
+          "summary": "A CTF participant can obtain the repository-default key and compute valid flags for any challenge whenever an operator enables flags without setting a deployment-specific CTF_KEY. Counterevidence: CTF_KEY can override the file and the impact is limited to CTF scoring rather than user authentication. The override is optional, and no named hacking challenge requires disclosure of the flag-signing key."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "TRwzkRJnHOTckssAeyJbysWgP!Qc2T",
+          "endLine": 1,
+          "explanation": "This root control location is part of the validated path for ctf flag-signing secret is committed in plaintext.",
+          "id": "evidence-1",
+          "label": "Root Control",
+          "language": "text",
+          "path": "ctf.key",
+          "role": "root_control",
+          "startLine": 1
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-8cc2334ca799e4b3",
+        "impact": "medium",
+        "intentionality": {
+          "evidence": "CTF_KEY can override the file and the impact is limited to CTF scoring rather than user authentication. The override is optional, and no named hacking challenge requires disclosure of the flag-signing key.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "high",
+        "owaspTop10_2025": [
+          {
+            "id": "A04:2025",
+            "rationale": "The finding is classified as Hard-coded credentials; CWE-321 appear in OWASP's official CWE mapping for A04:2025 Cryptographic Failures. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality.",
+            "sourceUrl": "https://owasp.org/Top10/2025/A04_2025-Cryptographic_Failures/",
+            "status": "mapped",
+            "title": "Cryptographic Failures"
+          },
+          {
+            "id": "A07:2025",
+            "rationale": "The finding is classified as Hard-coded credentials; CWE-798 appear in OWASP's official CWE mapping for A07:2025 Authentication Failures. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality.",
+            "sourceUrl": "https://owasp.org/Top10/2025/A07_2025-Authentication_Failures/",
+            "status": "mapped",
+            "title": "Authentication Failures"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Hard-coded credentials"
+      },
+      "findingId": "csf_1cf56382f75a2cac4ac76e80",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:904d3783e1a97f810f518822773d2c91a340fa5daa529ac63bdf0578df5453dc"
+      },
+      "identity": {
+        "anchor": "ctf-flag-key",
+        "instance": "candidate-8cc2334ca799e4b3"
+      },
+      "locations": [
+        {
+          "endLine": 1,
+          "path": "ctf.key",
+          "role": "root_control",
+          "startLine": 1
+        }
+      ],
+      "occurrenceId": "occ_c398efdde7f990a9b18281e4",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Remove sensitive fields/material from public responses and source-controlled defaults, apply least-privilege access to operational endpoints, and rotate any credential that may have been reused.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: CTF flag-signing secret is committed in plaintext.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "summary": "Closest cryptographic integrity, secrecy, freshness, or strong credential derivation control at ctf.key:1-1; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/ctf-flag-key",
+      "severity": {
+        "changeConditions": "Lower or ignore if flag mode refuses startup without a unique external CTF_KEY; raise if default-key flags gate prizes or trusted tournament outcomes.",
+        "level": "medium",
+        "rationale": "Use of the repository-default signing secret defeats challenge-progress integrity in default CTF deployments. The affected asset is bounded to CTF scoring, so medium impact with high likelihood yields medium."
+      },
+      "summary": "ctf.key contains the complete static secret used by the application to derive CTF flags. Anyone with the repository or a source distribution can reproduce valid flags without solving the associated challenges. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Hard-coded credentials",
+        "cwe": [
+          "CWE-321",
+          "CWE-798"
+        ]
+      },
+      "title": "CTF flag-signing secret is committed in plaintext",
+      "validation": {
+        "counterEvidence": [
+          "No exact complete control at the cited instance defeats the source-to-action path. Nearby safe paths and intentional challenge markers are not suppression evidence; no fresh live PoC was needed for this deterministic source/test trace.",
+          "No material validity uncertainty remains; deployment-specific impact and intentional-challenge classification remain separate downstream questions."
+        ],
+        "evidence": [
+          "ctf.key contains the complete static secret used by the application to derive CTF flags. Anyone with the repository or a source distribution can reproduce valid flags without solving the associated challenges.",
+          "Validated source/control/sink locations: ctf.key:1-1[root_control]."
+        ],
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance. OWASP Top 10:2025 classification (separate from technical status): A04:2025 Cryptographic Failures: The finding is classified as Hard-coded credentials; CWE-321 appear in OWASP's official CWE mapping for A04:2025 Cryptographic Failures. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality. A07:2025 Authentication Failures: The finding is classified as Hard-coded credentials; CWE-798 appear in OWASP's official CWE mapping for A07:2025 Authentication Failures. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Remote profile image download has no size or duration limit",
+          "sink": "Remote profile image download has no size or duration limit at routes/profileImageUrlUpload.ts:24-30.",
+          "source": "An authenticated user controls the remote image URL handled at routes/profileImageUrlUpload.ts:24-30.",
+          "summary": "Authenticated imageUrl -> unrestricted fetch() -> attacker-controlled response stream -> unbounded write to the served profile-image directory."
+        },
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "routes/profileImageUrlUpload.ts:24",
+          "outcome": "Remote profile image download has no size or duration limit",
+          "preconditions": [
+            "The named public route/interface is reachable from the network."
+          ],
+          "summary": "A self-registered user can submit a URL under their control and serve an indefinitely slow or arbitrarily large response. The handler has no AbortSignal, duration bound, byte ceiling, or content-length budget. Counterevidence: Authentication is required, the file is confined to a per-user name, and external proxy/disk quotas may limit impact. None of those application-external controls appears in the repository, and the SSRF challenge does not require unbounded transfer consumption."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "          const response = await fetch(url)\n          if (!response.ok || !response.body) {\n            throw new Error('url returned a non-OK status code or an empty body')\n          }\n          const ext = ['jpg', 'jpeg', 'png', 'svg', 'gif'].includes(url.split('.').slice(-1)[0].toLowerCase()) ? url.split('.').slice(-1)[0].toLowerCase() : 'jpg'\n          const fileStream = fs.createWriteStream(`frontend/dist/frontend/assets/public/images/uploads/${loggedInUser.data.id}.${ext}`, { flags: 'w' })\n          await finished(Readable.fromWeb(response.body as any).pipe(fileStream))",
+          "endLine": 30,
+          "explanation": "This sink location is part of the validated path for remote profile image download has no size or duration limit.",
+          "id": "evidence-1",
+          "label": "Sink",
+          "language": "typescript",
+          "path": "routes/profileImageUrlUpload.ts",
+          "role": "sink",
+          "startLine": 24
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-fd7ae09b18a695bf",
+        "impact": "medium",
+        "intentionality": {
+          "evidence": "Authentication is required, the file is confined to a per-user name, and external proxy/disk quotas may limit impact. None of those application-external controls appears in the repository, and the SSRF challenge does not require unbounded transfer consumption.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "high",
+        "owaspTop10_2025": [
+          {
+            "id": "Not mapped",
+            "rationale": "None of the applicable identifiers (CWE-400, CWE-770) appears in the official OWASP Top 10:2025 CWE lists. The finding is intentionally not forced into an OWASP category.",
+            "sourceUrl": "https://owasp.org/www-project-top-ten/",
+            "status": "not_mapped",
+            "title": "Not mapped"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Resource exhaustion"
+      },
+      "findingId": "csf_b50ed17c5f44baad3b19054a",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:a55737d836add9a0a0a2873bf44ce78daabadd8fc18e42d0acd76fda98f68e58"
+      },
+      "identity": {
+        "anchor": "profile-image-unbounded-download",
+        "instance": "candidate-fd7ae09b18a695bf"
+      },
+      "locations": [
+        {
+          "endLine": 30,
+          "path": "routes/profileImageUrlUpload.ts",
+          "role": "sink",
+          "startLine": 24
+        }
+      ],
+      "occurrenceId": "occ_7c7754f871f4b88e35febef6",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Enforce server-side bounds before allocation, recursion, database work, network reads, or model invocation; add timeouts/cancellation and per-principal rate and concurrency limits.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Remote profile image download has no size or duration limit.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "summary": "Closest scheme/host/redirect validation plus response size and timeout limits control at routes/profileImageUrlUpload.ts:24-30; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/profile-image-unbounded-download",
+      "severity": {
+        "changeConditions": "Raise if shared-volume exhaustion reliably affects multiple services; lower if strict response-byte, duration, concurrency, and cleanup budgets terminate the stream.",
+        "level": "medium",
+        "rationale": "A low-privilege user can consume request slots, bandwidth, and persistent storage until service degradation or outage. Medium availability impact with high likelihood yields medium."
+      },
+      "summary": "The handler streams the entire response into a public file and awaits completion without a content-length cap, byte-counting transform, or timeout. An authenticated attacker can point it at a very large or non-terminating response to exhaust disk, connections, or worker capacity. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Resource exhaustion",
+        "cwe": [
+          "CWE-400",
+          "CWE-770"
+        ]
+      },
+      "title": "Remote profile image download has no size or duration limit",
+      "validation": {
+        "counterEvidence": [
+          "No exact complete control at the cited instance defeats the source-to-action path. Nearby safe paths and intentional challenge markers are not suppression evidence; no fresh live PoC was needed for this deterministic source/test trace.",
+          "No material validity uncertainty remains; deployment-specific impact and intentional-challenge classification remain separate downstream questions."
+        ],
+        "evidence": [
+          "The handler streams the entire response into a public file and awaits completion without a content-length cap, byte-counting transform, or timeout. An authenticated attacker can point it at a very large or non-terminating response to exhaust disk, connections, or worker capacity.",
+          "Validated source/control/sink locations: routes/profileImageUrlUpload.ts:24-30[sink]."
+        ],
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance. OWASP Top 10:2025 classification (separate from technical status): Not mapped Not mapped: None of the applicable identifiers (CWE-400, CWE-770) appears in the official OWASP Top 10:2025 CWE lists. The finding is intentionally not forced into an OWASP category. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Unauthenticated chat requests can consume multi-step hosted-model resources without throttling",
+          "sink": "Unauthenticated chat requests can consume multi-step hosted-model resources without throttling at routes/chat.ts:190-209.",
+          "source": "The attacker-controlled trigger for \u201cUnauthenticated chat requests can consume multi-step hosted-model resources without throttling\u201d reaches the path beginning at server.ts:638-638.",
+          "summary": "Unauthenticated chat messages -> public POST /rest/chat -> server-configured model provider -> retries and up to ten model/tool steps -> long-lived SSE and provider resource consumption."
+        },
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "server.ts:638",
+          "outcome": "Unauthenticated chat requests can consume multi-step hosted-model resources without throttling",
+          "preconditions": [
+            "The named public route/interface is reachable from the network.",
+            "The optional chat/LLM integration is configured with a provider and credentials."
+          ],
+          "summary": "Any remote caller can open concurrent chat streams without an account whenever the configured LLM backend is reachable; no route rate, concurrency, token, or cost budget is enforced. Counterevidence: The default provider is local Ollama, provider/ingress quotas may exist, and prompt/tool weaknesses are named challenges. Aggregate unauthenticated model consumption is a separate non-challenge operator-cost and availability boundary."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "  app.post('/rest/chat', utils.asyncHandler(chat()))",
+          "endLine": 638,
+          "explanation": "This entrypoint location is part of the validated path for unauthenticated chat requests can consume multi-step hosted-model resources without throttling.",
+          "id": "evidence-1",
+          "label": "Entrypoint",
+          "language": "typescript",
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 638
+        },
+        {
+          "code": "    const model = config.get<string>('application.chatBot.model')\n    const messages = req.body?.messages ?? []\n    const userName = await getUserNameFromToken(req)\n\n    res.setHeader('Content-Type', 'text/event-stream')\n    res.setHeader('Cache-Control', 'no-cache, no-transform')\n    res.setHeader('Connection', 'keep-alive')\n    res.setHeader('Content-Encoding', 'identity')\n    res.flushHeaders()\n\n    const systemPrompt = buildSystemPrompt(userName)\n\n    try {\n      const result = streamText({\n        model: provider(model),\n        system: systemPrompt,\n        messages,\n        tools: { ...chatTools },\n        maxRetries: config.get<number>('application.chatBot.llmMaxRetries'),\n        stopWhen: stepCountIs(10),",
+          "endLine": 209,
+          "explanation": "This sink location is part of the validated path for unauthenticated chat requests can consume multi-step hosted-model resources without throttling.",
+          "id": "evidence-2",
+          "label": "Sink",
+          "language": "typescript",
+          "path": "routes/chat.ts",
+          "role": "sink",
+          "startLine": 190
+        }
+      ],
+      "confidence": {
+        "level": "medium",
+        "rationale": "The public multi-step model call and lack of route-level limits are exact, while provider configuration, retry cost, and effective upstream quotas are deployment-dependent."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-39edebcc839d977a",
+        "impact": "medium",
+        "intentionality": {
+          "evidence": "The default provider is local Ollama, provider/ingress quotas may exist, and prompt/tool weaknesses are named challenges. Aggregate unauthenticated model consumption is a separate non-challenge operator-cost and availability boundary.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "high",
+        "owaspTop10_2025": [
+          {
+            "id": "Not mapped",
+            "rationale": "None of the applicable identifiers (CWE-400) appears in the official OWASP Top 10:2025 CWE lists. The finding is intentionally not forced into an OWASP category.",
+            "sourceUrl": "https://owasp.org/www-project-top-ten/",
+            "status": "not_mapped",
+            "title": "Not mapped"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Resource exhaustion"
+      },
+      "findingId": "csf_6d9f0f90996d84137047359b",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:9bc16cf30184b7a7054f3f62d19a449b5fe418b55e48a99675d2739e8dbba178"
+      },
+      "identity": {
+        "anchor": "chat-unauthenticated-model-resource-exhaustion",
+        "instance": "candidate-39edebcc839d977a"
+      },
+      "locations": [
+        {
+          "endLine": 638,
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 638
+        },
+        {
+          "endLine": 209,
+          "path": "routes/chat.ts",
+          "role": "sink",
+          "startLine": 190
+        }
+      ],
+      "occurrenceId": "occ_78d58f6fadc75758cd269ca9",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Enforce server-side bounds before allocation, recursion, database work, network reads, or model invocation; add timeouts/cancellation and per-principal rate and concurrency limits.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Unauthenticated chat requests can consume multi-step hosted-model resources without throttling.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "summary": "Closest rate, size, time, concurrency, and lifecycle bounds control at routes/chat.ts:190-209; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/chat-unauthenticated-model-resource-exhaustion",
+      "severity": {
+        "changeConditions": "Raise for a billed provider with a high spend limit or scarce shared accelerator; lower if strict per-client concurrency, token, request, and spend limits are enforced before model invocation.",
+        "level": "medium",
+        "rationale": "Remote callers receive unmetered server-funded or server-hosted model work and can hold streams through retries/tool steps. Medium cost/availability impact with high likelihood yields medium."
+      },
+      "summary": "The public endpoint accepts caller-provided message histories and invokes the remote model with retries and up to ten tool/model steps. No authentication, per-user quota, concurrency bound or rate limiter precedes the paid/resource-intensive operation. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Resource exhaustion",
+        "cwe": [
+          "CWE-400"
+        ]
+      },
+      "title": "Unauthenticated chat requests can consume multi-step hosted-model resources without throttling",
+      "validation": {
+        "counterEvidence": [
+          "An unconfigured provider prevents the expensive call, and provider-side quotas may bound cost; neither is an application-side control on configured deployments. No cost/load reproduction was run.",
+          "No fresh end-to-end PoC was run in this compact phase; deployment-specific configuration and downstream impact remain for attack-path/severity calibration."
+        ],
+        "evidence": [
+          "The public endpoint accepts caller-provided message histories and invokes the remote model with retries and up to ten tool/model steps. No authentication, per-user quota, concurrency bound or rate limiter precedes the paid/resource-intensive operation.",
+          "Validated source/control/sink locations: server.ts:638-638[entrypoint]; routes/chat.ts:190-209[sink]."
+        ],
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The public multi-step model call and lack of route-level limits are exact, while provider configuration, retry cost, and effective upstream quotas are deployment-dependent. OWASP Top 10:2025 classification (separate from technical status): Not mapped Not mapped: None of the applicable identifiers (CWE-400) appears in the official OWASP Top 10:2025 CWE lists. The finding is intentionally not forced into an OWASP category. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Public Web3 wallet listener stores unbounded attacker-controlled addresses",
+          "sink": "Public Web3 wallet listener stores unbounded attacker-controlled addresses at routes/web3Wallet.ts:9-17.",
+          "source": "A network caller controls the object id, body field, expression, or action input beginning at routes/web3Wallet.ts:9-17.",
+          "summary": "Unauthenticated walletAddress body -> POST /rest/web3/walletExploitAddress -> process-global walletsConnected Set -> retained unique attacker strings without validation or eviction."
+        },
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "routes/web3Wallet.ts:9",
+          "outcome": "Public Web3 wallet listener stores unbounded attacker-controlled addresses",
+          "preconditions": [
+            "The named public route/interface is reachable from the network."
+          ],
+          "summary": "The Web3 listener route is public. Repeated requests with unique near-body-limit strings grow the Set until a matching on-chain event, which attacker junk values will never receive. Counterevidence: The endpoint supports the named Wallet Depletion challenge and request-body limits bound each element. Unbounded retention of arbitrary invalid addresses is not needed for that challenge and aggregate memory remains unbounded."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "const web3WalletAddress = '0x413744D59d31AFDC2889aeE602636177805Bd7b0'\nconst walletsConnected = new Set()\nlet isEventListenerCreated = false\n\nexport function contractExploitListener () {\n  return async (req: Request, res: Response) => {\n    const metamaskAddress = req.body.walletAddress\n    walletsConnected.add(metamaskAddress)\n    try {",
+          "endLine": 17,
+          "explanation": "This sink location is part of the validated path for public web3 wallet listener stores unbounded attacker-controlled addresses.",
+          "id": "evidence-1",
+          "label": "Sink",
+          "language": "typescript",
+          "path": "routes/web3Wallet.ts",
+          "role": "sink",
+          "startLine": 9
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-16aa606c1fada025",
+        "impact": "medium",
+        "intentionality": {
+          "evidence": "The endpoint supports the named Wallet Depletion challenge and request-body limits bound each element. Unbounded retention of arbitrary invalid addresses is not needed for that challenge and aggregate memory remains unbounded.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "high",
+        "owaspTop10_2025": [
+          {
+            "id": "Not mapped",
+            "rationale": "None of the applicable identifiers (CWE-400) appears in the official OWASP Top 10:2025 CWE lists. The finding is intentionally not forced into an OWASP category.",
+            "sourceUrl": "https://owasp.org/www-project-top-ten/",
+            "status": "not_mapped",
+            "title": "Not mapped"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Resource exhaustion"
+      },
+      "findingId": "csf_7f2a2fae8d106f03ab67f118",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:fc9d6c8bc3d7250ed8bc5629f0e34afba4ae98e3634a2269e76e98a1111cb104"
+      },
+      "identity": {
+        "anchor": "web3-wallet-listener-memory-dos",
+        "instance": "candidate-16aa606c1fada025"
+      },
+      "locations": [
+        {
+          "endLine": 17,
+          "path": "routes/web3Wallet.ts",
+          "role": "sink",
+          "startLine": 9
+        }
+      ],
+      "occurrenceId": "occ_ae051ab2445291a16f93299c",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Enforce server-side bounds before allocation, recursion, database work, network reads, or model invocation; add timeouts/cancellation and per-principal rate and concurrency limits.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Public Web3 wallet listener stores unbounded attacker-controlled addresses.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "summary": "Closest rate, size, time, concurrency, and lifecycle bounds control at routes/web3Wallet.ts:9-17; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/web3-wallet-listener-memory-dos",
+      "severity": {
+        "changeConditions": "Lower if addresses are strictly validated, capped, expired, and rate-limited; raise if a bounded test demonstrates rapid process termination on a supported shared deployment.",
+        "level": "medium",
+        "rationale": "An unauthenticated caller can create persistent process-memory growth and eventual service failure with repeatable requests. Medium availability impact with high likelihood yields medium."
+      },
+      "summary": "Every request adds an arbitrary value to a process-global Set before listener setup; entries are only removed on a matching on-chain event, allowing persistent memory growth. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Resource exhaustion",
+        "cwe": [
+          "CWE-400"
+        ]
+      },
+      "title": "Public Web3 wallet listener stores unbounded attacker-controlled addresses",
+      "validation": {
+        "counterEvidence": [
+          "No exact complete control at the cited instance defeats the source-to-action path. Nearby safe paths and intentional challenge markers are not suppression evidence; no fresh live PoC was needed for this deterministic source/test trace.",
+          "No material validity uncertainty remains; deployment-specific impact and intentional-challenge classification remain separate downstream questions."
+        ],
+        "evidence": [
+          "Every request adds an arbitrary value to a process-global Set before listener setup; entries are only removed on a matching on-chain event, allowing persistent memory growth.",
+          "Validated source/control/sink locations: routes/web3Wallet.ts:9-17[sink]."
+        ],
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance. OWASP Top 10:2025 classification (separate from technical status): Not mapped Not mapped: None of the applicable identifiers (CWE-400) appears in the official OWASP Top 10:2025 CWE lists. The finding is intentionally not forced into an OWASP category. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Checkout can process and delete another user's basket",
+          "sink": "Checkout can process and delete another user's basket at routes/order.ts:74-81.",
+          "source": "A network caller controls the object id, body field, expression, or action input beginning at routes/order.ts:32-57.",
+          "summary": "Authenticated caller-selected basket id -> POST /rest/basket/:id/checkout -> BasketModel.findOne(id) without owner binding -> order processing -> destruction of that basket's items."
+        },
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "routes/order.ts:32",
+          "outcome": "Checkout can process and delete another user's basket",
+          "preconditions": [
+            "The attacker has the ordinary authenticated account/session described by the candidate."
+          ],
+          "summary": "Any ordinary account can submit another basket identifier. The route authenticates the caller but never compares the basket owner with the authenticated subject before inventory/order side effects and deletion. Counterevidence: An account and basket id are required, and View Basket/Manipulate Basket are named challenges. Those challenges do not require checkout and deletion of a victim basket, so the broader integrity boundary survives policy adjustment."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "export function placeOrder () {\n  return (req: Request, res: Response, next: NextFunction) => {\n    const id = req.params.id\n    BasketModel.findOne({ where: { id }, include: [{ model: ProductModel, paranoid: false, as: 'Products' }] })\n      .then(async (basket: BasketModel | null) => {\n        if (basket != null) {\n          const customer = security.authenticatedUsers.from(req)\n          const email = customer ? customer.data ? customer.data.email : '' : ''\n          const orderId = security.hash(email).slice(0, 4) + '-' + utils.randomHexString(16)\n          const pdfFile = `order_${orderId}.pdf`\n          const { default: PDFDocument } = await import('pdfkit')\n          const doc = new PDFDocument()\n          const date = new Date().toJSON().slice(0, 10)\n          const fileWriter = doc.pipe(fs.createWriteStream(path.join('ftp/', pdfFile)))\n\n          fileWriter.on('finish', () => {\n            void (async () => {\n              try {\n                void basket.update({ coupon: null })\n                await BasketItemModel.destroy({ where: { BasketId: id } })\n                res.json({ orderConfirmation: orderId })\n              } catch (error: unknown) {\n                next(error)\n              }\n            })()\n          })",
+          "endLine": 57,
+          "explanation": "This entrypoint location is part of the validated path for checkout can process and delete another user's basket.",
+          "id": "evidence-1",
+          "label": "Entrypoint",
+          "language": "typescript",
+          "path": "routes/order.ts",
+          "role": "entrypoint",
+          "startLine": 32
+        },
+        {
+          "code": "          for (const { BasketItem, price, deluxePrice, name, id } of basket.Products ?? []) {\n            if (BasketItem != null) {\n              challengeUtils.solveIf(challenges.christmasSpecialChallenge, () => { return BasketItem.ProductId === products.christmasSpecial.id })\n              try {\n                const quantityRow = await QuantityModel.findOne({ where: { ProductId: BasketItem.ProductId } })\n                if (quantityRow) {\n                  const newQuantity = quantityRow.quantity - BasketItem.quantity\n                  await QuantityModel.update({ quantity: newQuantity }, { where: { ProductId: BasketItem.ProductId } })",
+          "endLine": 81,
+          "explanation": "This sink location is part of the validated path for checkout can process and delete another user's basket.",
+          "id": "evidence-2",
+          "label": "Sink",
+          "language": "typescript",
+          "path": "routes/order.ts",
+          "role": "sink",
+          "startLine": 74
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-a54fd38c7076f6ff",
+        "impact": "high",
+        "intentionality": {
+          "evidence": "An account and basket id are required, and View Basket/Manipulate Basket are named challenges. Those challenges do not require checkout and deletion of a victim basket, so the broader integrity boundary survives policy adjustment.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "high",
+        "owaspTop10_2025": [
+          {
+            "id": "A01:2025",
+            "rationale": "The finding is classified as Broken object-level authorization; CWE-639, CWE-862 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality.",
+            "sourceUrl": "https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/",
+            "status": "mapped",
+            "title": "Broken Access Control"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Broken object-level authorization"
+      },
+      "findingId": "csf_1ed34b2f7cec7d095e81a001",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:e6e8e228888405ea75b15548684bfcf7512b5480a746e53eab1091945c5ee277"
+      },
+      "identity": {
+        "anchor": "checkout-basket-idor",
+        "instance": "candidate-a54fd38c7076f6ff"
+      },
+      "locations": [
+        {
+          "endLine": 57,
+          "path": "routes/order.ts",
+          "role": "entrypoint",
+          "startLine": 32
+        },
+        {
+          "endLine": 81,
+          "path": "routes/order.ts",
+          "role": "sink",
+          "startLine": 74
+        }
+      ],
+      "occurrenceId": "occ_3c3acaaabd3ce16d2e1cd5a4",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Derive the subject and target object from the authenticated server-side principal, enforce authorization immediately before the state-changing/read operation, and ignore or reject client-supplied ownership/role fields.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Checkout can process and delete another user's basket.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "summary": "Closest authentication/role/object-ownership binding control at routes/order.ts:74-81; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/checkout-basket-idor",
+      "severity": {
+        "changeConditions": "Raise only if the same path can debit victim payment assets or scale broadly; lower if checkout binds the basket and all payment/user identifiers to the authenticated principal.",
+        "level": "high",
+        "rationale": "A low-privilege user can remotely process and empty another user's basket, crossing a direct object-ownership boundary with destructive state changes. The narrow object scope prevents critical, while high impact and high likelihood support high."
+      },
+      "summary": "placeOrder selects the basket solely from the URL ID without comparing it to the authenticated user's basket ID. It decrements inventory for that basket and destroys its BasketItem rows after generating the order, so an authenticated attacker can submit or empty a victim basket. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Broken object-level authorization",
+        "cwe": [
+          "CWE-639",
+          "CWE-862"
+        ]
+      },
+      "title": "Checkout can process and delete another user's basket",
+      "validation": {
+        "counterEvidence": [
+          "No exact complete control at the cited instance defeats the source-to-action path. Nearby safe paths and intentional challenge markers are not suppression evidence; no fresh live PoC was needed for this deterministic source/test trace.",
+          "No material validity uncertainty remains; deployment-specific impact and intentional-challenge classification remain separate downstream questions."
+        ],
+        "evidence": [
+          "placeOrder selects the basket solely from the URL ID without comparing it to the authenticated user's basket ID. It decrements inventory for that basket and destroys its BasketItem rows after generating the order, so an authenticated attacker can submit or empty a victim basket.",
+          "Validated source/control/sink locations: routes/order.ts:32-57[entrypoint]; routes/order.ts:74-81[sink]."
+        ],
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance. OWASP Top 10:2025 classification (separate from technical status): A01:2025 Broken Access Control: The finding is classified as Broken object-level authorization; CWE-639, CWE-862 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Coupon application modifies any basket selected by path id",
+          "sink": "Coupon application modifies any basket selected by path id at routes/coupon.ts:10-24.",
+          "source": "A network caller controls the object id, body field, expression, or action input beginning at test/api/basket.test.ts:110-123.",
+          "summary": "Authenticated caller-selected basket id and coupon -> PUT /rest/basket/:id/coupon/:coupon -> BasketModel lookup by id -> coupon mutation without owner binding."
+        },
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "routes/coupon.ts:10",
+          "outcome": "Coupon application modifies any basket selected by path id",
+          "preconditions": [
+            "The attacker has the ordinary authenticated account/session described by the candidate."
+          ],
+          "summary": "Any ordinary account can target another known basket id. Intentional basket-view challenge behavior makes identifiers obtainable, and the coupon route checks authentication but not ownership. Counterevidence: The mutation is limited to a discount field and may benefit rather than harm the victim; it does not expose payment data or grant attacker privilege. No named challenge specifically requires cross-user coupon mutation."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "export function applyCoupon () {\n  return async ({ params }: Request, res: Response, next: NextFunction) => {\n    try {\n      const id = params.id\n      let coupon: string | undefined | null = params.coupon ? decodeURIComponent(params.coupon) : undefined\n      const discount = security.discountFromCoupon(coupon)\n      coupon = discount ? coupon : null\n\n      const basket = await BasketModel.findByPk(id)\n      if (!basket) {\n        next(new Error(`Basket with id=${id} does not exist.`))\n        return\n      }\n\n      await basket.update({ coupon: coupon?.toString() })",
+          "endLine": 24,
+          "explanation": "This sink location is part of the validated path for coupon application modifies any basket selected by path id.",
+          "id": "evidence-1",
+          "label": "Sink",
+          "language": "typescript",
+          "path": "routes/coupon.ts",
+          "role": "sink",
+          "startLine": 10
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact source/control/sink behavior is visible in the checked-in code and is corroborated by focused checked-in API, unit, or browser evidence; no complete compensating control defeats this instance."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-b357325dc8de7e69",
+        "impact": "low",
+        "intentionality": {
+          "evidence": "The mutation is limited to a discount field and may benefit rather than harm the victim; it does not expose payment data or grant attacker privilege. No named challenge specifically requires cross-user coupon mutation.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "high",
+        "owaspTop10_2025": [
+          {
+            "id": "A01:2025",
+            "rationale": "The finding is classified as Broken object-level authorization; CWE-639 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality.",
+            "sourceUrl": "https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/",
+            "status": "mapped",
+            "title": "Broken Access Control"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Broken object-level authorization"
+      },
+      "findingId": "csf_ebcd8a6092b97a2a75085eb5",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:16daed271e03b4984451b9084d34e10dfea29ae06bcd46d1ca07fe1f86d419fa"
+      },
+      "identity": {
+        "anchor": "coupon-basket-idor",
+        "instance": "candidate-b357325dc8de7e69"
+      },
+      "locations": [
+        {
+          "endLine": 24,
+          "path": "routes/coupon.ts",
+          "role": "sink",
+          "startLine": 10
+        },
+        {
+          "endLine": 123,
+          "path": "test/api/basket.test.ts",
+          "role": "evidence",
+          "startLine": 110
+        }
+      ],
+      "occurrenceId": "occ_adf385ef52e02ad595758fbe",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Derive the subject and target object from the authenticated server-side principal, enforce authorization immediately before the state-changing/read operation, and ignore or reject client-supplied ownership/role fields.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Coupon application modifies any basket selected by path id.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "summary": "Closest authentication/role/object-ownership binding control at routes/coupon.ts:10-24; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/coupon-basket-idor",
+      "severity": {
+        "changeConditions": "Raise if coupon mutation can cause victim charges, irreversible order effects, or privileged discounts; lower if ownership is enforced before lookup/update.",
+        "level": "low",
+        "rationale": "This is a real horizontal authorization failure, but its standalone integrity impact is narrow and reversible. Low impact remains low at high likelihood."
+      },
+      "summary": "The authenticated route updates req.params.id without verifying that the basket belongs to the token user; related API coverage confirms cross-user basket identifiers are accessible. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Broken object-level authorization",
+        "cwe": [
+          "CWE-639"
+        ]
+      },
+      "title": "Coupon application modifies any basket selected by path id",
+      "validation": {
+        "counterEvidence": [
+          "No exact complete control at the cited instance defeats the source-to-action path. Nearby safe paths and intentional challenge markers are not suppression evidence; no fresh live PoC was needed for this deterministic source/test trace.",
+          "No material validity uncertainty remains; deployment-specific impact and intentional-challenge classification remain separate downstream questions."
+        ],
+        "evidence": [
+          "The authenticated route updates req.params.id without verifying that the basket belongs to the token user; related API coverage confirms cross-user basket identifiers are accessible.",
+          "Validated source/control/sink locations: routes/coupon.ts:10-24[sink]; test/api/basket.test.ts:110-123[evidence].",
+          "Checked-in focused test/challenge evidence exercises or asserts the same behavior; it was used as corroboration, not as a replacement for the runtime trace."
+        ],
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "method": "static source/control/sink trace with existing focused test and challenge evidence",
+        "summary": "Disposition: reportable. The exact source/control/sink behavior is visible in the checked-in code and is corroborated by focused checked-in API, unit, or browser evidence; no complete compensating control defeats this instance. OWASP Top 10:2025 classification (separate from technical status): A01:2025 Broken Access Control: The finding is classified as Broken object-level authorization; CWE-639 appear in OWASP's official CWE mapping for A01:2025 Broken Access Control. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Authenticated token cache grows without bounds or expiration cleanup",
+          "sink": "Authenticated token cache grows without bounds or expiration cleanup at lib/insecurity.ts:70-91.",
+          "source": "The attacker-controlled trigger for \u201cAuthenticated token cache grows without bounds or expiration cleanup\u201d reaches the path beginning at lib/insecurity.ts:186-196.",
+          "summary": "Public registration/login or accepted JWT -> authenticatedUsers.put() -> process-global tokenMap/idMap -> no expiry-driven deletion -> retained session objects."
+        },
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": "lib/insecurity.ts:186",
+          "outcome": "Authenticated token cache grows without bounds or expiration cleanup",
+          "preconditions": [
+            "The attacker has the ordinary authenticated account/session described by the candidate."
+          ],
+          "summary": "A remote actor can create accounts and obtain many distinct valid tokens; each token key remains in tokenMap for the process lifetime even when idMap is overwritten. Counterevidence: Material exhaustion requires many unique tokens/accounts, same-second tokens can collide, and process restart clears the cache. These constraints reduce likelihood but do not impose an application bound."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "export const updateAuthenticatedUsers = () => (req: Request, res: Response, next: NextFunction) => {\n  const token = req.cookies.token || utils.jwtFrom(req)\n  if (token && authenticatedUsers.get(token) === undefined) {\n    jwt.verify(token, publicKey, (err: Error | null, decoded: any) => {\n      if (err === null && decoded?.data !== undefined) {\n        authenticatedUsers.put(token, decoded)\n        res.cookie('token', token)\n      }\n    })\n  }\n  next()",
+          "endLine": 196,
+          "explanation": "This entrypoint/wrapper location is part of the validated path for authenticated token cache grows without bounds or expiration cleanup.",
+          "id": "evidence-1",
+          "label": "Entrypoint/Wrapper",
+          "language": "typescript",
+          "path": "lib/insecurity.ts",
+          "role": "entrypoint/wrapper",
+          "startLine": 186
+        },
+        {
+          "code": "export const authenticatedUsers: IAuthenticatedUsers = {\n  tokenMap: {},\n  idMap: {},\n  put: function (token: string, user: ResponseWithUser) {\n    this.tokenMap[token] = user\n    this.idMap[user.data.id] = token\n  },\n  get: function (token?: string) {\n    return token ? this.tokenMap[utils.unquote(token)] : undefined\n  },\n  tokenOf: function (user: UserModel) {\n    return user ? this.idMap[user.id] : undefined\n  },\n  from: function (req: Request) {\n    const token = utils.jwtFrom(req)\n    return token ? this.get(token) : undefined\n  },\n  updateFrom: function (req: Request, user: ResponseWithUser) {\n    const token = utils.jwtFrom(req)\n    this.put(token, user)\n  }\n}",
+          "endLine": 91,
+          "explanation": "This concrete implementation location is part of the validated path for authenticated token cache grows without bounds or expiration cleanup.",
+          "id": "evidence-2",
+          "label": "Concrete Implementation",
+          "language": "typescript",
+          "path": "lib/insecurity.ts",
+          "role": "concrete_implementation",
+          "startLine": 70
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-d7c04800b443477b",
+        "impact": "medium",
+        "intentionality": {
+          "evidence": "Material exhaustion requires many unique tokens/accounts, same-second tokens can collide, and process restart clears the cache. These constraints reduce likelihood but do not impose an application bound.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "medium",
+        "owaspTop10_2025": [
+          {
+            "id": "Not mapped",
+            "rationale": "None of the applicable identifiers (CWE-770) appears in the official OWASP Top 10:2025 CWE lists. The finding is intentionally not forced into an OWASP category.",
+            "sourceUrl": "https://owasp.org/www-project-top-ten/",
+            "status": "not_mapped",
+            "title": "Not mapped"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Resource exhaustion"
+      },
+      "findingId": "csf_c44cb62f919d4f85a31df020",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:c0d207d6d6fd32738f24034d6857d4809f416844064a8bd13d2c2a4d2a0dca16"
+      },
+      "identity": {
+        "anchor": "jwt-cache-exhaustion",
+        "instance": "candidate-d7c04800b443477b"
+      },
+      "locations": [
+        {
+          "endLine": 196,
+          "path": "lib/insecurity.ts",
+          "role": "entrypoint/wrapper",
+          "startLine": 186
+        },
+        {
+          "endLine": 91,
+          "path": "lib/insecurity.ts",
+          "role": "concrete_implementation",
+          "startLine": 70
+        }
+      ],
+      "occurrenceId": "occ_ffa0a4b4c9b465f437ca6ed5",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Enforce server-side bounds before allocation, recursion, database work, network reads, or model invocation; add timeouts/cancellation and per-principal rate and concurrency limits.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Authenticated token cache grows without bounds or expiration cleanup.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "summary": "Closest rate, size, time, concurrency, and lifecycle bounds control at lib/insecurity.ts:70-91; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/jwt-cache-exhaustion",
+      "severity": {
+        "changeConditions": "Raise if a bounded test shows practical exhaustion or long-lived shared instances; lower if entries expire with JWT exp and both maps enforce hard cardinality limits.",
+        "level": "low",
+        "rationale": "The cache permits persistent attacker-driven memory growth, but material impact requires sustained high-volume account/token creation. Medium impact with medium likelihood yields low."
+      },
+      "summary": "Every previously unseen valid token is copied into process-global tokenMap and idMap, but no logout, expiration, eviction, or size bound is implemented. Repeatedly creating accounts and tokens can consume server memory for the lifetime of the process. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Resource exhaustion",
+        "cwe": [
+          "CWE-770"
+        ]
+      },
+      "title": "Authenticated token cache grows without bounds or expiration cleanup",
+      "validation": {
+        "counterEvidence": [
+          "No exact complete control at the cited instance defeats the source-to-action path. Nearby safe paths and intentional challenge markers are not suppression evidence; no fresh live PoC was needed for this deterministic source/test trace.",
+          "No material validity uncertainty remains; deployment-specific impact and intentional-challenge classification remain separate downstream questions."
+        ],
+        "evidence": [
+          "Every previously unseen valid token is copied into process-global tokenMap and idMap, but no logout, expiration, eviction, or size bound is implemented. Repeatedly creating accounts and tokens can consume server memory for the lifetime of the process.",
+          "Validated source/control/sink locations: lib/insecurity.ts:186-196[entrypoint/wrapper]; lib/insecurity.ts:70-91[concrete_implementation]."
+        ],
+        "evidenceRefs": [
+          "evidence-1",
+          "evidence-2"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The exact source/control/sink behavior is visible in the checked-in code and is deterministic from the cited operation; no complete compensating control defeats this instance. OWASP Top 10:2025 classification (separate from technical status): Not mapped Not mapped: None of the applicable identifiers (CWE-770) appears in the official OWASP Top 10:2025 CWE lists. The finding is intentionally not forced into an OWASP category. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "CI executes a mutable Coveralls action tag with an authentication token",
+          "sink": "CI executes a mutable Coveralls action tag with an authentication token at .github/workflows/ci.yml:188-190.",
+          "source": "Mutable third-party workflow/action or downloaded installer selected by trusted CI at .github/workflows/ci.yml:188-190.",
+          "summary": "Trusted-branch push coverage job -> .github/workflows/ci.yml -> mutable third-party action coverallsapp/github-action@v2 -> action code executes with the job GITHUB_TOKEN."
+        },
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": ".github/workflows/ci.yml:188",
+          "outcome": "CI executes a mutable Coveralls action tag with an authentication token",
+          "preconditions": [
+            "The workflow job runs and the mutable/upstream executable input is compromised or changed."
+          ],
+          "summary": "Execution occurs in the canonical repository workflow. Exploitation requires compromise or malicious retargeting of the third-party mutable ref, after which the next qualifying workflow run executes attacker code. Counterevidence: Only canonical-repository events qualify, upstream compromise is a low-likelihood precondition, and effective token permissions/branch protection are external. The repository nevertheless passes a token to code not pinned by immutable commit."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "        uses: coverallsapp/github-action@v2\n        with:\n          github-token: ${{ secrets.GITHUB_TOKEN }}",
+          "endLine": 190,
+          "explanation": "This root control location is part of the validated path for ci executes a mutable coveralls action tag with an authentication token.",
+          "id": "evidence-1",
+          "label": "Root Control",
+          "language": "yaml",
+          "path": ".github/workflows/ci.yml",
+          "role": "root_control",
+          "startLine": 188
+        }
+      ],
+      "confidence": {
+        "level": "medium",
+        "rationale": "The workflow executes a mutable third-party reference with repository privileges, but exploitation additionally requires compromise or retagging of that upstream reference."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-8b4a404c40e11dfa",
+        "impact": "high",
+        "intentionality": {
+          "evidence": "Only canonical-repository events qualify, upstream compromise is a low-likelihood precondition, and effective token permissions/branch protection are external. The repository nevertheless passes a token to code not pinned by immutable commit.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "low",
+        "owaspTop10_2025": [
+          {
+            "id": "A08:2025",
+            "rationale": "The finding is classified as Software supply-chain integrity; CWE-829 appear in OWASP's official CWE mapping for A08:2025 Software or Data Integrity Failures. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality.",
+            "sourceUrl": "https://owasp.org/Top10/2025/A08_2025-Software_or_Data_Integrity_Failures/",
+            "status": "mapped",
+            "title": "Software or Data Integrity Failures"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Software supply-chain integrity"
+      },
+      "findingId": "csf_03a09ac79bb17effcf373aac",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:c73c34513ea5828312c05c3bd739b3a5d1924c5055d7dc06b562d3cd2d5482e0"
+      },
+      "identity": {
+        "anchor": "github-actions-mutable-coveralls",
+        "instance": "candidate-8b4a404c40e11dfa"
+      },
+      "locations": [
+        {
+          "endLine": 190,
+          "path": ".github/workflows/ci.yml",
+          "role": "root_control",
+          "startLine": 188
+        }
+      ],
+      "occurrenceId": "occ_739ffc4a4b3991406168d46e",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Pin executable third-party build inputs to reviewed immutable commit digests, minimize workflow token permissions, verify downloaded artifacts with a trusted digest/signature, and automate update review.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: CI executes a mutable Coveralls action tag with an authentication token.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "summary": "Closest immutable revision/integrity pinning of executable CI inputs control at .github/workflows/ci.yml:188-190; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/github-actions-mutable-coveralls",
+      "severity": {
+        "changeConditions": "Raise if repository settings grant broad write/secrets access to the job; lower or close when every executed third-party action is pinned to a reviewed commit and token permissions are explicitly minimal.",
+        "level": "low",
+        "rationale": "A compromised action reference could affect repository or workflow integrity, but the necessary upstream supply-chain compromise is unlikely. High impact with low likelihood yields low."
+      },
+      "summary": "coverallsapp/github-action@v2 is not commit-pinned and receives github-token, creating a supply-chain path from retagged action code to repository credentials. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Software supply-chain integrity",
+        "cwe": [
+          "CWE-829"
+        ]
+      },
+      "title": "CI executes a mutable Coveralls action tag with an authentication token",
+      "validation": {
+        "counterEvidence": [
+          "TLS and GitHub's action ecosystem reduce casual tampering but do not provide immutable revision/integrity binding for the exact executable input. Upstream compromise was not reproduced.",
+          "No fresh end-to-end PoC was run in this compact phase; deployment-specific configuration and downstream impact remain for attack-path/severity calibration."
+        ],
+        "evidence": [
+          "coverallsapp/github-action@v2 is not commit-pinned and receives github-token, creating a supply-chain path from retagged action code to repository credentials.",
+          "Validated source/control/sink locations: .github/workflows/ci.yml:188-190[root_control]."
+        ],
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The workflow executes a mutable third-party reference with repository privileges, but exploitation additionally requires compromise or retagging of that upstream reference. OWASP Top 10:2025 classification (separate from technical status): A08:2025 Software or Data Integrity Failures: The finding is classified as Software supply-chain integrity; CWE-829 appear in OWASP's official CWE mapping for A08:2025 Software or Data Integrity Failures. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "outcome": "Image workflow runs mutable third-party action refs with repository credentials",
+          "sink": "Image workflow runs mutable third-party action refs with repository credentials at .github/workflows/image_actions.yml:30-46.",
+          "source": "Mutable third-party workflow/action or downloaded installer selected by trusted CI at .github/workflows/image_actions.yml:30-46.",
+          "summary": "Push or same-repository image change -> .github/workflows/image_actions.yml -> mutable third-party action calibreapp/image-actions@main (with other tag-only actions) -> action code executes with the job GITHUB_TOKEN."
+        },
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "reachability": {
+          "attacker": "Remote or supply-chain attacker with the capability stated in the validated preconditions.",
+          "entrypoint": ".github/workflows/image_actions.yml:30",
+          "outcome": "Image workflow runs mutable third-party action refs with repository credentials",
+          "preconditions": [
+            "The workflow job runs and the mutable/upstream executable input is compromised or changed."
+          ],
+          "summary": "Execution occurs in the canonical repository workflow. Exploitation requires compromise or malicious retargeting of the third-party mutable ref, after which the next qualifying workflow run executes attacker code. Counterevidence: Only canonical-repository events qualify, upstream compromise is a low-likelihood precondition, and effective token permissions/branch protection are external. The repository nevertheless passes a token to code not pinned by immutable commit."
+        }
+      },
+      "codeEvidence": [
+        {
+          "code": "        uses: actions/checkout@v6\n      - name: Compress Images\n        id: calibre\n        uses: calibreapp/image-actions@main\n        with:\n          githubToken: ${{ secrets.GITHUB_TOKEN }}\n          ignorePaths: '**/3d_keychain.jpg,**/favorite-hiking-place.png,**/5.png'\n          compressOnly: ${{ github.event_name != 'pull_request' }}\n      - name: Create Pull Request\n        if: |\n          github.event_name != 'pull_request' &&\n          steps.calibre.outputs.markdown != ''\n        uses: peter-evans/create-pull-request@v8\n        with:\n          title: Auto Compress Images\n          delete-branch: true\n          commit-message: Compress Images",
+          "endLine": 46,
+          "explanation": "This root control location is part of the validated path for image workflow runs mutable third-party action refs with repository credentials.",
+          "id": "evidence-1",
+          "label": "Root Control",
+          "language": "yaml",
+          "path": ".github/workflows/image_actions.yml",
+          "role": "root_control",
+          "startLine": 30
+        }
+      ],
+      "confidence": {
+        "level": "medium",
+        "rationale": "The workflow executes a mutable third-party reference with repository privileges, but exploitation additionally requires compromise or retagging of that upstream reference."
+      },
+      "extensions": {
+        "attackPathDecision": "reportable",
+        "candidateId": "candidate-ff57fb347ba4a886",
+        "impact": "high",
+        "intentionality": {
+          "evidence": "Only canonical-repository events qualify, upstream compromise is a low-likelihood precondition, and effective token permissions/branch protection are external. The repository nevertheless passes a token to code not pinned by immutable commit.",
+          "rationale": "Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+          "status": "not_identified_as_intentional_challenge"
+        },
+        "likelihood": "low",
+        "owaspTop10_2025": [
+          {
+            "id": "A08:2025",
+            "rationale": "The finding is classified as Software supply-chain integrity; CWE-829 appear in OWASP's official CWE mapping for A08:2025 Software or Data Integrity Failures. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality.",
+            "sourceUrl": "https://owasp.org/Top10/2025/A08_2025-Software_or_Data_Integrity_Failures/",
+            "status": "mapped",
+            "title": "Software or Data Integrity Failures"
+          }
+        ],
+        "validationDisposition": "reportable",
+        "vulnerabilityCategory": "Software supply-chain integrity"
+      },
+      "findingId": "csf_0e192989bd894aec5f157413",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:13860c75e408332865e2e5ab07cec7054c06c280acb94fe117272439410a55ca"
+      },
+      "identity": {
+        "anchor": "github-actions-mutable-image-actions",
+        "instance": "candidate-ff57fb347ba4a886"
+      },
+      "locations": [
+        {
+          "endLine": 46,
+          "path": ".github/workflows/image_actions.yml",
+          "role": "root_control",
+          "startLine": 30
+        }
+      ],
+      "occurrenceId": "occ_e4f4daa6b437b5ae1561267d",
+      "preventiveControls": [
+        "Centralize the relevant authorization, validation, or integrity control so sibling routes cannot omit it.",
+        "Keep a security regression test tied to the exact root-control and sink locations."
+      ],
+      "provenance": {
+        "source": "codex-security standard repository scan"
+      },
+      "remediation": "Pin executable third-party build inputs to reviewed immutable commit digests, minimize workflow token permissions, verify downloaded artifacts with a trusted digest/signature, and automate update review.",
+      "remediationTests": [
+        "Add a focused regression test that reproduces and then rejects: Image workflow runs mutable third-party action refs with repository credentials.",
+        "Add negative tests for alternate encodings, duplicate fields, boundary values, and unauthorized principals relevant to this path."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "summary": "Closest immutable revision/integrity pinning of executable CI inputs control at .github/workflows/image_actions.yml:30-46; source and checked-in evidence show it is absent, incomplete, or bypassable for this exact row."
+      },
+      "ruleId": "codex-security/github-actions-mutable-image-actions",
+      "severity": {
+        "changeConditions": "Raise if repository settings grant broad write/secrets access to the job; lower or close when every executed third-party action is pinned to a reviewed commit and token permissions are explicitly minimal.",
+        "level": "low",
+        "rationale": "A compromised action reference could affect repository or workflow integrity, but the necessary upstream supply-chain compromise is unlikely. High impact with low likelihood yields low."
+      },
+      "summary": "The workflow invokes calibreapp/image-actions@main and peter-evans/create-pull-request@v8 rather than immutable commit SHAs while passing GITHUB_TOKEN and permitting repository mutation. The final attack-path decision is reportable. Intentionality was assessed separately: Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance.",
+      "taxonomy": {
+        "category": "Software supply-chain integrity",
+        "cwe": [
+          "CWE-829"
+        ]
+      },
+      "title": "Image workflow runs mutable third-party action refs with repository credentials",
+      "validation": {
+        "counterEvidence": [
+          "TLS and GitHub's action ecosystem reduce casual tampering but do not provide immutable revision/integrity binding for the exact executable input. Upstream compromise was not reproduced.",
+          "No fresh end-to-end PoC was run in this compact phase; deployment-specific configuration and downstream impact remain for attack-path/severity calibration."
+        ],
+        "evidence": [
+          "The workflow invokes calibreapp/image-actions@main and peter-evans/create-pull-request@v8 rather than immutable commit SHAs while passing GITHUB_TOKEN and permitting repository mutation.",
+          "Validated source/control/sink locations: .github/workflows/image_actions.yml:30-46[root_control]."
+        ],
+        "evidenceRefs": [
+          "evidence-1"
+        ],
+        "method": "static source/control/sink and boundary trace",
+        "summary": "Disposition: reportable. The workflow executes a mutable third-party reference with repository privileges, but exploitation additionally requires compromise or retagging of that upstream reference. OWASP Top 10:2025 classification (separate from technical status): A08:2025 Software or Data Integrity Failures: The finding is classified as Software supply-chain integrity; CWE-829 appear in OWASP's official CWE mapping for A08:2025 Software or Data Integrity Failures. This OWASP classification does not determine severity, confidence, reachability, validation status, or challenge intentionality. Challenge intentionality (separate): not_identified_as_intentional_challenge \u2014 Attack-path policy retained this row as reportable under SECURITY.md after checking the repository's challenge context; no exact named intentional challenge was established for this instance."
+      }
+    }
+  ],
+  "scanId": "190e1880-4ba5-412f-943b-4c6c6a5830d9",
+  "schemaVersion": "1.0"
+}

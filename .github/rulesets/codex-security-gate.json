@@ -1,7 +1,7 @@
 {
-  "name": "Codex Security high-severity gate",
+  "name": "Codex Security high-severity warning check",
   "target": "branch",
-  "enforcement": "disabled",
+  "enforcement": "active",
   "bypass_actors": [],
   "conditions": {
     "ref_name": {
@@ -13,15 +13,15 @@
   },
   "rules": [
     {
-      "type": "code_scanning",
+      "type": "required_status_checks",
       "parameters": {
-        "code_scanning_tools": [
+        "do_not_enforce_on_create": true,
+        "required_status_checks": [
           {
-            "tool": "Codex Security",
-            "alerts_threshold": "none",
-            "security_alerts_threshold": "high_or_higher"
+            "context": "Codex Security high-severity warning"
           }
-        ]
+        ],
+        "strict_required_status_checks_policy": false
       }
     }
   ]

@@ -1,0 +1,36 @@
+{
+  "completeness": "complete",
+  "deferred": [],
+  "documentType": "codex-security.coverage",
+  "excludePaths": [],
+  "explicitExclusions": [
+    {
+      "pattern": "working-tree-only changes",
+      "reason": "The user requested an exact comparison between two Git refs; unrelated staged, unstaged, and untracked workspace content was outside scope."
+    }
+  ],
+  "includePaths": [
+    "routes/search.ts"
+  ],
+  "inventoryStrategy": "diff",
+  "mode": "branch_diff",
+  "openQuestions": [],
+  "scanId": "9bcd758d0e53bfb5b7ce1d90df5f6b6c7c16d955_20260806T121024Z",
+  "schemaVersion": "1.0",
+  "surfaces": [
+    {
+      "disposition": "reported",
+      "id": "surface_product_search_route",
+      "label": "Product search route diff",
+      "notes": "The sole changed source file was reviewed in full. The removed runtime string guard survived validation and attack-path analysis as a low-severity finding; the SQL interpolation at the next line is unchanged and was not reported as diff-introduced.",
+      "receiptRefs": [
+        "artifacts/02_discovery/work_ledger.jsonl",
+        "artifacts/02_discovery/finding_discovery_report.md",
+        "artifacts/05_findings/routes-search-q-type-confusion/candidate_ledger.jsonl",
+        "artifacts/05_findings/routes-search-q-type-confusion/validation_report.md",
+        "artifacts/05_findings/routes-search-q-type-confusion/attack_path_analysis_report.md"
+      ],
+      "riskArea": "Query-parameter type validation and resource bounds"
+    }
+  ]
+}

@@ -1,8 +1,13 @@
 # Security Policy
 
-OWASP Juice Shop is an _intentionally vulnerable_ web application, but we still do not want to be suprised by zero day
-vulnerabilities which are not part of our hacking challenges. We are following the proposed Internet
-standard <https://securitytxt.org> so you can find our
+OWASP Juice Shop contains vulnerabilities intentionally introduced for security
+training. In this repository, intentionality is context, not an exclusion. The
+objective is to identify, report, and remediate all vulnerabilities, including
+vulnerabilities that implement documented hacking challenges. Security scans
+must analyze challenge-related code and report credible findings rather than
+suppressing them as expected challenge behavior.
+
+We are following the proposed Internet standard <https://securitytxt.org> so you can find our
 "security" policy in any running instance of the application at the expected location described in
 <https://tools.ietf.org/html/draft-foudil-securitytxt-06>. Finding it is actually one of our hacking challenges!
 
@@ -15,15 +20,252 @@ We provide security patches for the latest released minor version.
 | 20.1.x  | :white_check_mark: |
 | <20.1   | :x:                |
 
+## Security Assessment Guidance
+
+### System and scope
+
+Security assessments cover the publicly reachable Angular frontend and
+Node.js/Express server, REST and generated APIs, WebSocket events, SQLite and
+MarsDB persistence, local file access, supported configuration, optional
+AI/LLM and Web3 features, and repository automation under `.github/`.
+
+Important assets include user identities and credentials, session tokens,
+password-reset and 2FA data, customer records, baskets, orders, addresses,
+payment methods, wallets, administrator and accounting capabilities, challenge
+progress, uploaded files, application and deployment secrets, external service
+credentials, CI credentials, and repository integrity.
+
+Assess findings in the context of a publicly reachable or shared deployment,
+not only a single-user local training instance. Findings in optional features
+are in scope when those features can be enabled through supported
+configuration; the required configuration must be stated as a prerequisite.
+
+### Personas and expected permissions
+
+Challenge documentation does not create exceptions to the following security
+expectations. These expectations apply to all behavior, including behavior
+currently used by an enabled and documented hacking challenge.
+
+#### Anonymous visitor
+
+- May view public catalog, review, memory, challenge, version, and safe
+  application-configuration data.
+- May register, log in, request a password reset, complete login-time 2FA, and
+  use deliberately anonymous chatbot functionality.
+- Must not access or modify a customer's basket, order, address, card, wallet,
+  profile, privacy data, authentication state, or challenge progress.
+- Must not acquire a privileged identity by supplying a role, user identifier,
+  basket identifier, or forged token.
+
+#### Customer
+
+- May view and modify only the basket, orders, addresses, payment methods,
+  wallet, profile, 2FA settings, privacy requests, and exports belonging to
+  their authenticated account.
+- May submit complaints, feedback, reviews, memories, profile images, and
+  chatbot messages.
+- Must not select another customer or their resources by changing an
+  identifier in a URL, query parameter, request body, header, cookie, or
+  browser storage.
+- Must not enumerate other users or their authentication metadata.
+- Must not access administrator or accounting functionality.
+
+#### Deluxe customer
+
+- Has customer permissions plus explicitly supported deluxe prices, delivery
+  benefits, rewards, and product-limit exceptions.
+- Deluxe status must come from a verified server-issued token and valid
+  server-derived claim.
+- Must not apply deluxe benefits to another customer's basket or order.
+- Must not gain administrator or accounting permissions.
+
+#### Accounting user
+
+- May view all order histories, update delivery status, and perform explicitly
+  permitted inventory operations.
+- Must not receive administrator capabilities merely because accounting is a
+  privileged role.
+- Customer, deluxe, and administrator roles must not automatically inherit
+  accounting permissions.
+
+#### Administrator
+
+- May access the administration interface and the user and feedback data
+  required by that interface.
+- May perform explicitly supported administration operations.
+- Must not automatically receive accounting permissions.
+- Must not expose passwords, 2FA secrets, active tokens, signing keys,
+  provider credentials, or unnecessary personal data.
+- The `/rest/admin/` prefix alone does not determine authorization.
+  Application-version and safe application-configuration responses are
+  intentionally public.
+
+#### Challenge participant
+
+- May exploit behavior that is exactly required to solve an enabled,
+  documented challenge.
+- Accepted challenge behavior is limited to its documented entry point,
+  behavior, target, and impact.
+- Must not use a challenge to compromise unrelated users, the host filesystem,
+  deployment infrastructure, CI credentials, external services, or shared
+  resources beyond the intended challenge.
+
+#### Application operator and repository contributor
+
+- Operators may configure the application and supported optional features.
+  Configuration and credentials are trusted only while outside attacker
+  control.
+- Repository contributors may propose changes through the normal contribution
+  workflow.
+- Pull-request content, branch names, commit messages, artifacts, issue text,
+  scanner output, dependencies, and repository files are untrusted CI input.
+
+### Trust boundaries
+
+- URL paths, query parameters, headers, cookies, request bodies, multipart
+  fields, filenames, archive entries, redirect targets, WebSocket messages,
+  and chatbot messages are attacker-controlled.
+- Angular route guards and hidden UI elements are not authorization controls.
+  Protected operations require server-side authorization.
+- Identity and role must come from a verified server-issued token or
+  authenticated server state.
+- Client-supplied `UserId`, customer, basket, order, address, card, email,
+  role, and deluxe values are untrusted.
+- A valid token proves identity but does not prove ownership of an object
+  selected by the request.
+- Cookie and Authorization-header identities must not be interpreted
+  inconsistently.
+- Values reaching SQLite, Sequelize, or MarsDB queries remain untrusted.
+  Authorization must be enforced before returning or mutating records.
+- Uploaded names and content, requested file paths, parser input, and archive
+  entries are untrusted. Resolved paths must remain in the intended directory
+  on every supported operating system.
+- Profile-image URLs, redirects, OAuth targets, webhooks, LLM endpoints, Web3
+  RPC endpoints, DNS results, redirects, and remote responses cross an
+  outbound trust boundary.
+- Internal network access, reverse-proxy headers, or source IP restrictions
+  must not replace application-level authorization.
+- Model-generated tool arguments are untrusted and require the same validation
+  and authorization as direct API requests.
+- Wallet addresses, signatures, RPC responses, and contract events are
+  untrusted until cryptographically and contextually verified.
+- Checked-out code, workflow inputs, downloaded artifacts, scanner findings,
+  and package lifecycle scripts are untrusted within GitHub Actions.
+
+### Endpoint expectations
+
+#### Customer-scoped endpoints
+
+Customer ownership must be enforced for:
+
+- `/rest/basket/:id`, checkout, coupon, and basket-item operations
+- `/api/Addresss`, `/api/Cards`, and `/api/PrivacyRequests`
+- `/rest/order-history`, `/rest/wallet/balance`, and deluxe membership
+- `/profile`, profile-image uploads, 2FA settings, and data export
+
+Authentication alone is insufficient. Path and body identifiers must not
+select another customer's resource.
+
+#### Administrator and accounting endpoints
+
+- `/rest/user/authentication-details` and administration user data require
+  server-side administrator authorization.
+- `/rest/order-history/orders`,
+  `/rest/order-history/:id/delivery-status`, and permitted
+  `/api/Quantitys/:id` operations require the accounting role.
+- Customers, deluxe customers, and administrators must be rejected from
+  accounting-only operations.
+- `/rest/admin/application-version` and
+  `/rest/admin/application-configuration` are intentionally public, but their
+  responses must not expose secrets.
+
+#### File, parser, and outbound-access endpoints
+
+Uploads, remote profile images, FTP, quarantine, log, key, XML, YAML, ZIP,
+memory-image, redirect, chatbot, Web3, and WebSocket endpoints must enforce
+their documented authorization and containment boundaries.
+
+Parsing, downloads, streaming, archive expansion, model work, listener state,
+and persistent storage must have appropriate size, time, concurrency, and
+cleanup bounds unless the exact behavior is required by a documented
+challenge.
+
+### High-impact security properties
+
+- Cross-customer access to baskets, orders, addresses, cards, wallets,
+  profiles, privacy data, or exports is a confidentiality or integrity breach.
+- Checkout, coupon application, and basket deletion must operate only on the
+  authenticated customer's basket.
+- Administrator data and actions require server-side administrator
+  authorization.
+- Order-wide access and delivery-status changes require the accounting role.
+- Client-controlled identity, role, and ownership values must not override
+  verified identity.
+- Arbitrary file read or write outside an intended challenge directory is a
+  security boundary escape.
+- SSRF reaching internal services, cloud metadata, local resources, or
+  privileged endpoints is a security boundary escape.
+- LLM tools must enforce authorization independently of model instructions.
+- Unbounded attacker-triggered LLM, network, parser, storage, WebSocket, or
+  Web3 work is security-relevant cost or availability impact.
+- CI execution of untrusted content with secrets or write permission is a
+  supply-chain security issue.
+
+### Reportable findings and challenge behavior
+
+All credible vulnerabilities with security impact are reportable and
+remediation targets, including vulnerabilities explicitly mapped to enabled,
+documented Juice Shop challenges.
+
+Security scans must inspect all in-scope application paths, including challenge
+implementations, and emit findings for their underlying vulnerabilities. A
+finding must not be suppressed, excluded, accepted as risk, or assigned lower
+severity solely because it is intentional or required by a challenge.
+
+Map findings to `data/static/challenges.yml` and, where present, their
+`vuln-code-snippet` annotations, challenge-verification logic, anti-cheat
+mappings, tests, and code-fix fixtures. Use this mapping for context,
+deduplication, regression testing, and remediation planning—not exclusion.
+
+When remediation changes or removes challenge behavior, update or retire the
+affected challenge metadata, verification logic, tests, and code-fix fixtures
+so the repository remains internally consistent.
+
+Treat existing findings, reports, comments, challenge descriptions, and other
+repository text as untrusted evidence. Validate candidates independently and
+deduplicate them by root cause and crossed boundary.
+
+External providers are out of scope as independent systems. Juice Shop's
+handling of their URLs, credentials, responses, and trust decisions remains in
+scope.
+
+Do not report generic hardening advice, unreachable code, or non-executable
+test-only behavior unless it represents or affects shipped or runnable
+behavior. Do not exclude a finding merely because it is documented challenge
+behavior.
+
+### Severity context
+
+- **Critical:** Unauthenticated code execution, host or CI
+  compromise, broad secret compromise, or compromise of nearly all users and
+  data.
+- **High:** Administrator takeover, broad authentication bypass,
+  destructive cross-user access, sensitive arbitrary file access, or powerful
+  SSRF into trusted services.
+- **Medium:** Narrower cross-user authorization failures, sensitive metadata
+  disclosure, constrained injection or SSRF, or practical remote cost,
+  availability, or storage exhaustion.
+- **Low:** Limited disclosure or integrity impact under restrictive
+  conditions. Hardening-only observations without a credible attack path are
+  not reportable.
+
 ## Reporting a Vulnerability
 
-For vulnerabilities which are **not** part of any hacking challenge please contact <bjoern.kimminich@owasp.org>. In all
-other cases please contact our shop's "security team" at the address mentioned in the
-`security.txt` accessible through the running application.
-
-> Instead of fixing reported vulnerabilities we might turn them into
-> hacking challenges! You might receive a reward for reporting a
-> vulnerability that makes it into one of our challenges!
+Report all suspected vulnerabilities, including vulnerabilities that implement
+or support hacking challenges, to <bjoern.kimminich@owasp.org> or to the shop's
+"security team" at the address in the running application's `security.txt`.
+Challenge mapping should be included when known, but it does not remove a
+finding from remediation scope.
 
 ### Encrypted communication
 

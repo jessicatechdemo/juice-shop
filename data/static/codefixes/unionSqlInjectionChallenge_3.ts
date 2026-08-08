@@ -1,6 +1,7 @@
 export function searchProducts () {
   return (req: Request, res: Response, next: NextFunction) => {
-    let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    const rawCriteria = req.query.q
+    let criteria = (typeof rawCriteria === 'string' && rawCriteria !== 'undefined') ? rawCriteria : ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
     // only allow apple or orange related searches
     if (!criteria.startsWith("apple") || !criteria.startsWith("orange")) {

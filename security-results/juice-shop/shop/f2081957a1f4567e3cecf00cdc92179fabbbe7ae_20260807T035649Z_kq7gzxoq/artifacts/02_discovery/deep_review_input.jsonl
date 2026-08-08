@@ -1,0 +1,3 @@
+{"path":"routes/search.ts","area":"diff"}
+{"path":".github/workflows/ci.yml","area":"diff","add_back_reason":"Changed executable CI workflow configuration is security-relevant and was omitted by the source-like rank helper."}
+{"path":".github/workflows/codeql-scheduled.yml","area":"diff","add_back_reason":"Changed executable CodeQL workflow configuration is security-relevant and was omitted by the source-like rank helper."}

@@ -1,0 +1,129 @@
+{
+  "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/schemas/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "automationDetails": {
+        "id": "9bcd758d0e53bfb5b7ce1d90df5f6b6c7c16d955_20260806T121024Z"
+      },
+      "properties": {
+        "codexSecuritySchemaVersion": "1.0",
+        "codexSecurityTargetKind": "git_diff"
+      },
+      "results": [
+        {
+          "level": "note",
+          "locations": [
+            {
+              "message": {
+                "text": "root_control"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "routes/search.ts"
+                },
+                "region": {
+                  "endLine": 21,
+                  "startLine": 21
+                }
+              }
+            },
+            {
+              "message": {
+                "text": "sink"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "routes/search.ts"
+                },
+                "region": {
+                  "endLine": 23,
+                  "startLine": 22
+                }
+              }
+            },
+            {
+              "message": {
+                "text": "entrypoint"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "server.ts"
+                },
+                "region": {
+                  "endLine": 602,
+                  "startLine": 602
+                }
+              }
+            },
+            {
+              "message": {
+                "text": "evidence:untyped-query-control"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "routes/search.ts"
+                },
+                "region": {
+                  "endLine": 22,
+                  "startLine": 20
+                }
+              }
+            },
+            {
+              "message": {
+                "text": "evidence:query-string-construction"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "routes/search.ts"
+                },
+                "region": {
+                  "endLine": 23,
+                  "startLine": 23
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "The target revision removes the base revision's runtime string check for the public `q` search parameter. Express extended parsing can therefore supply an object or array to string-specific processing: object-shaped values trigger a server-side request failure, while duplicate-key arrays use element count instead of character count and bypass the intended 200-character limit before SQL construction."
+          },
+          "partialFingerprints": {
+            "codexSecurity/v1": "codex-security/v1:sha256:665000477746c27cf79cb2ad1369d3ce4dee5363ac0c07b95fbe7590e01ac971",
+            "primaryLocationLineHash": "ad3bd3efce5ee9f9:1"
+          },
+          "properties": {
+            "candidateId": "routes-search-q-type-confusion",
+            "category": "Type confusion through parameter tampering",
+            "confidence": "high",
+            "findingId": "csf_eada35b5dfdbdb57cb32be4e",
+            "occurrenceId": "occ_bb87848cd99579a1c14e5684",
+            "severity": "low"
+          },
+          "ruleId": "type-confusion.query-parameter",
+          "ruleIndex": 0
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "Codex Security",
+          "rules": [
+            {
+              "id": "type-confusion.query-parameter",
+              "name": "type-confusion.query-parameter",
+              "properties": {
+                "tags": [
+                  "security"
+                ]
+              },
+              "shortDescription": {
+                "text": "type-confusion.query-parameter"
+              }
+            }
+          ],
+          "version": "0.1.17"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}
