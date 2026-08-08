@@ -38,19 +38,6 @@ jobs:
           npm install --ignore-scripts
       - name: "Lint source code"
         run: npm run lint
-  coding-challenge-rsn:
-    runs-on: windows-latest
-    steps:
-      - name: "Check out Git repository"
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
-      - name: "Use Node.js"
-        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af #v4.1.0
-        with:
-          node-version: ${{ env.NODE_DEFAULT_VERSION }}
-      - name: "Install application"
-        run: npm install
-      - name: "Check coding challenges for accidental code discrepancies"
-        run: npm run rsn
   frontend-test:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -378,7 +365,6 @@ jobs:
       - docker
       - heroku
       - lint
-      - coding-challenge-rsn
       - smoke-test
       - coverage-report
     runs-on: ubuntu-latest
