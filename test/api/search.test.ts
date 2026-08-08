@@ -39,6 +39,23 @@ void describe('/rest/products/search', () => {
     assert.equal(res.body.data.length, 1)
   })
 
+  void it('GET product search treats repeated search parameters as an empty search', async () => {
+    const productsRes = await request(app)
+      .get('/api/Products')
+    assert.equal(productsRes.status, 200)
+
+    const searchRes = await request(app)
+      .get(`/rest/products/search?q=nomatcheswhatsoever&q=${'x'.repeat(201)}`)
+    assert.equal(searchRes.status, 200)
+    assert.ok(searchRes.headers['content-type']?.includes('application/json'))
+    assert.equal(searchRes.body.data.length, productsRes.body.data.length)
+
+    const overflowRes = await request(app)
+      .get(`/rest/products/search?${Array(201).fill('q=x').join('&')}`)
+    assert.equal(overflowRes.status, 200)
+    assert.equal(overflowRes.body.data.length, productsRes.body.data.length)
+  })
+
   void it('GET product search fails with error message that exposes ins SQL Injection vulnerability', async () => {
     const res = await request(app)
       .get("/rest/products/search?q=';")

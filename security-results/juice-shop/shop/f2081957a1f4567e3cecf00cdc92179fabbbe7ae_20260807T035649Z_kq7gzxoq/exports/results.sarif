@@ -1,0 +1,115 @@
+{
+  "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/schemas/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "automationDetails": {
+        "id": "1077317d-2494-4a9f-a1f4-f61d1ce55dc7"
+      },
+      "properties": {
+        "codexSecuritySchemaVersion": "1.0",
+        "codexSecurityTargetKind": "git_diff"
+      },
+      "results": [
+        {
+          "level": "note",
+          "locations": [
+            {
+              "message": {
+                "text": "root_control"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "routes/search.ts"
+                },
+                "region": {
+                  "endLine": 21,
+                  "startLine": 21
+                }
+              }
+            },
+            {
+              "message": {
+                "text": "entrypoint/wrapper"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "server.ts"
+                },
+                "region": {
+                  "endLine": 602,
+                  "startLine": 602
+                }
+              }
+            },
+            {
+              "message": {
+                "text": "sink"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "routes/search.ts"
+                },
+                "region": {
+                  "endLine": 22,
+                  "startLine": 22
+                }
+              }
+            },
+            {
+              "message": {
+                "text": "evidence"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "lib/utils.ts"
+                },
+                "region": {
+                  "endLine": 230,
+                  "startLine": 229
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "The target removes runtime string narrowing for the anonymous `q` parameter in `searchProducts()`. Express query values can be arrays or objects, so a crafted value reaches `.length` and `.substring()` as `any`: object-shaped values deterministically fail the request, while duplicate-key arrays use element count rather than character count and bypass the intended 200-character bound. The raw SQL interpolation is unchanged between the refs and is not part of this diff finding."
+          },
+          "partialFingerprints": {
+            "codexSecurity/v1": "codex-security/v1:sha256:da57fdf6b1262ba2728943ac84e9d88ebbfa027f0f9a59ffe8c607f2c67cd755",
+            "primaryLocationLineHash": "b898d9a39daafe8d:1"
+          },
+          "properties": {
+            "candidateId": "candidate-ca51cfb4ceda98d6",
+            "category": "Query parameter type confusion / improper input validation",
+            "confidence": "high",
+            "findingId": "csf_1a235d703bb5fcd7dd148a33",
+            "occurrenceId": "occ_b266a2e6a9d6b484992f7707",
+            "severity": "low"
+          },
+          "ruleId": "type-confusion.query-parameter",
+          "ruleIndex": 0
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "Codex Security",
+          "rules": [
+            {
+              "id": "type-confusion.query-parameter",
+              "name": "type-confusion.query-parameter",
+              "properties": {
+                "tags": [
+                  "security"
+                ]
+              },
+              "shortDescription": {
+                "text": "type-confusion.query-parameter"
+              }
+            }
+          ],
+          "version": "0.1.17"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

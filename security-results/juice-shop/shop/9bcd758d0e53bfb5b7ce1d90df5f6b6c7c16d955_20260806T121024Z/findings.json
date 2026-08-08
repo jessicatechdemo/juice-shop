@@ -1,0 +1,186 @@
+{
+  "documentType": "codex-security.findings",
+  "findings": [
+    {
+      "attackPath": {
+        "dataflow": {
+          "evidenceRefs": [
+            "public-search-route",
+            "untyped-query-control",
+            "query-string-construction"
+          ],
+          "outcome": "Request-level server error or bypass of the intended 200-character input bound",
+          "sink": "Type-dependent request processing and subsequent SQL-string construction",
+          "source": "Anonymous attacker-controlled `q` query parameter",
+          "summary": "HTTP `q` parameter -> Express extended query parser -> `req.query.q` -> untyped `criteria` -> `length`/`substring()` -> SQL text",
+          "transformations": [
+            "Extended parsing can produce an object or array.",
+            "Target line 21 assigns the parsed value as `any` without the base string check.",
+            "Target line 22 treats object shape or array element count as string semantics."
+          ]
+        },
+        "evidenceRefs": [
+          "public-search-route",
+          "untyped-query-control",
+          "query-string-construction"
+        ],
+        "impact": {
+          "level": "low",
+          "why": "The proved effects are a request-level failure and an input-bound bypass; broader service availability or cross-user harm was not established."
+        },
+        "likelihood": {
+          "level": "high",
+          "why": "The endpoint is anonymous and structured query syntax is straightforward to send."
+        },
+        "limitations": [
+          "No process-wide outage or persistent resource exhaustion was demonstrated.",
+          "The unchanged SQL injection is not used to increase impact or severity."
+        ],
+        "reachability": {
+          "attacker": "Anonymous remote caller",
+          "entrypoint": "GET /rest/products/search",
+          "outcome": "The server processes a non-string value through a removed validation boundary, producing a request failure or bounds bypass.",
+          "preconditions": [
+            "The public route is reachable.",
+            "The default extended query parser remains active.",
+            "The attacker supplies object-shaped or duplicate `q` parameters."
+          ],
+          "summary": "The route is public and the trigger needs only crafted query syntax under the application's default extended parser configuration."
+        },
+        "summary": "An anonymous caller sends object-shaped or duplicate `q` parameters to the public search route. Extended query parsing creates a non-string value, the removed guard accepts it, and string-specific handling either fails the request or lets array element count bypass the character bound before SQL construction."
+      },
+      "codeEvidence": [
+        {
+          "code": "  app.get('/rest/products/search', utils.asyncHandler(searchProducts()))",
+          "endLine": 602,
+          "explanation": "The application registers `searchProducts()` on a GET route without authentication middleware, so an anonymous caller can control its query parameters.",
+          "id": "public-search-route",
+          "label": "Public product-search route",
+          "language": "typescript",
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 602
+        },
+        {
+          "code": "  return (req: Request, res: Response, next: NextFunction) => {\n    let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''\n    criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)",
+          "endLine": 22,
+          "explanation": "Attacker-controlled `req.query.q` is assigned as `any` and immediately processed with string-specific length and `substring()` assumptions, violating the invariant that the bounded value must first be a string.",
+          "id": "untyped-query-control",
+          "label": "Query value accepted without a string-type guard",
+          "language": "typescript",
+          "path": "routes/search.ts",
+          "role": "root_control",
+          "startLine": 20
+        },
+        {
+          "code": "    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge",
+          "endLine": 23,
+          "explanation": "An array that passes the element-count check is string-coerced into the SQL text, so the removed type guard also defeats the intended 200-character bound. The SQL interpolation itself is unchanged between revisions and is supporting context, not a newly introduced injection finding.",
+          "id": "query-string-construction",
+          "label": "Bounded value is consumed by SQL construction",
+          "language": "typescript",
+          "path": "routes/search.ts",
+          "role": "sink",
+          "startLine": 23
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "Static source tracing and bounded inspection of the configured Express/qs parser establish anonymous reachability, non-string query values, removal of the exact type guard, deterministic incompatible string handling, and the character-limit bypass; only the wider operational magnitude remains unmeasured."
+      },
+      "extensions": {
+        "candidateId": "routes-search-q-type-confusion"
+      },
+      "findingId": "csf_eada35b5dfdbdb57cb32be4e",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:665000477746c27cf79cb2ad1369d3ce4dee5363ac0c07b95fbe7590e01ac971"
+      },
+      "identity": {
+        "anchor": "search-query-string-validation",
+        "instance": "public-product-search"
+      },
+      "locations": [
+        {
+          "endLine": 21,
+          "path": "routes/search.ts",
+          "role": "root_control",
+          "startLine": 21
+        },
+        {
+          "endLine": 23,
+          "path": "routes/search.ts",
+          "role": "sink",
+          "startLine": 22
+        },
+        {
+          "endLine": 602,
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 602
+        }
+      ],
+      "occurrenceId": "occ_bb87848cd99579a1c14e5684",
+      "preventiveControls": [
+        "Validate and narrow Express query parameter types at route boundaries before business logic.",
+        "Use a shared schema validator that rejects arrays and objects for scalar query fields.",
+        "Keep focused regression coverage for structured parameter tampering on public routes."
+      ],
+      "provenance": {
+        "source": "local_plugin"
+      },
+      "remediation": "Restore runtime string validation before length handling, or reject every non-string `q` value with HTTP 400. Apply the 200-character limit only after type validation. Keep any separate SQL parameterization work distinct from this diff-specific root cause.",
+      "remediationTests": [
+        "Verify object-shaped `q` input is rejected or safely normalized without an HTTP 500.",
+        "Verify duplicate `q` keys cannot bypass a 200-character aggregate input limit.",
+        "Verify ordinary string, empty, and missing `q` values retain the intended search behavior."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "public-search-route",
+          "untyped-query-control",
+          "query-string-construction"
+        ],
+        "summary": "The security invariant is that `q` must be a string before the route performs string length enforcement or passes it onward. The base revision enforced that invariant with a runtime `typeof` check; the target replaces it with an `any` assignment. Because Express extended query parsing can produce objects and arrays, the target allows non-string values to reach string-specific processing and SQL-string construction."
+      },
+      "ruleId": "type-confusion.query-parameter",
+      "severity": {
+        "changeConditions": "Raise the severity if one crafted request can terminate or wedge the Node.js process, or if the length-cap bypass causes disproportionate CPU, memory, or database consumption that affects other users. Lower or reject it if an upstream parser or middleware is shown to coerce or reject every non-string `q` value before this route.",
+        "level": "low",
+        "rationale": "An anonymous remote caller can trigger the flaw with ordinary query syntax, but repository evidence establishes only a request-level failure and a bounded length-control bypass. Express error handling and parser/request-size limits reduce amplification, and no process termination, persistent degradation, or cross-user impact was demonstrated."
+      },
+      "summary": "The target revision removes the base revision's runtime string check for the public `q` search parameter. Express extended parsing can therefore supply an object or array to string-specific processing: object-shaped values trigger a server-side request failure, while duplicate-key arrays use element count instead of character count and bypass the intended 200-character limit before SQL construction.",
+      "taxonomy": {
+        "category": "Type confusion through parameter tampering",
+        "cwe": [
+          "CWE-843"
+        ]
+      },
+      "title": "Structured search parameters bypass string validation and input bounds",
+      "validation": {
+        "assertions": [
+          "Express extended query parsing can represent `q` as an object or array.",
+          "The target no longer rejects non-string `q` values before type-dependent processing.",
+          "Object-shaped input deterministically reaches an incompatible string operation, and array input measures elements rather than characters."
+        ],
+        "counterevidence": [
+          "Express error middleware is expected to convert the thrown error into a request-level HTTP 500 response.",
+          "Parser parameter limits and HTTP request-size limits bound individual-request amplification."
+        ],
+        "evidenceRefs": [
+          "public-search-route",
+          "untyped-query-control",
+          "query-string-construction"
+        ],
+        "limitations": [
+          "Application execution and tests were forbidden, so sustained shared-service availability impact was not measured.",
+          "The intentional SQL injection at the next line exists in both revisions and is not attributed to this diff."
+        ],
+        "method": "Static source trace with bounded Express/qs parser inspection",
+        "summary": "The review confirmed that the anonymous route accepts structured query values, the target removes the base string guard, object values reach incompatible `substring()` handling, and duplicate-key arrays bypass the intended character bound before SQL construction."
+      }
+    }
+  ],
+  "scanId": "9bcd758d0e53bfb5b7ce1d90df5f6b6c7c16d955_20260806T121024Z",
+  "schemaVersion": "1.0"
+}

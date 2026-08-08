@@ -1,0 +1,9 @@
+# Fix-Finding Output in CLI
+• Updated Plan
+  └ The concrete HTTP boundary and intended normalization behavior are established from route registration, current code, tests, and the prior fix
+    commit. A focused repeated-parameter regression is now encoded before implementation.
+    ✔ Read the fix workflow and finding evidence; establish the patch contract
+    □ Reproduce the issue with a focused failing regression test
+    □ Implement the smallest complete fix
+    □ Run ordered security, behavior, and repository verification
+    □ Write the fix report and summarize evidence

@@ -1,0 +1,198 @@
+{
+  "documentType": "codex-security.findings",
+  "findings": [
+    {
+      "attackPath": {
+        "dataflow": {
+          "evidenceRefs": [
+            "public-search-route",
+            "missing-q-type-guard",
+            "string-only-processing",
+            "request-error-boundary"
+          ],
+          "outcome": "repeatable request-level failure or bypass of the 200-character processing bound",
+          "sink": "string-only processing at `routes/search.ts:22`",
+          "source": "anonymous attacker-controlled `q` query value",
+          "summary": "HTTP query `q` -> Express `req.query.q` -> `criteria` as `any` -> `.length`/`.substring()` -> request error or bound bypass"
+        },
+        "decision": "reportable",
+        "evidenceRefs": [
+          "public-search-route",
+          "missing-q-type-guard",
+          "string-only-processing"
+        ],
+        "impact": {
+          "level": "low",
+          "why": "Only request-level availability failure and local input-bound bypass are established."
+        },
+        "likelihood": {
+          "level": "high",
+          "why": "The route is public and the crafted query requires no credentials or special deployment access."
+        },
+        "limitations": [
+          "Centralized error handling is strong counterevidence against process termination or proven cross-user denial of service."
+        ],
+        "reachability": {
+          "attacker": "remote unauthenticated client",
+          "entrypoint": "GET `/rest/products/search`",
+          "outcome": "the crafted request fails or evades the intended character bound",
+          "summary": "The route is public and requires no authentication. Exploitation requires only encoding `q` as a structured query value supported by Express query parsing."
+        },
+        "summary": "A remote unauthenticated attacker sends a structured `q` query value to `/rest/products/search`. The changed handler accepts it as `any`, then executes string-only processing; an object triggers a request exception and an array bypasses the intended character bound."
+      },
+      "codeEvidence": [
+        {
+          "code": "app.get('/rest/products/search', utils.asyncHandler(searchProducts()))",
+          "endLine": 602,
+          "explanation": "An unauthenticated HTTP client controls the query string passed through `asyncHandler()` to `searchProducts()`.",
+          "id": "public-search-route",
+          "label": "Anonymous product-search route",
+          "language": "typescript",
+          "path": "server.ts",
+          "role": "entrypoint",
+          "startLine": 602
+        },
+        {
+          "code": "let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''",
+          "endLine": 21,
+          "explanation": "The changed assignment preserves any non-null parsed query value, including arrays and objects, instead of narrowing `q` to a string.",
+          "id": "missing-q-type-guard",
+          "label": "Structured query value accepted as any",
+          "language": "typescript",
+          "path": "routes/search.ts",
+          "role": "root_control",
+          "startLine": 21
+        },
+        {
+          "code": "criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)",
+          "endLine": 22,
+          "explanation": "The handler treats the attacker-selected value as a string. An object lacks `substring()`, while an array's element count is not the intended character-length bound.",
+          "id": "string-only-processing",
+          "label": "String-only bound and substring processing",
+          "language": "typescript",
+          "path": "routes/search.ts",
+          "role": "sink",
+          "startLine": 22
+        },
+        {
+          "code": "export const asyncHandler = (fn: (req: any, res: any, next: any) => Promise<any> | any) => (req: any, res: any, next: any) => {\n  void Promise.resolve(fn(req, res, next)).catch(next)\n}",
+          "endLine": 230,
+          "explanation": "A synchronous type error becomes a rejected promise and is forwarded to Express error middleware, limiting the demonstrated consequence to request handling.",
+          "id": "request-error-boundary",
+          "label": "Route errors are forwarded to middleware",
+          "language": "typescript",
+          "path": "lib/utils.ts",
+          "role": "outcome",
+          "startLine": 229
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "The exact base/target diff, anonymous route registration, removed type guard, immediate string-only sink, error boundary, and repository fix history form a complete static trace with no material reachability gap."
+      },
+      "extensions": {
+        "candidateId": "candidate-ca51cfb4ceda98d6",
+        "discoveryCandidateId": "routes-search-q-type-confusion"
+      },
+      "findingId": "csf_1a235d703bb5fcd7dd148a33",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:da57fdf6b1262ba2728943ac84e9d88ebbfa027f0f9a59ffe8c607f2c67cd755"
+      },
+      "identity": {
+        "anchor": "routes/search.ts/searchproducts/q-type-guard",
+        "instance": "get-rest-products-search/q"
+      },
+      "locations": [
+        {
+          "endLine": 602,
+          "path": "server.ts",
+          "role": "entrypoint/wrapper",
+          "startLine": 602
+        },
+        {
+          "endLine": 21,
+          "path": "routes/search.ts",
+          "role": "root_control",
+          "startLine": 21
+        },
+        {
+          "endLine": 22,
+          "path": "routes/search.ts",
+          "role": "sink",
+          "startLine": 22
+        },
+        {
+          "endLine": 230,
+          "path": "lib/utils.ts",
+          "role": "evidence",
+          "startLine": 229
+        }
+      ],
+      "occurrenceId": "occ_b266a2e6a9d6b484992f7707",
+      "preventiveControls": [
+        "Avoid `any` for Express query values and narrow `string | ParsedQs | string[] | ParsedQs[] | undefined` at route boundaries.",
+        "Use a shared schema validator for public query parameters before business logic.",
+        "Keep static-analysis checks for type confusion through parameter tampering enabled."
+      ],
+      "provenance": {
+        "source": "local_plugin",
+        "worker": "preflight_updated"
+      },
+      "remediation": "Restore runtime narrowing before all string operations: read `req.query.q` into a temporary value, accept it only when `typeof value === 'string'` and it is not the sentinel `'undefined'`, and otherwise use an empty string. Keep the intentional SQL-injection challenge behavior unchanged.",
+      "remediationTests": [
+        "Add a focused API regression test asserting object-shaped `q` does not return an internal error.",
+        "Add a duplicate-key `q` regression test proving the 200-character bound is applied to a string value rather than array element count.",
+        "Retain existing challenge tests to confirm the intentional SQL-injection behavior remains available."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "public-search-route",
+          "missing-q-type-guard",
+          "string-only-processing",
+          "request-error-boundary"
+        ],
+        "summary": "The violated invariant is that `q` must be a string before string-length enforcement and substring truncation. The public route forwards parsed query values to `searchProducts()`, the target removes the base revision's `typeof` guard, and the next line assumes string behavior on an `any` value."
+      },
+      "ruleId": "type-confusion.query-parameter",
+      "severity": {
+        "changeConditions": "Severity would increase if runtime evidence showed that repeated malformed queries terminate the process, cause material shared-service resource exhaustion, or create cross-user impact. It would decrease to informational or be suppressed if deployment evidence proved the route unreachable to untrusted users or an equivalent pre-handler type guard rejected structured query values.",
+        "level": "low",
+        "rationale": "The route is public and exploitation requires only a crafted query, making likelihood high. The proven impact is limited to repeatable request-level failures and bypass of a processing bound because the wrapper forwards exceptions to error middleware; no process-wide crash, cross-user data impact, or material shared-service exhaustion was established. Low impact with high likelihood yields low severity."
+      },
+      "summary": "The target removes runtime string narrowing for the anonymous `q` parameter in `searchProducts()`. Express query values can be arrays or objects, so a crafted value reaches `.length` and `.substring()` as `any`: object-shaped values deterministically fail the request, while duplicate-key arrays use element count rather than character count and bypass the intended 200-character bound. The raw SQL interpolation is unchanged between the refs and is not part of this diff finding.",
+      "taxonomy": {
+        "category": "Query parameter type confusion / improper input validation",
+        "cwe": [
+          "CWE-20",
+          "CWE-400",
+          "CWE-843"
+        ]
+      },
+      "title": "Search query type confusion bypasses input bounds and triggers request failures",
+      "validation": {
+        "assertions": [
+          "Anonymous input controls `req.query.q`.",
+          "The base `typeof` string guard is absent in the target.",
+          "Structured values reach `.length` and `.substring()`.",
+          "Error forwarding limits demonstrated impact but does not prevent the crafted request failure or bound bypass."
+        ],
+        "confidence": "high",
+        "disposition": "reportable",
+        "evidenceRefs": [
+          "public-search-route",
+          "missing-q-type-guard",
+          "string-only-processing",
+          "request-error-boundary"
+        ],
+        "limitations": [
+          "No dynamic reproduction was permitted, so process-wide or material cross-user availability impact remains unproven."
+        ],
+        "method": "Static immutable-revision source/control/sink trace; application execution and tests were prohibited.",
+        "summary": "The exact diff proves that the base string guard is removed. Source review confirms the public route, immediate string-only operations, and request-level error boundary."
+      }
+    }
+  ],
+  "scanId": "1077317d-2494-4a9f-a1f4-f61d1ce55dc7",
+  "schemaVersion": "1.0"
+}

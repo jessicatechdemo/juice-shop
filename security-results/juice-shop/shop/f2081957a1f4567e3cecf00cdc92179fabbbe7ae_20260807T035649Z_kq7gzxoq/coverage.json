@@ -1,0 +1,57 @@
+{
+  "completeness": "complete",
+  "deferred": [],
+  "documentType": "codex-security.coverage",
+  "excludePaths": [],
+  "explicitExclusions": [
+    {
+      "pattern": "AGENTS.md",
+      "reason": "Documentation-only change with no executable security behavior."
+    },
+    {
+      "pattern": "unchanged code outside the selected diff",
+      "reason": "This is a diff scan; unchanged repository vulnerabilities, including the intentional SQL interpolation in routes/search.ts, were not attributed to the target change."
+    }
+  ],
+  "includePaths": [
+    "."
+  ],
+  "inventoryStrategy": "diff",
+  "mode": "branch_diff",
+  "openQuestions": [],
+  "scanId": "1077317d-2494-4a9f-a1f4-f61d1ce55dc7",
+  "schemaVersion": "1.0",
+  "surfaces": [
+    {
+      "disposition": "reported",
+      "id": "surface_product-search-query-handling",
+      "label": "Product search query handling",
+      "notes": "Reviewed the complete target file and exact diff. The removed string guard produced one low-severity finding; unchanged intentional SQL injection was excluded from diff attribution.",
+      "receiptRefs": [
+        "artifacts/02_discovery/work_ledger.jsonl",
+        "artifacts/05_findings/candidate-ca51cfb4ceda98d6/candidate_ledger.jsonl"
+      ],
+      "riskArea": "Public input validation and runtime availability"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "surface_primary-ci-workflow-changes",
+      "label": "Primary CI workflow changes",
+      "notes": "The added RSN job uses pinned actions and introduces no new privileged or pull-request-secret execution path.",
+      "receiptRefs": [
+        "artifacts/02_discovery/work_ledger.jsonl"
+      ],
+      "riskArea": "CI supply chain and untrusted code execution"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "surface_scheduled-codeql-and-codex-security-workflow",
+      "label": "Scheduled CodeQL and Codex Security workflow",
+      "notes": "Reviewed all 511 lines. The workflow resolves and checks out an exact master revision, limits job permissions, disables persisted checkout credentials, and is not triggered by untrusted pull requests. No actionable compromise path was established.",
+      "receiptRefs": [
+        "artifacts/02_discovery/work_ledger.jsonl"
+      ],
+      "riskArea": "Scheduled privileged automation, secrets, artifact integrity, and supply chain"
+    }
+  ]
+}
